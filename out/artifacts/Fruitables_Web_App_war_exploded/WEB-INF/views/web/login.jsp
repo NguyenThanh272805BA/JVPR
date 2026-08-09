@@ -62,6 +62,16 @@
                 <p class="font-body-md text-body-md text-on-surface-variant">Đăng nhập để tiếp tục</p>
             </div>
 
+            <!-- KHỐI HIỂN THỊ THÔNG BÁO ĐĂNG KÝ THÀNH CÔNG TỪ SESSION -->
+            <c:if test="${not empty sessionScope.successMsg}">
+                <div class="bg-secondary-container text-on-secondary-container p-3 rounded-md mb-6 font-body-md flex items-center shadow-sm">
+                    <span class="material-symbols-outlined mr-2">check_circle</span>
+                    <c:out value="${sessionScope.successMsg}"/>
+                </div>
+                <!-- Xóa session báo thành công đi để F5 trang không hiện lại nữa -->
+                <c:remove var="successMsg" scope="session" />
+            </c:if>
+
             <!-- KHỐI HIỂN THỊ THÔNG BÁO LỖI TỪ SERVLET (JSTL) -->
             <c:if test="${not empty message}">
                 <div class="bg-error-container text-error p-3 rounded-md mb-6 font-body-md flex items-center shadow-sm">
@@ -74,7 +84,6 @@
             <form action="${pageContext.request.contextPath}/login" method="POST" class="space-y-6">
                 <div>
                     <label class="block font-label-bold text-label-bold text-on-surface mb-1" for="email">Email</label>
-                    <!-- Thêm thuộc tính name="email" -->
                     <input class="w-full rounded-md border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-primary-container focus:ring-1 transition-colors px-4 py-3"
                            id="email" name="email" placeholder="nhap@email.com" type="email" required />
                 </div>
@@ -84,7 +93,6 @@
                         <a class="font-body-md text-body-md text-primary hover:underline text-sm" href="${pageContext.request.contextPath}/forgot-password">Quên mật khẩu?</a>
                     </div>
                     <div class="relative">
-                        <!-- Thêm thuộc tính name="password" -->
                         <input class="w-full rounded-md border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-primary-container focus:ring-1 transition-colors px-4 py-3"
                                id="password" name="password" placeholder="••••••••" type="password" required />
                         <button id="togglePassword" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" type="button">
@@ -138,7 +146,6 @@
             <a class="font-display-lg text-display-lg font-extrabold text-primary mb-4 block" href="/">Fruitables</a>
             <p class="font-body-md text-body-md text-on-surface-variant">© 2024 Fruitables. All rights reserved.</p>
         </div>
-        <!-- Chú ý: Đã lược bớt các mục Footer trống để code gọn gàng, bạn có thể thêm lại y hệt HTML cũ -->
     </div>
 </footer>
 

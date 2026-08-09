@@ -173,7 +173,7 @@
 <!-- FOOTER (Tái sử dụng từ home.jsp) -->
 <footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center text-on-surface-variant font-body-md">
-        <p>© 2026 Fruitables.</p>
+        <p>© 2024 Fruitables. Thiết kế phục vụ Đồ án Java Servlet.</p>
     </div>
 </footer>
 </body>
