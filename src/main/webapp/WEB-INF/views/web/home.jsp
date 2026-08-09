@@ -35,8 +35,12 @@
         <div class="flex items-center space-x-4">
             <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative">
                 <span class="material-symbols-outlined">shopping_cart</span>
-                <!-- Hiển thị số lượng giỏ hàng (Giả lập) -->
-                <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+                <!-- Hiển thị số lượng giỏ hàng LINH ĐỘNG từ Session -->
+                <c:if test="${not empty sessionScope.CART_TOTAL_ITEMS && sessionScope.CART_TOTAL_ITEMS > 0}">
+                    <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        <c:out value="${sessionScope.CART_TOTAL_ITEMS}"/>
+                    </span>
+                </c:if>
             </a>
 
             <c:choose>
@@ -66,6 +70,16 @@
         </div>
     </div>
 </nav>
+
+<!-- THÔNG BÁO ĐẶT HÀNG THÀNH CÔNG TỪ CHECKOUT -->
+<c:if test="${not empty sessionScope.orderSuccess}">
+    <div class="bg-primary-container text-white text-center py-3 px-4 font-label-bold shadow-md relative flex justify-center items-center">
+        <span class="material-symbols-outlined align-middle mr-2">check_circle</span>
+        <c:out value="${sessionScope.orderSuccess}"/>
+        <!-- Xóa thông báo khỏi session sau khi hiển thị để F5 không bị hiện lại -->
+        <c:remove var="orderSuccess" scope="session"/>
+    </div>
+</c:if>
 
 <!-- HERO SECTION -->
 <section class="relative w-full bg-surface-container h-[500px] flex items-center overflow-hidden">
@@ -168,13 +182,18 @@
                         </div>
 
                         <div class="mt-auto flex items-center justify-between">
-                                <span class="font-price-tag text-price-tag text-primary">
-                                    <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
-                                </span>
-                            <!-- Nút Thêm vào giỏ hàng -->
-                            <button class="w-10 h-10 rounded-full border border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center transition-colors">
-                                <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
-                            </button>
+                            <span class="font-price-tag text-price-tag text-primary">
+                                <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                            </span>
+
+                            <!-- FORM THÊM VÀO GIỎ HÀNG -->
+                            <form action="${pageContext.request.contextPath}/cart" method="POST">
+                                <input type="hidden" name="action" value="add">
+                                <input type="hidden" name="productId" value="${item.id}">
+                                <button type="submit" class="w-10 h-10 rounded-full border border-primary text-primary hover:bg-primary hover:text-white flex items-center justify-center transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
