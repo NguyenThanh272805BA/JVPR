@@ -46,17 +46,16 @@
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
                     <!-- Đã đăng nhập -->
-                    <div class="group relative cursor-pointer">
+                    <div class="group relative cursor-pointer py-2">
                         <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
                             <span class="font-label-bold text-label-bold hidden md:block"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
                         </div>
-                        <!-- Dropdown -->
-                        <div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant">
+                        <div class="absolute right-0 top-full w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant z-50 overflow-hidden">
                             <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-2 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
+                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
                             </c:if>
-                            <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-2 text-error hover:bg-error-container transition-colors">Đăng xuất</a>
+                            <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
                         </div>
                     </div>
                 </c:when>

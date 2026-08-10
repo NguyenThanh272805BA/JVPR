@@ -1,6 +1,9 @@
 package vn.edu.eaut.fruitables.controller.web;
 
 import vn.edu.eaut.fruitables.model.dto.CartItemDTO;
+import vn.edu.eaut.fruitables.model.entity.ProductModel;
+import vn.edu.eaut.fruitables.service.IProductService;
+import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,9 +18,16 @@ import java.util.Map;
 @WebServlet(urlPatterns = {"/cart"})
 public class CartServlet extends HttpServlet {
 
+    // Khai báo Service để lấy dữ liệu sản phẩm từ CSDL
+    private IProductService productService;
+
+    public CartServlet() {
+        this.productService = new ProductServiceImpl();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Chỉ đơn giản là chuyển hướng đến trang giao diện giỏ hàng
+        // Chuyển hướng đến trang giao diện giỏ hàng
         request.getRequestDispatcher("/WEB-INF/views/web/cart.jsp").forward(request, response);
     }
 
@@ -27,6 +37,7 @@ public class CartServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Lấy giỏ hàng từ Session. Nếu chưa có thì tạo mới một HashMap
+        @SuppressWarnings("unchecked")
         Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
         if (cart == null) {
             cart = new HashMap<>();
@@ -36,18 +47,24 @@ public class CartServlet extends HttpServlet {
             Long productId = Long.parseLong(request.getParameter("productId"));
 
             if ("add".equals(action)) {
-                // TÌM SẢN PHẨM: Đáng lẽ gọi DAO (productDAO.findById), nhưng tạm dùng Mock Data
-                CartItemDTO item = getMockProductById(productId);
+                // SỬ DỤNG DỮ LIỆU THẬT: Truy vấn sản phẩm từ DB
+                ProductModel product = productService.findById(productId);
 
-                if (item != null) {
+                if (product != null) {
                     if (cart.containsKey(productId)) {
                         // Đã có trong giỏ -> Tăng số lượng
                         CartItemDTO existingItem = cart.get(productId);
                         existingItem.setQuantity(existingItem.getQuantity() + 1);
                     } else {
-                        // Chưa có -> Thêm mới với số lượng = 1
-                        item.setQuantity(1);
-                        cart.put(productId, item);
+                        // Chưa có -> Tạo Item mới dựa trên dữ liệu thật từ DB
+                        CartItemDTO newItem = new CartItemDTO(
+                                product.getId(),
+                                product.getName(),
+                                product.getImageUrl(),
+                                product.getPrice(),
+                                1 // Số lượng mặc định ban đầu là 1
+                        );
+                        cart.put(productId, newItem);
                     }
                 }
             } else if ("update".equals(action)) {
@@ -78,14 +95,5 @@ public class CartServlet extends HttpServlet {
 
         // Sau khi xử lý POST, dùng sendRedirect để tránh lỗi "Submit lại form" khi F5
         response.sendRedirect(request.getContextPath() + "/cart");
-    }
-
-    // HÀM MOCK DATA TẠM THỜI (Sau này sẽ xóa và thay bằng ProductDAO)
-    private CartItemDTO getMockProductById(Long id) {
-        if (id == 1L) return new CartItemDTO(1L, "Táo Gala Hữu Cơ", "https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?w=500&auto=format&fit=crop", 115000.0, 0);
-        if (id == 2L) return new CartItemDTO(2L, "Rau Bina Hữu Cơ", "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=500&auto=format&fit=crop", 25000.0, 0);
-        if (id == 3L) return new CartItemDTO(3L, "Chanh Vàng Sạch", "https://images.unsplash.com/photo-1590502593747-422e15779c16?w=500&auto=format&fit=crop", 18000.0, 0);
-        if (id == 4L) return new CartItemDTO(4L, "Cà chua Cherry", "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&auto=format&fit=crop", 105000.0, 0);
-        return null;
     }
 }
