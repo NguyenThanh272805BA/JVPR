@@ -162,6 +162,31 @@
                     </div>
 
                 </div>
+                <!-- BỘ KHUNG NHẬP VOUCHER -->
+                <div class="mt-6 pt-6 border-t border-surface-variant">
+                    <label class="block font-label-bold text-on-surface mb-2">Mã giảm giá / Voucher</label>
+
+                    <c:choose>
+                        <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP: Bắt buộc đăng nhập để dùng voucher --%>
+                        <c:when test="${empty sessionScope.USERMODEL}">
+                            <div class="p-3 bg-surface-container rounded-lg text-sm text-on-surface-variant flex items-center justify-between">
+                                <span>Đăng nhập để sử dụng Voucher độc quyền cho thành viên!</span>
+                                <a href="${pageContext.request.contextPath}/login" class="text-primary font-label-bold hover:underline whitespace-nowrap ml-2">Đăng nhập</a>
+                            </div>
+                        </c:when>
+
+                        <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP: Cho phép nhập mã voucher --%>
+                        <c:otherwise>
+                            <form action="${pageContext.request.contextPath}/apply-coupon" method="POST" class="flex gap-2">
+                                <input type="text" name="couponCode" placeholder="Nhập mã (VD: FRUIT50K)"
+                                       class="flex-1 px-3 py-2 rounded-md border border-outline-variant outline-none focus:border-primary text-sm bg-surface-container-lowest">
+                                <button type="submit" class="px-4 py-2 bg-primary text-white font-label-bold rounded-md hover:bg-primary-container transition-colors text-sm">
+                                    Áp dụng
+                                </button>
+                            </form>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </c:otherwise>
         </c:choose>
 

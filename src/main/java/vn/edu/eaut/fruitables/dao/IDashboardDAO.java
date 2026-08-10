@@ -1,4 +1,8 @@
 package vn.edu.eaut.fruitables.dao;
 
-public class IDashboardDAO {
+public interface IDashboardDAO {
+    double getTotalRevenue();
+    int getTotalOrders();
+    int getTotalProducts();
+    int getOutOfStockProducts();
 }

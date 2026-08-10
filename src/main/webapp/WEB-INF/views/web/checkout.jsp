@@ -15,7 +15,7 @@
 
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- NAVBAR (Đã tinh gọn) -->
+<!-- NAVBAR -->
 <nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
     <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
         <a class="font-display-lg-mobile font-extrabold text-primary" href="${pageContext.request.contextPath}/home">Fruitables</a>
@@ -31,6 +31,24 @@
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
         <h1 class="font-headline-md text-3xl text-on-surface mb-8 font-bold">Chi tiết thanh toán</h1>
 
+        <!-- BANNER KHUYẾN KHÍCH ĐĂNG NHẬP DÀNH CHO KHÁCH VÃNG LAI -->
+        <c:if test="${empty sessionScope.USERMODEL}">
+            <div class="mb-8 bg-inverse-primary/20 border border-primary-container p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white flex-shrink-0">
+                        <span class="material-symbols-outlined">redeem</span>
+                    </div>
+                    <div>
+                        <h4 class="font-label-bold text-on-surface text-lg">Bạn có mã giảm giá hoặc điểm tích lũy?</h4>
+                        <p class="font-body-md text-on-surface-variant text-sm">Đăng nhập ngay để sử dụng ưu đãi và theo dõi đơn hàng dễ dàng hơn.</p>
+                    </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/login" class="whitespace-nowrap px-6 py-2 bg-primary text-white font-label-bold rounded-full hover:bg-primary-container transition-colors shadow-md">
+                    Đăng nhập ngay
+                </a>
+            </div>
+        </c:if>
+
         <form action="${pageContext.request.contextPath}/checkout" method="POST" class="flex flex-col lg:flex-row gap-8">
 
             <!-- CỘT TRÁI: Form điền thông tin -->
@@ -41,26 +59,36 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label class="block font-label-bold text-on-surface mb-2">Họ và tên *</label>
-                            <input type="text" name="fullName" required value="${sessionScope.USERMODEL.fullName}"
+                            <input type="text" name="fullName" required value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.fullName : ''}"
                                    class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
                         </div>
                         <div>
                             <label class="block font-label-bold text-on-surface mb-2">Số điện thoại *</label>
-                            <input type="tel" name="phone" required value="${sessionScope.USERMODEL.phone}"
+                            <input type="tel" name="phone" required value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.phone : ''}"
                                    class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
                         </div>
                     </div>
 
                     <div class="mb-6">
                         <label class="block font-label-bold text-on-surface mb-2">Địa chỉ Email</label>
-                        <input type="email" readonly value="${sessionScope.USERMODEL.email}"
-                               class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed">
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.USERMODEL}">
+                                <!-- Đã đăng nhập -> Khóa ô Email -->
+                                <input type="email" name="email" readonly value="${sessionScope.USERMODEL.email}"
+                                       class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed">
+                            </c:when>
+                            <c:otherwise>
+                                <!-- Khách vãng lai -> Cho phép nhập Email -->
+                                <input type="email" name="email" placeholder="Nhập địa chỉ email của bạn..."
+                                       class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
 
                     <div class="mb-6">
                         <label class="block font-label-bold text-on-surface mb-2">Địa chỉ nhận hàng (Chi tiết) *</label>
                         <textarea name="address" required rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
-                                  class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">${sessionScope.USERMODEL.address}</textarea>
+                                  class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.address : ''}</textarea>
                     </div>
                 </div>
 
@@ -149,8 +177,32 @@
                     </button>
                 </div>
             </div>
-
         </form>
+    </div>
+    <!-- BỘ KHUNG NHẬP VOUCHER -->
+    <div class="mt-6 pt-6 border-t border-surface-variant">
+        <label class="block font-label-bold text-on-surface mb-2">Mã giảm giá / Voucher</label>
+
+        <c:choose>
+            <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP: Bắt buộc đăng nhập để dùng voucher --%>
+            <c:when test="${empty sessionScope.USERMODEL}">
+                <div class="p-3 bg-surface-container rounded-lg text-sm text-on-surface-variant flex items-center justify-between">
+                    <span>Đăng nhập để sử dụng Voucher độc quyền cho thành viên!</span>
+                    <a href="${pageContext.request.contextPath}/login" class="text-primary font-label-bold hover:underline whitespace-nowrap ml-2">Đăng nhập</a>
+                </div>
+            </c:when>
+
+            <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP: Cho phép nhập mã voucher --%>
+            <c:otherwise>
+                <form action="${pageContext.request.contextPath}/apply-coupon" method="POST" class="flex gap-2">
+                    <input type="text" name="couponCode" placeholder="Nhập mã (VD: FRUIT50K)"
+                           class="flex-1 px-3 py-2 rounded-md border border-outline-variant outline-none focus:border-primary text-sm bg-surface-container-lowest">
+                    <button type="submit" class="px-4 py-2 bg-primary text-white font-label-bold rounded-md hover:bg-primary-container transition-colors text-sm">
+                        Áp dụng
+                    </button>
+                </form>
+            </c:otherwise>
+        </c:choose>
     </div>
 </main>
 </body>

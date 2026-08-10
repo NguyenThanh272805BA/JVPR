@@ -1,5 +1,8 @@
 package vn.edu.eaut.fruitables.controller.admin;
 
+import vn.edu.eaut.fruitables.dao.IDashboardDAO;
+import vn.edu.eaut.fruitables.dao.impl.DashboardDAOImpl;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,13 +13,25 @@ import java.io.IOException;
 @WebServlet(urlPatterns = {"/admin/dashboard"})
 public class AdminDashboardServlet extends HttpServlet {
 
+    private IDashboardDAO dashboardDAO;
+
+    public AdminDashboardServlet() {
+        this.dashboardDAO = new DashboardDAOImpl();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Tạm thời truyền các chỉ số bằng 0 hoặc rỗng theo yêu cầu để render UI
-        request.setAttribute("totalRevenue", 0);
-        request.setAttribute("totalOrders", 0);
-        request.setAttribute("totalProducts", 0);
-        request.setAttribute("outOfStock", 0);
+        // Truy xuất các chỉ số thực tế từ DB
+        double totalRevenue = dashboardDAO.getTotalRevenue();
+        int totalOrders = dashboardDAO.getTotalOrders();
+        int totalProducts = dashboardDAO.getTotalProducts();
+        int outOfStock = dashboardDAO.getOutOfStockProducts();
+
+        // Truyền dữ liệu sang JSP
+        request.setAttribute("totalRevenue", totalRevenue);
+        request.setAttribute("totalOrders", totalOrders);
+        request.setAttribute("totalProducts", totalProducts);
+        request.setAttribute("outOfStock", outOfStock);
 
         // Chuyển hướng tới giao diện JSP
         request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);
