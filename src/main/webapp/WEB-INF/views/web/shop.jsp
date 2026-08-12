@@ -15,7 +15,7 @@
 
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- NAVBAR (Tái sử dụng code Navbar từ home.jsp) -->
+<!-- NAVBAR -->
 <nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
     <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
         <a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg font-extrabold text-primary" href="${pageContext.request.contextPath}/home">
@@ -29,7 +29,9 @@
         <div class="flex items-center space-x-4">
             <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative">
                 <span class="material-symbols-outlined">shopping_cart</span>
-                <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+                <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    ${not empty sessionScope.CART_TOTAL_ITEMS ? sessionScope.CART_TOTAL_ITEMS : 0}
+                </span>
             </a>
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
@@ -67,21 +69,27 @@
 <main class="flex-grow py-12">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col md:flex-row gap-8">
 
-        <!-- SIDEBAR: LỌC & TÌM KIẾM -->
+        <!-- SIDEBAR -->
         <aside class="w-full md:w-1/4 flex flex-col gap-6">
-            <!-- Search Bar -->
+            <!-- Tích hợp AJAX Live Search -->
             <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
                 <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Tìm kiếm</h3>
-                <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
-                    <input type="text" name="keyword" value="${keyword}" placeholder="Nhập tên sản phẩm..."
-                           class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface">
-                    <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-primary">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                </form>
+                <div class="relative">
+                    <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
+                        <input type="text" id="liveSearchInput" name="keyword" value="${keyword}" placeholder="Nhập tên sản phẩm..."
+                               class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface" autocomplete="off">
+                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-primary">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
+                    </form>
+
+                    <!-- Khung chứa kết quả AJAX -->
+                    <ul id="searchDropdown" class="absolute z-50 w-full bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg hidden mt-1 max-h-80 overflow-y-auto divide-y divide-surface-variant">
+                    </ul>
+                </div>
             </div>
 
-            <!-- Categories -->
+            <!-- Danh mục -->
             <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
                 <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Danh mục</h3>
                 <ul class="space-y-3 font-body-md text-on-surface-variant">
@@ -137,10 +145,10 @@
                         <div class="p-5 flex flex-col flex-grow">
                             <h3 class="font-label-bold text-lg text-on-surface mb-2"><c:out value="${item.name}"/></h3>
                             <div class="mt-auto flex items-center justify-between">
-                                    <span class="font-price-tag text-price-tag text-primary">
-                                        <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
-                                    </span>
-                                <!-- Nút Thêm Giỏ Hàng sẽ trỏ về CartServlet sau này -->
+                                <span class="font-price-tag text-price-tag text-primary">
+                                    <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                </span>
+                                <!-- Nút Thêm Giỏ Hàng -->
                                 <form action="${pageContext.request.contextPath}/cart" method="POST">
                                     <input type="hidden" name="action" value="add">
                                     <input type="hidden" name="productId" value="${item.id}">
@@ -170,11 +178,165 @@
     </div>
 </main>
 
-<!-- FOOTER (Tái sử dụng từ home.jsp) -->
+<!-- FOOTER -->
 <footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center text-on-surface-variant font-body-md">
         <p>© 2026 Fruitables.</p>
     </div>
 </footer>
+
+<!-- SCRIPT: Xử lý gọi AJAX Fetch API cho tính năng Live Search -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('liveSearchInput');
+        const searchDropdown = document.getElementById('searchDropdown');
+        let timeoutId;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            const keyword = this.value.trim();
+
+            if (keyword.length < 2) {
+                searchDropdown.classList.add('hidden');
+                return;
+            }
+
+            // Debounce: Đợi 300ms sau khi ngừng gõ mới gọi API
+            timeoutId = setTimeout(() => {
+                fetch(`${pageContext.request.contextPath}/api/search-products?keyword=` + encodeURIComponent(keyword))
+                    .then(response => response.json())
+                    .then(data => {
+                        searchDropdown.innerHTML = '';
+
+                        if (data.length > 0) {
+                            data.forEach(product => {
+                                const priceStr = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price);
+
+                                const li = document.createElement('li');
+                                li.className = 'px-4 py-3 hover:bg-surface-container cursor-pointer flex items-center gap-3 transition-colors';
+                                li.innerHTML = `
+                                    <img src="` + product.imageUrl + `" class="w-12 h-12 object-cover rounded-md border border-outline-variant">
+                                    <div class="flex-1 overflow-hidden">
+                                        <div class="font-label-bold text-sm text-on-surface truncate">` + product.name + `</div>
+                                        <div class="text-primary text-xs font-bold mt-1">` + priceStr + `</div>
+                                    </div>
+                                `;
+                                li.addEventListener('click', () => {
+                                    window.location.href = `${pageContext.request.contextPath}/shop?keyword=` + encodeURIComponent(product.name);
+                                });
+                                searchDropdown.appendChild(li);
+                            });
+                            searchDropdown.classList.remove('hidden');
+                        } else {
+                            searchDropdown.innerHTML = '<li class="px-4 py-4 text-sm text-on-surface-variant text-center">Không tìm thấy sản phẩm phù hợp.</li>';
+                            searchDropdown.classList.remove('hidden');
+                        }
+                    })
+                    .catch(err => console.error('Lỗi khi tải kết quả tìm kiếm:', err));
+            }, 300);
+        });
+
+        // Ẩn dropdown khi click ra ngoài
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.add('hidden');
+            }
+        });
+    });
+</script>
+<!-- JAVASCRIPT AJAX ADD TO CART & TOAST NOTIFICATION -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tìm tất cả các form gửi đến /cart
+        const addCartForms = document.querySelectorAll('form[action$="/cart"]');
+
+        addCartForms.forEach(form => {
+            // Chỉ bắt sự kiện với những form có input action = add
+            const actionInput = form.querySelector('input[name="action"][value="add"]');
+
+            if (actionInput) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                    const formData = new FormData(this);
+                    const data = new URLSearchParams(formData);
+
+                    // Gửi request ngầm (Fetch API)
+                    fetch(`${pageContext.request.contextPath}/api/add-to-cart`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: data.toString()
+                    })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                updateCartBadge(res.totalItems);
+                                showToast(res.message, 'success');
+                            } else {
+                                showToast(res.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Lỗi API:', err);
+                            showToast('Có lỗi xảy ra, vui lòng thử lại.', 'error');
+                        });
+                });
+            }
+        });
+
+        // Hàm 1: Cập nhật con số trên Navbar (Badge)
+        function updateCartBadge(total) {
+            // Tìm nút giỏ hàng trên Navbar
+            const cartLink = document.querySelector('a[href$="/cart"]');
+            if (cartLink) {
+                let badge = cartLink.querySelector('span.bg-error');
+
+                // Nếu chưa có badge (giỏ hàng đang 0), thì tạo mới HTML
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center';
+                    cartLink.appendChild(badge);
+                }
+                badge.textContent = total;
+            }
+        }
+
+        // Hàm 2: Hiển thị thông báo Toast góc dưới màn hình
+        function showToast(message, type) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            // Cấu hình màu nền dựa trên trạng thái
+            const bgColor = type === 'success' ? 'bg-primary' : 'bg-error';
+            const icon = type === 'success' ? 'check_circle' : 'error';
+
+            toast.className = `px-6 py-3 rounded-lg shadow-lg text-white font-label-bold transition-all duration-300 transform translate-y-10 opacity-0 flex items-center gap-2 ` + bgColor;
+            toast.innerHTML = `<span class="material-symbols-outlined">` + icon + `</span> ` + message;
+
+            container.appendChild(toast);
+
+            // Kích hoạt Animation hiện lên
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Tự động tắt sau 3 giây
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300); // Xóa element sau khi fade out
+            }, 3000);
+        }
+    });
+</script>
 </body>
 </html>

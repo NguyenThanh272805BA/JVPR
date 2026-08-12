@@ -129,11 +129,11 @@
                 </div>
             </div>
 
-            <!-- Chart Section -->
-            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] h-96 flex flex-col">
-                <h2 class="font-label-bold text-label-bold text-on-surface mb-4">Revenue Overview</h2>
-                <div class="flex-1 border-2 border-dashed border-surface-variant rounded-lg flex items-center justify-center bg-surface-container/30">
-                    <span class="text-outline font-body-md text-body-md">Chart.js Canvas Placeholder here</span>
+            <!-- Chart Section (ĐÃ TÍCH HỢP CHART.JS) -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col mb-8">
+                <h2 class="font-label-bold text-label-bold text-on-surface mb-4">Tổng quan doanh thu 6 tháng qua</h2>
+                <div class="relative h-[400px] w-full">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
 
@@ -180,5 +180,55 @@
         </div>
     </main>
 </div>
+
+<!-- Chèn thư viện Chart.js qua CDN và Logic khởi tạo biểu đồ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gọi API lấy data JSON
+        fetch('${pageContext.request.contextPath}/api/chart-data')
+            .then(response => response.json())
+            .then(chartData => {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line', // Biểu đồ dạng đường
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: chartData.data,
+                            borderColor: '#81c408', // Màu primary của Fruitables
+                            backgroundColor: 'rgba(129, 196, 8, 0.2)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#81c408',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            fill: true,
+                            tension: 0.4 // Làm cong đường nét
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(err => console.error('Lỗi khi vẽ biểu đồ:', err));
+    });
+</script>
 </body>
 </html>

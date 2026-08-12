@@ -233,5 +233,99 @@
         </div>
     </div>
 </footer>
+<!-- JAVASCRIPT AJAX ADD TO CART & TOAST NOTIFICATION -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tìm tất cả các form gửi đến /cart
+        const addCartForms = document.querySelectorAll('form[action$="/cart"]');
+
+        addCartForms.forEach(form => {
+            // Chỉ bắt sự kiện với những form có input action = add
+            const actionInput = form.querySelector('input[name="action"][value="add"]');
+
+            if (actionInput) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn hành vi load lại trang mặc định
+
+                    const formData = new FormData(this);
+                    const data = new URLSearchParams(formData);
+
+                    // Gửi request ngầm (Fetch API)
+                    fetch(`${pageContext.request.contextPath}/api/add-to-cart`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: data.toString()
+                    })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                updateCartBadge(res.totalItems);
+                                showToast(res.message, 'success');
+                            } else {
+                                showToast(res.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Lỗi API:', err);
+                            showToast('Có lỗi xảy ra, vui lòng thử lại.', 'error');
+                        });
+                });
+            }
+        });
+
+        // Hàm 1: Cập nhật con số trên Navbar (Badge)
+        function updateCartBadge(total) {
+            // Tìm nút giỏ hàng trên Navbar
+            const cartLink = document.querySelector('a[href$="/cart"]');
+            if (cartLink) {
+                let badge = cartLink.querySelector('span.bg-error');
+
+                // Nếu chưa có badge (giỏ hàng đang 0), thì tạo mới HTML
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center';
+                    cartLink.appendChild(badge);
+                }
+                badge.textContent = total;
+            }
+        }
+
+        // Hàm 2: Hiển thị thông báo Toast góc dưới màn hình
+        function showToast(message, type) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            // Cấu hình màu nền dựa trên trạng thái
+            const bgColor = type === 'success' ? 'bg-primary' : 'bg-error';
+            const icon = type === 'success' ? 'check_circle' : 'error';
+
+            toast.className = `px-6 py-3 rounded-lg shadow-lg text-white font-label-bold transition-all duration-300 transform translate-y-10 opacity-0 flex items-center gap-2 ` + bgColor;
+            toast.innerHTML = `<span class="material-symbols-outlined">` + icon + `</span> ` + message;
+
+            container.appendChild(toast);
+
+            // Kích hoạt Animation hiện lên
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Tự động tắt sau 3 giây
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300); // Xóa element sau khi fade out
+            }, 3000);
+        }
+    });
+</script>
 </body>
 </html>

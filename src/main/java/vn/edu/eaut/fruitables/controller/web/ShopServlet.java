@@ -25,27 +25,24 @@ public class ShopServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // Nhận tham số tìm kiếm hoặc lọc từ URL (Nếu có)
+        // 1. Nhận các tham số tìm kiếm, lọc và sắp xếp từ URL
         String keyword = request.getParameter("keyword");
-        String category = request.getParameter("category");
+        String categoryParam = request.getParameter("category");
+        String sortOption = request.getParameter("sort");
 
-        List<ProductModel> products;
-
-        // 1. Ưu tiên lấy từ Database (có xử lý lọc)
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            products = productService.searchByName(keyword);
-        } else if (category != null && !category.trim().isEmpty()) {
+        Integer categoryId = null;
+        if (categoryParam != null && !categoryParam.trim().isEmpty()) {
             try {
-                Integer categoryId = Integer.parseInt(category);
-                products = productService.findByCategory(categoryId);
+                categoryId = Integer.parseInt(categoryParam);
             } catch (NumberFormatException e) {
-                products = productService.findAll();
+                categoryId = null;
             }
-        } else {
-            products = productService.findAll();
         }
 
-        // 2. TÍCH HỢP MOCK DATA: Nếu DB trống, tạo danh sách hiển thị tạm thời
+        // 2. Gọi DB thông qua bộ lọc động (Lọc đa chiều)
+        List<ProductModel> products = productService.filterProducts(keyword, categoryId, sortOption);
+
+        // 3. TÍCH HỢP MOCK DATA: Nếu DB trống, tạo danh sách hiển thị tạm thời
         if (products == null || products.isEmpty()) {
             products = new ArrayList<>();
 
@@ -74,9 +71,11 @@ public class ShopServlet extends HttpServlet {
             products.add(p4);
         }
 
-        // Đẩy danh sách sản phẩm và tham số tìm kiếm lại view để giữ giá trị trên ô input
+        // 4. Đẩy dữ liệu ra view để hiển thị và giữ lại trạng thái bộ lọc trên UI
         request.setAttribute("products", products);
-        request.setAttribute("keyword", keyword);
+        request.setAttribute("keyword", keyword != null ? keyword : "");
+        request.setAttribute("selectedCategory", categoryId);
+        request.setAttribute("selectedSort", sortOption);
 
         request.getRequestDispatcher("/WEB-INF/views/web/shop.jsp").forward(request, response);
     }

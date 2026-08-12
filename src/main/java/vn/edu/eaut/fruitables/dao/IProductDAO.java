@@ -9,4 +9,6 @@ public interface IProductDAO extends GenericDAO<ProductModel> {
     List<ProductModel> searchByName(String keyword);
     ProductModel findById(Long id);
     List<ProductModel> findTopProducts(int limit);
+    List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption);
+    Long save(ProductModel product);
 }
