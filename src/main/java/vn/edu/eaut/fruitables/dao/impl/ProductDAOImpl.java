@@ -31,6 +31,19 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
                 product.getStatus());
     }
     @Override
+    public void updateProduct(ProductModel product) {
+        // Nếu có upload ảnh mới thì cập nhật luôn ảnh, không thì giữ nguyên
+        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, stock = ?, image_url = ?, status = ? WHERE id = ?";
+            update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
+                    product.getDescription(), product.getPrice(), product.getStock(), product.getImageUrl(), product.getStatus(), product.getId());
+        } else {
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, stock = ?, status = ? WHERE id = ?";
+            update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
+                    product.getDescription(), product.getPrice(), product.getStock(), product.getStatus(), product.getId());
+        }
+    }
+    @Override
     public List<ProductModel> findByCategory(Integer categoryId) {
         String sql = BASE_SQL + " WHERE p.category_id = ? ORDER BY p.id DESC";
         return query(sql, new ProductMapper(), categoryId);

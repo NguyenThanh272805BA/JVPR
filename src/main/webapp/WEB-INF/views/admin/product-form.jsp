@@ -4,13 +4,12 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8"/>
-    <title>Thêm Sản Phẩm Mới - Fruitables Admin</title>
+    <title>${product != null ? 'Sửa' : 'Thêm'} Sản Phẩm - Fruitables Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 flex h-screen overflow-hidden text-gray-800">
 
-<!-- Cấu trúc Sidebar & Header Admin giản lược cho form -->
 <div class="flex-1 flex flex-col h-full overflow-y-auto">
     <header class="h-20 bg-white border-b border-gray-200 flex items-center px-8">
         <h1 class="text-2xl font-bold text-green-700">Fruitables Workspace</h1>
@@ -19,59 +18,71 @@
 
     <main class="p-8 max-w-4xl mx-auto w-full">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <h2 class="text-xl font-bold mb-6 border-b pb-4">Thêm sản phẩm mới</h2>
+            <h2 class="text-xl font-bold mb-6 border-b pb-4">${product != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}</h2>
 
             <c:if test="${param.message == 'Error'}">
-                <div class="bg-red-100 text-red-600 p-3 rounded mb-4 font-semibold">Lỗi hệ thống khi thêm sản phẩm!</div>
+                <div class="bg-red-100 text-red-600 p-3 rounded mb-4 font-semibold">Lỗi hệ thống khi lưu sản phẩm!</div>
             </c:if>
 
-            <!-- FORM MULTIPART -->
-            <form action="${pageContext.request.contextPath}/admin/products/add" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <!-- Action linh hoạt: Tùy thuộc đang Sửa hay Thêm -->
+            <form action="${pageContext.request.contextPath}/admin/products/${product != null ? 'edit' : 'add'}" method="POST" enctype="multipart/form-data" class="space-y-6">
+
+                <c:if test="${product != null}">
+                    <input type="hidden" name="id" value="${product.id}">
+                </c:if>
 
                 <div class="grid grid-cols-2 gap-6">
                     <div>
                         <label class="block font-semibold mb-2">Tên sản phẩm *</label>
-                        <input type="text" name="name" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
+                        <input type="text" name="name" value="${product != null ? product.name : ''}" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
                     </div>
 
                     <div>
                         <label class="block font-semibold mb-2">Danh mục *</label>
                         <select name="categoryId" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
-                            <option value="1">Trái cây nhập khẩu</option>
-                            <option value="2">Trái cây nội địa</option>
-                            <option value="3">Rau xanh</option>
+                            <option value="1" ${product != null && product.categoryId == 1 ? 'selected' : ''}>Trái cây nhập khẩu</option>
+                            <option value="2" ${product != null && product.categoryId == 2 ? 'selected' : ''}>Trái cây nội địa</option>
+                            <option value="3" ${product != null && product.categoryId == 3 ? 'selected' : ''}>Rau xanh</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block font-semibold mb-2">Giá bán (VNĐ) *</label>
-                        <input type="number" name="price" required min="0" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
+                        <input type="number" name="price" value="${product != null ? product.price : ''}" required min="0" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
                     </div>
 
                     <div>
-                        <label class="block font-semibold mb-2">Tồn kho ban đầu *</label>
-                        <input type="number" name="stock" required min="0" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
+                        <label class="block font-semibold mb-2">Tồn kho *</label>
+                        <input type="number" name="stock" value="${product != null ? product.stock : ''}" required min="0" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-semibold mb-2">Mô tả sản phẩm</label>
-                    <textarea name="description" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500"></textarea>
+                    <textarea name="description" rows="4" class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-green-500">${product != null ? product.description : ''}</textarea>
                 </div>
 
                 <div>
-                    <label class="block font-semibold mb-2">Ảnh sản phẩm *</label>
-                    <input type="file" name="imageFile" accept="image/*" required class="w-full border border-gray-300 px-4 py-2 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                    <label class="block font-semibold mb-2">Ảnh sản phẩm ${product == null ? '*' : '(Bỏ trống nếu giữ nguyên)'}</label>
+                    <!-- Bắt buộc chọn ảnh nếu là Thêm mới (product == null), không bắt buộc nếu là Sửa -->
+                    <input type="file" name="imageFile" accept="image/*" ${product == null ? 'required' : ''} class="w-full border border-gray-300 px-4 py-2 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+
+                    <c:if test="${product != null && product.imageUrl != null}">
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-500 mb-2">Ảnh hiện tại:</p>
+                            <img src="${product.imageUrl}" class="w-32 h-32 object-cover rounded-md border border-gray-200">
+                        </div>
+                    </c:if>
                 </div>
 
                 <div class="flex items-center">
-                    <input type="checkbox" name="status" id="status" checked class="w-5 h-5 text-green-600 rounded">
+                    <input type="checkbox" name="status" id="status" ${product == null || product.status ? 'checked' : ''} class="w-5 h-5 text-green-600 rounded">
                     <label for="status" class="ml-2 font-semibold">Kích hoạt bán ngay lập tức</label>
                 </div>
 
                 <div class="pt-4 border-t border-gray-200 text-right">
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors">
-                        Lưu Sản Phẩm
+                        ${product != null ? 'Cập nhật Sản Phẩm' : 'Lưu Sản Phẩm'}
                     </button>
                 </div>
             </form>

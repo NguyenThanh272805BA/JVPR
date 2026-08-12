@@ -1,19 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: admin
-  Date: 8/8/2026
-  Time: 7:39 AM
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -24,7 +8,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Fruitables - Quản lý Sản phẩm</title>
 
-    <!-- Cấu hình CSS/Tailwind dùng chung -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
@@ -45,11 +28,12 @@
             <span class="material-symbols-outlined">inventory_2</span>
             <span class="font-label-bold text-label-bold">Sản phẩm</span>
         </a>
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+        <!-- Đã fix link danh mục -->
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="${pageContext.request.contextPath}/admin/categories">
             <span class="material-symbols-outlined">category</span>
             <span class="font-label-bold text-label-bold">Danh mục</span>
         </a>
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="${pageContext.request.contextPath}/admin/orders">
             <span class="material-symbols-outlined">shopping_cart</span>
             <span class="font-label-bold text-label-bold">Đơn hàng</span>
         </a>
@@ -86,10 +70,11 @@
         <!-- Page Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="font-headline-md text-headline-md text-on-surface">Quản lý Sản phẩm</h1>
-            <button class="flex items-center gap-2 bg-primary-container hover:bg-primary text-on-primary px-6 py-3 rounded-full font-label-bold text-label-bold transition-all duration-200 shadow-[0_4px_12px_rgba(129,196,8,0.15)] hover:-translate-y-1">
+            <!-- Đã gắn link chuyển hướng sang form Thêm sản phẩm mới -->
+            <a href="${pageContext.request.contextPath}/admin/products/add" class="flex items-center gap-2 bg-primary-container hover:bg-primary text-on-primary px-6 py-3 rounded-full font-label-bold text-label-bold transition-all duration-200 shadow-[0_4px_12px_rgba(129,196,8,0.15)] hover:-translate-y-1">
                 <span class="material-symbols-outlined">add</span>
                 Thêm sản phẩm mới
-            </button>
+            </a>
         </div>
 
         <!-- Data Table Card -->
@@ -109,7 +94,6 @@
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-surface-variant">
-                    <!-- VÒNG LẶP JSTL ĐỂ ĐỔ DỮ LIỆU SẢN PHẨM -->
                     <c:forEach var="item" items="${products}">
                         <tr class="hover:bg-surface-container-lowest transition-colors">
                             <td class="py-4 px-6 text-on-surface-variant font-medium">#PRD-<c:out value="${item.id}"/></td>
@@ -125,43 +109,31 @@
                             </td>
                             <td class="py-4 px-6 text-on-surface-variant"><c:out value="${item.stock}"/></td>
                             <td class="py-4 px-6">
-                                <!-- Logic hiển thị trạng thái dựa trên Tồn kho -->
                                 <c:choose>
                                     <c:when test="${item.stock > 20}">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
-                                                    Còn hàng
-                                                </span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">Còn hàng</span>
                                     </c:when>
                                     <c:when test="${item.stock > 0}">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container" style="background-color:#ffe4b5; color:#b8860b">
-                                                    Sắp hết hàng
-                                                </span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container" style="background-color:#ffe4b5; color:#b8860b">Sắp hết hàng</span>
                                     </c:when>
                                     <c:otherwise>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant">
-                                                    Hết hàng
-                                                </span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant">Hết hàng</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
+                            <!-- Đã mapping nút Sửa trỏ trực tiếp đến trang chỉnh sửa theo ID sản phẩm -->
                             <td class="py-4 px-6 text-center">
-                                <a href="#" class="text-on-surface-variant hover:text-primary mx-1 transition-colors" title="Sửa"><span class="material-symbols-outlined">edit</span></a>
-                                <a href="#" class="text-on-surface-variant hover:text-error mx-1 transition-colors" title="Xóa"><span class="material-symbols-outlined">delete</span></a>
+                                <a href="${pageContext.request.contextPath}/admin/products/edit?id=${item.id}" class="text-on-surface-variant hover:text-primary mx-1 transition-colors" title="Sửa">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </a>
+                                <a href="${pageContext.request.contextPath}/admin/products/delete?id=${item.id}" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?');" class="text-on-surface-variant hover:text-error mx-1 transition-colors" title="Xóa">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-surface-variant bg-surface-container-lowest">
-                <span class="text-sm text-on-surface-variant">Hiển thị <c:out value="${products.size()}"/> sản phẩm</span>
-                <div class="flex space-x-1">
-                    <button class="px-3 py-1 rounded-md border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50">Trước</button>
-                    <button class="px-3 py-1 rounded-md bg-primary text-on-primary font-medium">1</button>
-                    <button class="px-3 py-1 rounded-md border border-outline-variant text-on-surface-variant hover:bg-surface-container transition-colors">Tiếp</button>
-                </div>
             </div>
         </div>
     </div>

@@ -11,4 +11,5 @@ public interface IProductDAO extends GenericDAO<ProductModel> {
     List<ProductModel> findTopProducts(int limit);
     List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption);
     Long save(ProductModel product);
+    void updateProduct(ProductModel product);
 }

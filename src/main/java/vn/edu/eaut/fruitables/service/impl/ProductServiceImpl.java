@@ -52,4 +52,8 @@ public class ProductServiceImpl implements IProductService {
         }
         return null;
     }
+    @Override
+    public void updateProduct(ProductModel product) {
+        productDAO.updateProduct(product);
+    }
 }

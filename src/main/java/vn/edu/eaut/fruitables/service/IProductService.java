@@ -11,4 +11,5 @@ public interface IProductService {
     List<ProductModel> findTopProducts(int limit);
     List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption);
     ProductModel save(ProductModel product);
+    void updateProduct(ProductModel product);
 }
