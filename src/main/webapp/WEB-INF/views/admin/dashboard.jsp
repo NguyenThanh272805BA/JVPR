@@ -1,13 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="vi">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Fruitables Admin Dashboard</title>
+    <title>Bảng điều khiển - Fruitables Admin</title>
 
-    <!-- Cấu hình CSS/Tailwind dùng chung từ Giai đoạn 2 -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
@@ -32,20 +31,23 @@
     <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
         <a class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-lg transition-colors" href="${pageContext.request.contextPath}/admin/dashboard">
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
-            <span class="font-label-bold text-label-bold">Dashboard</span>
+            <span class="font-label-bold text-label-bold">Tổng quan</span>
         </a>
         <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/products">
             <span class="material-symbols-outlined">inventory_2</span>
-            <span class="font-label-bold text-label-bold">Products</span>
+            <span class="font-label-bold text-label-bold">Sản phẩm</span>
         </a>
-        <!-- Các menu khác -->
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="#">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/categories">
             <span class="material-symbols-outlined">category</span>
-            <span class="font-label-bold text-label-bold">Categories</span>
+            <span class="font-label-bold text-label-bold">Danh mục</span>
         </a>
-        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="#">
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/orders">
             <span class="material-symbols-outlined">receipt_long</span>
-            <span class="font-label-bold text-label-bold">Orders</span>
+            <span class="font-label-bold text-label-bold">Đơn hàng</span>
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/coupons">
+            <span class="material-symbols-outlined">redeem</span>
+            <span class="font-label-bold text-label-bold">Mã khuyến mãi</span>
         </a>
     </nav>
 </aside>
@@ -58,22 +60,20 @@
         <div class="flex items-center w-full max-w-md">
             <div class="relative w-full">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-                <input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-md border-transparent focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md transition-shadow" placeholder="Search..." type="text"/>
+                <input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-md border-transparent focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md transition-shadow" placeholder="Tìm kiếm nhanh..." type="text"/>
             </div>
         </div>
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-3">
                 <div class="flex flex-col text-right">
-                    <!-- Lấy tên từ Session -->
                     <span class="font-label-bold text-label-bold text-on-surface">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
                     <span class="text-sm text-on-surface-variant">Quản trị viên</span>
                 </div>
                 <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">account_circle</span>
             </div>
-            <!-- Nút Logout -->
             <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-2 text-error hover:text-on-error-container transition-colors">
                 <span class="material-symbols-outlined">logout</span>
-                <span class="font-label-bold text-label-bold">Logout</span>
+                <span class="font-label-bold text-label-bold">Đăng xuất</span>
             </a>
         </div>
     </header>
@@ -82,45 +82,41 @@
     <main class="flex-1 overflow-y-auto p-margin-desktop bg-background">
         <div class="max-w-container-max-width mx-auto space-y-8">
             <div>
-                <h1 class="font-headline-md text-headline-md text-on-surface">Overview</h1>
+                <h1 class="font-headline-md text-headline-md text-on-surface">Tổng quan hệ thống</h1>
             </div>
 
             <!-- Stats Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-                <!-- Stat Card 1 -->
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-on-surface-variant font-label-bold text-label-bold">Total Revenue</span>
+                        <span class="text-on-surface-variant font-label-bold text-label-bold">Tổng doanh thu</span>
                         <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
                             <span class="material-symbols-outlined">payments</span>
                         </div>
                     </div>
                     <div class="font-price-tag text-price-tag text-primary">${totalRevenue} ₫</div>
                 </div>
-                <!-- Stat Card 2 -->
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-on-surface-variant font-label-bold text-label-bold">Total Orders</span>
+                        <span class="text-on-surface-variant font-label-bold text-label-bold">Tổng đơn hàng</span>
                         <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
                             <span class="material-symbols-outlined">shopping_cart</span>
                         </div>
                     </div>
                     <div class="font-price-tag text-price-tag text-on-surface">${totalOrders}</div>
                 </div>
-                <!-- Stat Card 3 -->
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-on-surface-variant font-label-bold text-label-bold">Total Products</span>
+                        <span class="text-on-surface-variant font-label-bold text-label-bold">Tổng sản phẩm</span>
                         <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
                             <span class="material-symbols-outlined">inventory_2</span>
                         </div>
                     </div>
                     <div class="font-price-tag text-price-tag text-on-surface">${totalProducts}</div>
                 </div>
-                <!-- Stat Card 4 -->
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-on-surface-variant font-label-bold text-label-bold">Out of Stock</span>
+                        <span class="text-on-surface-variant font-label-bold text-label-bold">Cảnh báo tồn kho</span>
                         <div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center">
                             <span class="material-symbols-outlined">warning</span>
                         </div>
@@ -129,35 +125,34 @@
                 </div>
             </div>
 
-            <!-- Chart Section (ĐÃ TÍCH HỢP CHART.JS) -->
+            <!-- Chart Section -->
             <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col mb-8">
-                <h2 class="font-label-bold text-label-bold text-on-surface mb-4">Tổng quan doanh thu 6 tháng qua</h2>
+                <h2 class="font-label-bold text-label-bold text-on-surface mb-4">Biểu đồ doanh thu 6 tháng qua</h2>
                 <div class="relative h-[400px] w-full">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
 
-            <!-- Recent Products (Dummy Data) -->
+            <!-- Recent Products -->
             <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-6 border-b border-surface-variant flex justify-between items-center">
-                    <h2 class="font-label-bold text-label-bold text-on-surface">Recent Products</h2>
-                    <a href="${pageContext.request.contextPath}/admin/products" class="text-primary-container hover:text-primary font-label-bold text-label-bold transition-colors">View All</a>
+                    <h2 class="font-label-bold text-label-bold text-on-surface">Sản phẩm mới thêm</h2>
+                    <a href="${pageContext.request.contextPath}/admin/products" class="text-primary-container hover:text-primary font-label-bold text-label-bold transition-colors">Xem tất cả</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
                         <tr class="bg-surface-container text-on-surface-variant font-label-bold text-label-bold text-sm">
-                            <th class="py-4 px-6 font-medium">ID</th>
-                            <th class="py-4 px-6 font-medium">Image</th>
-                            <th class="py-4 px-6 font-medium">Name</th>
-                            <th class="py-4 px-6 font-medium">Category</th>
-                            <th class="py-4 px-6 font-medium">Price</th>
-                            <th class="py-4 px-6 font-medium">Stock</th>
-                            <th class="py-4 px-6 font-medium">Status</th>
+                            <th class="py-4 px-6 font-medium">Mã SP</th>
+                            <th class="py-4 px-6 font-medium">Hình ảnh</th>
+                            <th class="py-4 px-6 font-medium">Tên sản phẩm</th>
+                            <th class="py-4 px-6 font-medium">Danh mục</th>
+                            <th class="py-4 px-6 font-medium">Giá bán</th>
+                            <th class="py-4 px-6 font-medium">Tồn kho</th>
+                            <th class="py-4 px-6 font-medium">Trạng thái</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-surface-variant text-body-md text-on-surface">
-                        <!-- Dummy Row 1 -->
                         <tr class="hover:bg-surface-bright transition-colors">
                             <td class="py-4 px-6">#PRD-001</td>
                             <td class="py-4 px-6">
@@ -165,12 +160,12 @@
                                     <span class="material-symbols-outlined text-sm">image</span>
                                 </div>
                             </td>
-                            <td class="py-4 px-6 font-medium">Organic Bananas</td>
-                            <td class="py-4 px-6 text-on-surface-variant">Fruits</td>
+                            <td class="py-4 px-6 font-medium">Chuối hữu cơ nhập khẩu</td>
+                            <td class="py-4 px-6 text-on-surface-variant">Trái cây</td>
                             <td class="py-4 px-6">45,000 ₫</td>
                             <td class="py-4 px-6">120</td>
                             <td class="py-4 px-6">
-                                <span class="px-3 py-1 bg-primary-container/20 text-primary-container rounded-full text-xs font-semibold">Active</span>
+                                <span class="px-3 py-1 bg-primary-container/20 text-primary-container rounded-full text-xs font-semibold">Đang bán</span>
                             </td>
                         </tr>
                         </tbody>
@@ -181,23 +176,21 @@
     </main>
 </div>
 
-<!-- Chèn thư viện Chart.js qua CDN và Logic khởi tạo biểu đồ -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Gọi API lấy data JSON
         fetch('${pageContext.request.contextPath}/api/chart-data')
             .then(response => response.json())
             .then(chartData => {
                 const ctx = document.getElementById('revenueChart').getContext('2d');
                 new Chart(ctx, {
-                    type: 'line', // Biểu đồ dạng đường
+                    type: 'line',
                     data: {
                         labels: chartData.labels,
                         datasets: [{
                             label: 'Doanh thu (VNĐ)',
                             data: chartData.data,
-                            borderColor: '#81c408', // Màu primary của Fruitables
+                            borderColor: '#81c408',
                             backgroundColor: 'rgba(129, 196, 8, 0.2)',
                             borderWidth: 3,
                             pointBackgroundColor: '#ffffff',
@@ -205,15 +198,13 @@
                             pointBorderWidth: 2,
                             pointRadius: 5,
                             fill: true,
-                            tension: 0.4 // Làm cong đường nét
+                            tension: 0.4
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top' }
-                        },
+                        plugins: { legend: { position: 'top' } },
                         scales: {
                             y: {
                                 beginAtZero: true,

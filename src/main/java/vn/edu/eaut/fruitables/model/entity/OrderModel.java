@@ -12,6 +12,7 @@ public class OrderModel {
     private String paymentMethod;
     private String status;
     private Timestamp createdAt;
+    private String paymentStatus;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -37,6 +38,9 @@ public class OrderModel {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }

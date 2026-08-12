@@ -17,6 +17,7 @@ public class OrderMapper implements IRowMapper<OrderModel> {
             order.setPhone(rs.getString("phone"));
             order.setPaymentMethod(rs.getString("payment_method"));
             order.setStatus(rs.getString("status"));
+            order.setPaymentStatus(rs.getString("payment_status"));
             order.setCreatedAt(rs.getTimestamp("created_at"));
             return order;
         } catch (SQLException e) {

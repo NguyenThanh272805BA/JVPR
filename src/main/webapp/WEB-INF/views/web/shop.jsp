@@ -57,13 +57,15 @@
     </div>
 </nav>
 
-<!-- SHOP HEADER -->
-<div class="bg-primary-container text-white py-12">
-    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center">
-        <h1 class="font-display-lg text-4xl md:text-5xl font-extrabold mb-4">Cửa Hàng Trực Tuyến</h1>
-        <p class="font-body-lg text-white/90">Khám phá các sản phẩm tươi sạch và an toàn nhất</p>
+<!-- SHOP HERO BANNER -->
+<section class="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=2070&auto=format&fit=crop');"></div>
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div class="relative z-10 text-center px-4">
+        <h1 class="text-white font-display-lg text-4xl md:text-5xl font-extrabold mb-4 tracking-wide drop-shadow-lg">Cửa Hàng Trực Tuyến</h1>
+        <p class="text-white/90 font-body-lg text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">Khám phá các sản phẩm tươi sạch, an toàn và 100% hữu cơ được thu hoạch mỗi ngày từ nông trại.</p>
     </div>
-</div>
+</section>
 
 <!-- MAIN SHOP CONTENT -->
 <main class="flex-grow py-12">
@@ -72,12 +74,12 @@
         <!-- SIDEBAR -->
         <aside class="w-full md:w-1/4 flex flex-col gap-6">
             <!-- Tích hợp AJAX Live Search -->
-            <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
+            <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
                 <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Tìm kiếm</h3>
                 <div class="relative">
                     <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
                         <input type="text" id="liveSearchInput" name="keyword" value="${keyword}" placeholder="Nhập tên sản phẩm..."
-                               class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface" autocomplete="off">
+                               class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface transition-colors" autocomplete="off">
                         <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-primary">
                             <span class="material-symbols-outlined">search</span>
                         </button>
@@ -90,31 +92,27 @@
             </div>
 
             <!-- Danh mục -->
-            <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
+            <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
                 <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Danh mục</h3>
                 <ul class="space-y-3 font-body-md text-on-surface-variant">
                     <li>
                         <a href="${pageContext.request.contextPath}/shop" class="flex justify-between items-center hover:text-primary transition-colors">
                             <span>Tất cả sản phẩm</span>
-                            <span class="bg-surface-container px-2 py-1 rounded text-xs">120</span>
                         </a>
                     </li>
                     <li>
                         <a href="${pageContext.request.contextPath}/shop?category=1" class="flex justify-between items-center hover:text-primary transition-colors">
-                            <span>Hoa quả tươi</span>
-                            <span class="bg-surface-container px-2 py-1 rounded text-xs">45</span>
+                            <span>Trái cây nhập khẩu</span>
                         </a>
                     </li>
                     <li>
                         <a href="${pageContext.request.contextPath}/shop?category=2" class="flex justify-between items-center hover:text-primary transition-colors">
-                            <span>Rau củ quả</span>
-                            <span class="bg-surface-container px-2 py-1 rounded text-xs">30</span>
+                            <span>Trái cây nội địa</span>
                         </a>
                     </li>
                     <li>
                         <a href="${pageContext.request.contextPath}/shop?category=3" class="flex justify-between items-center hover:text-primary transition-colors">
-                            <span>Thịt & Hải sản</span>
-                            <span class="bg-surface-container px-2 py-1 rounded text-xs">25</span>
+                            <span>Rau xanh</span>
                         </a>
                     </li>
                 </ul>
@@ -125,11 +123,15 @@
         <div class="w-full md:w-3/4">
             <div class="flex justify-between items-center mb-6">
                 <p class="font-body-md text-on-surface-variant">Hiển thị <span class="font-label-bold text-on-surface"><c:out value="${products.size()}"/></span> kết quả</p>
-                <select class="border border-outline-variant rounded-md px-3 py-2 font-body-md text-on-surface bg-surface-container-lowest outline-none focus:border-primary">
-                    <option>Mới nhất</option>
-                    <option>Giá: Thấp đến Cao</option>
-                    <option>Giá: Cao xuống Thấp</option>
-                </select>
+                <form action="${pageContext.request.contextPath}/shop" method="GET">
+                    <input type="hidden" name="keyword" value="${keyword}">
+                    <input type="hidden" name="category" value="${selectedCategory}">
+                    <select name="sort" onchange="this.form.submit()" class="border border-outline-variant rounded-md px-3 py-2 font-body-md text-on-surface bg-surface-container-lowest outline-none focus:border-primary">
+                        <option value="newest" ${selectedSort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                        <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Giá: Thấp đến Cao</option>
+                        <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Giá: Cao xuống Thấp</option>
+                    </select>
+                </form>
             </div>
 
             <!-- Lưới hiển thị sản phẩm -->
@@ -201,7 +203,6 @@
                 return;
             }
 
-            // Debounce: Đợi 300ms sau khi ngừng gõ mới gọi API
             timeoutId = setTimeout(() => {
                 fetch(`${pageContext.request.contextPath}/api/search-products?keyword=` + encodeURIComponent(keyword))
                     .then(response => response.json())
@@ -236,7 +237,6 @@
             }, 300);
         });
 
-        // Ẩn dropdown khi click ra ngoài
         document.addEventListener('click', function(e) {
             if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
                 searchDropdown.classList.add('hidden');
@@ -244,24 +244,22 @@
         });
     });
 </script>
+
 <!-- JAVASCRIPT AJAX ADD TO CART & TOAST NOTIFICATION -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tìm tất cả các form gửi đến /cart
         const addCartForms = document.querySelectorAll('form[action$="/cart"]');
 
         addCartForms.forEach(form => {
-            // Chỉ bắt sự kiện với những form có input action = add
             const actionInput = form.querySelector('input[name="action"][value="add"]');
 
             if (actionInput) {
                 form.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Chặn hành vi load lại trang mặc định
+                    e.preventDefault();
 
                     const formData = new FormData(this);
                     const data = new URLSearchParams(formData);
 
-                    // Gửi request ngầm (Fetch API)
                     fetch(`${pageContext.request.contextPath}/api/add-to-cart`, {
                         method: 'POST',
                         headers: {
@@ -286,14 +284,10 @@
             }
         });
 
-        // Hàm 1: Cập nhật con số trên Navbar (Badge)
         function updateCartBadge(total) {
-            // Tìm nút giỏ hàng trên Navbar
             const cartLink = document.querySelector('a[href$="/cart"]');
             if (cartLink) {
                 let badge = cartLink.querySelector('span.bg-error');
-
-                // Nếu chưa có badge (giỏ hàng đang 0), thì tạo mới HTML
                 if (!badge) {
                     badge = document.createElement('span');
                     badge.className = 'absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center';
@@ -303,7 +297,6 @@
             }
         }
 
-        // Hàm 2: Hiển thị thông báo Toast góc dưới màn hình
         function showToast(message, type) {
             let container = document.getElementById('toast-container');
             if (!container) {
@@ -314,7 +307,6 @@
             }
 
             const toast = document.createElement('div');
-            // Cấu hình màu nền dựa trên trạng thái
             const bgColor = type === 'success' ? 'bg-primary' : 'bg-error';
             const icon = type === 'success' ? 'check_circle' : 'error';
 
@@ -323,17 +315,15 @@
 
             container.appendChild(toast);
 
-            // Kích hoạt Animation hiện lên
             requestAnimationFrame(() => {
                 toast.classList.remove('translate-y-10', 'opacity-0');
                 toast.classList.add('translate-y-0', 'opacity-100');
             });
 
-            // Tự động tắt sau 3 giây
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => toast.remove(), 300); // Xóa element sau khi fade out
+                setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
     });
