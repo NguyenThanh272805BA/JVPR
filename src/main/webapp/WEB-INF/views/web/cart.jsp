@@ -22,6 +22,7 @@
         <div class="hidden md:flex space-x-8 items-center">
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/home">Trang chủ</a>
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
         </div>
         <div class="flex items-center space-x-4">
             <a href="${pageContext.request.contextPath}/cart" class="text-primary bg-surface-container-highest p-2 rounded-full transition-colors relative">
@@ -33,7 +34,7 @@
                         </span>
                 </c:if>
             </a>
-            <!-- Tái sử dụng logic User account ở đây... -->
+            <!-- logic User account ở đây... -->
         </div>
     </div>
 </nav>
