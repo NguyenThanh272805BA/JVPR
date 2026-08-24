@@ -61,15 +61,16 @@
 </nav>
 
 <!-- HERO BANNER KHUYẾN MÃI -->
-<section class="relative w-full bg-primary-container text-white py-16">
-  <div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center">
-    <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Săn Voucher Mỗi Ngày</span>
-    <h1 class="font-display-lg text-4xl md:text-5xl font-extrabold mb-4">Kho Voucher & Ưu Đãi Độc Quyền</h1>
-    <p class="font-body-lg text-white/90 max-w-xl mx-auto">Áp dụng mã giảm giá trực tiếp vào giỏ hàng để mua sắm nông sản hữu cơ với mức giá tiết kiệm nhất.</p>
+<section class="relative w-full text-white py-20 bg-[url('https://images.unsplash.com/photo-1608686207856-001b95cf60ca?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
+  <div class="absolute inset-0 bg-black/60"></div> <!-- Lớp màng đen tối màu -->
+  <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center z-10">
+    <span class="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-6 inline-block shadow-lg">Săn Voucher & Flash Sale</span>
+    <h1 class="font-display-lg text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">Kho Ưu Đãi Độc Quyền</h1>
+    <p class="font-body-lg text-gray-200 max-w-xl mx-auto drop-shadow">Khám phá các mã giảm giá và hàng loạt sản phẩm hữu cơ đang được xả kho với mức giá cực sốc.</p>
   </div>
 </section>
 
-<!-- MAIN CONTENT: DANH SÁCH VOUCHER -->
+<!-- MAIN CONTENT: DANH SÁCH VOUCHER & FLASH SALE -->
 <main class="flex-grow py-12 bg-background">
   <div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop">
 
@@ -87,6 +88,7 @@
       </div>
     </c:if>
 
+    <!-- DANH SÁCH VOUCHER -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <c:forEach var="coupon" items="${coupons}">
         <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col relative hover:shadow-md transition-shadow">
@@ -139,13 +141,60 @@
         </div>
       </c:forEach>
     </div>
+
+    <!-- FLASH SALE SECTION -->
+    <c:if test="${not empty flashSaleProducts}">
+      <div class="mt-20 mb-8 border-t border-surface-variant pt-12">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="font-display-md text-3xl font-extrabold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-500 text-4xl">local_fire_department</span>
+            Sản Phẩm Flash Sale
+          </h2>
+          <a href="${pageContext.request.contextPath}/shop" class="text-primary font-semibold hover:underline transition-colors">Xem tất cả ></a>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <c:forEach var="product" items="${flashSaleProducts}">
+            <div class="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden hover:shadow-md transition-shadow relative group">
+
+              <!-- Nhãn giảm giá % -->
+              <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10 shadow-sm">
+                - <fmt:formatNumber value="${(product.price - product.discountPrice) / product.price * 100}" maxFractionDigits="0"/>%
+              </div>
+
+              <!-- Ảnh sản phẩm -->
+              <div class="aspect-square bg-gray-50 overflow-hidden relative">
+                <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+              </div>
+
+              <!-- Thông tin sản phẩm -->
+              <div class="p-4 flex flex-col h-full">
+                <p class="text-sm text-gray-500 mb-1"><c:out value="${product.categoryName}"/></p>
+                <h3 class="font-bold text-gray-800 mb-2 truncate" title="${product.name}"><c:out value="${product.name}"/></h3>
+
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                  <span class="text-red-600 font-bold text-lg"><fmt:formatNumber value="${product.discountPrice}" type="number" groupingUsed="true"/> ₫</span>
+                  <span class="text-gray-400 text-sm line-through"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> ₫</span>
+                </div>
+
+                <!-- Nút Thêm vào giỏ -->
+                <button onclick="window.location.href='${pageContext.request.contextPath}/cart/add?id=${product.id}'" class="mt-auto w-full py-2 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 hover:bg-red-500 hover:text-white transition-colors flex justify-center items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">shopping_cart</span> Thêm vào giỏ
+                </button>
+              </div>
+            </div>
+          </c:forEach>
+        </div>
+      </div>
+    </c:if>
+
   </div>
 </main>
 
 <!-- FOOTER -->
 <footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
   <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center text-on-surface-variant font-body-md">
-    <p>© 2026 Fruitables. All rights reserved.</p>
+    <p>© 2026 Fruitables. Bài tập lớn công nghệ Java.</p>
   </div>
 </footer>
 

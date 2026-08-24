@@ -12,4 +12,5 @@ public interface IProductService {
     List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption);
     ProductModel save(ProductModel product);
     void updateProduct(ProductModel product);
+    List<ProductModel> findFlashSaleProducts(int limit);
 }

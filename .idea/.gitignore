@@ -13,3 +13,4 @@ target/
 *.iml
 *.class
 /src/main/webapp/uploads/
+src/main/resources/application.properties

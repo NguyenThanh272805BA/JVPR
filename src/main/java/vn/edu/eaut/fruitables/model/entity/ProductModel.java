@@ -9,14 +9,17 @@ public class ProductModel {
     private Integer stock;
     private String imageUrl;
     private Boolean status;
-    private String categoryName; // Dùng để hiển thị tên thay vì hiển thị categoryId
-
+    private String categoryName;
+    private Double discountPrice;
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public Integer getCategoryId() { return categoryId; }
     public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
+
+    public Double getDiscountPrice() { return discountPrice; }
+    public void setDiscountPrice(Double discountPrice) { this.discountPrice = discountPrice; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

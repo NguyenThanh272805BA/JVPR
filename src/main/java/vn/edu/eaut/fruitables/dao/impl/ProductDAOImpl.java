@@ -18,29 +18,22 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
     }
     @Override
     public Long save(ProductModel product) {
-        String sql = "INSERT INTO products (category_id, name, slug, description, price, stock, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        // Hàm insert đã được định nghĩa sẵn trong AbstractDAO
+        String sql = "INSERT INTO products (category_id, name, slug, description, price, discount_price, stock, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return insert(sql,
-                product.getCategoryId(),
-                product.getName(),
-                product.getName().toLowerCase().replaceAll("\\s+", "-"), // Tạo slug
-                product.getDescription(),
-                product.getPrice(),
-                product.getStock(),
-                product.getImageUrl(),
-                product.getStatus());
+                product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
+                product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(),
+                product.getImageUrl(), product.getStatus());
     }
     @Override
     public void updateProduct(ProductModel product) {
-        // Nếu có upload ảnh mới thì cập nhật luôn ảnh, không thì giữ nguyên
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, stock = ?, image_url = ?, status = ? WHERE id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, discount_price = ?, stock = ?, image_url = ?, status = ? WHERE id = ?";
             update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
-                    product.getDescription(), product.getPrice(), product.getStock(), product.getImageUrl(), product.getStatus(), product.getId());
+                    product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(), product.getImageUrl(), product.getStatus(), product.getId());
         } else {
-            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, stock = ?, status = ? WHERE id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, discount_price = ?, stock = ?, status = ? WHERE id = ?";
             update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
-                    product.getDescription(), product.getPrice(), product.getStock(), product.getStatus(), product.getId());
+                    product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(), product.getStatus(), product.getId());
         }
     }
     @Override
@@ -48,7 +41,11 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
         String sql = BASE_SQL + " WHERE p.category_id = ? ORDER BY p.id DESC";
         return query(sql, new ProductMapper(), categoryId);
     }
-
+    @Override
+    public List<ProductModel> findFlashSaleProducts(int limit) {
+        String sql = BASE_SQL + " WHERE p.discount_price IS NOT NULL AND p.discount_price > 0 AND p.status = 1 ORDER BY p.id DESC LIMIT ?";
+        return query(sql, new ProductMapper(), limit);
+    }
     @Override
     public List<ProductModel> searchByName(String keyword) {
         String sql = BASE_SQL + " WHERE p.name LIKE ? ORDER BY p.id DESC";

@@ -14,30 +14,32 @@
 <body class="bg-background text-on-surface font-body-md text-body-md flex h-screen overflow-hidden">
 
 <!-- Sidebar -->
+<!-- SIDEBAR CHUẨN ĐỒNG BỘ -->
+<c:set var="currentURI" value="${requestScope['javax.servlet.forward.request_uri']}" />
 <aside class="w-64 bg-surface-container-lowest border-r border-surface-variant flex flex-col h-full flex-shrink-0 z-20 shadow-sm hidden md:flex">
   <div class="h-20 flex items-center px-6 border-b border-surface-variant">
     <span class="font-display-lg text-xl font-extrabold text-primary">Fruitables</span>
   </div>
   <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/dashboard">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/dashboard') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/dashboard">
       <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-label-bold text-label-bold">Tổng quan</span>
+      <span class="font-label-bold">Tổng quan</span>
     </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/products">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/products') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/products">
       <span class="material-symbols-outlined">inventory_2</span>
-      <span class="font-label-bold text-label-bold">Sản phẩm</span>
+      <span class="font-label-bold">Sản phẩm</span>
     </a>
-    <a class="bg-primary text-white flex items-center gap-3 px-4 py-3 rounded-lg transition-colors" href="${pageContext.request.contextPath}/admin/categories">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
       <span class="material-symbols-outlined">category</span>
-      <span class="font-label-bold text-label-bold">Danh mục</span>
+      <span class="font-label-bold">Danh mục</span>
     </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/orders">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/orders') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/orders">
       <span class="material-symbols-outlined">receipt_long</span>
-      <span class="font-label-bold text-label-bold">Đơn hàng</span>
+      <span class="font-label-bold">Đơn hàng</span>
     </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors" href="${pageContext.request.contextPath}/admin/coupons">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/coupons') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/coupons">
       <span class="material-symbols-outlined">redeem</span>
-      <span class="font-label-bold text-label-bold">Mã khuyến mãi</span>
+      <span class="font-label-bold">Mã khuyến mãi</span>
     </a>
   </nav>
 </aside>

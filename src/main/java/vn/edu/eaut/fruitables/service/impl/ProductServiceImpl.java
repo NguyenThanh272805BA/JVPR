@@ -56,4 +56,8 @@ public class ProductServiceImpl implements IProductService {
     public void updateProduct(ProductModel product) {
         productDAO.updateProduct(product);
     }
+    @Override
+    public List<ProductModel> findFlashSaleProducts(int limit) {
+        return productDAO.findFlashSaleProducts(limit);
+    }
 }

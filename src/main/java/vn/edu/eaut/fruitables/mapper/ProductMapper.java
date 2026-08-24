@@ -9,6 +9,7 @@ public class ProductMapper implements IRowMapper<ProductModel> {
     public ProductModel mapRow(ResultSet rs) {
         try {
             ProductModel product = new ProductModel();
+            product.setDiscountPrice(rs.getObject("discount_price") != null ? rs.getDouble("discount_price") : null);
             product.setId(rs.getLong("id"));
             product.setCategoryId(rs.getInt("category_id"));
             product.setName(rs.getString("name"));
@@ -18,7 +19,7 @@ public class ProductMapper implements IRowMapper<ProductModel> {
             product.setImageUrl(rs.getString("image_url"));
             product.setStatus(rs.getBoolean("status"));
 
-            // Lấy thêm tên danh mục từ câu lệnh JOIN SQL (nếu có)
+            // Lấy thêm tên danh mục từ câu lệnh JOIN SQL
             try {
                 product.setCategoryName(rs.getString("category_name"));
             } catch (SQLException e) {
