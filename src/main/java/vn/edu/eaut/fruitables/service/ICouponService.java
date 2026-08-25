@@ -5,4 +5,9 @@ import java.util.List;
 public interface ICouponService {
     List<CouponModel> findAll();
     CouponModel save(CouponModel couponModel);
+    CouponModel findById(Integer id);
+    void update(CouponModel coupon);
+    void hardDelete(Integer id);
+    void restore(Integer id);
+    void softDelete(Integer id);
 }

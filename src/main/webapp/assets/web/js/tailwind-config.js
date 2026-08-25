@@ -3,41 +3,82 @@ tailwind.config = {
     theme: {
         extend: {
             colors: {
-                "on-tertiary-container": "#7b0080", "on-secondary-container": "#496b5e",
-                "on-error": "#ffffff", "primary": "#436900", "on-primary-fixed": "#112000",
-                "inverse-on-surface": "#e9f1fe", "inverse-primary": "#95da2a",
-                "error-container": "#ffdad6", "on-surface": "#141c25", "tertiary": "#9d28a0",
-                "surface-container-lowest": "#ffffff", "tertiary-fixed": "#ffd6f7",
-                "surface-container-highest": "#dae3f0", "on-error-container": "#93000a",
-                "on-tertiary": "#ffffff", "outline": "#727a64", "surface-dim": "#d2dbe7",
-                "secondary-container": "#c5ebda", "on-tertiary-fixed": "#37003a",
-                "secondary-fixed": "#c5ebda", "tertiary-fixed-dim": "#ffaaf7",
-                "secondary": "#436558", "surface-tint": "#436900", "primary-fixed": "#b0f748",
-                "surface-container": "#e6effb", "primary-fixed-dim": "#95da2a",
-                "on-secondary-fixed-variant": "#2b4d41", "on-primary-container": "#2f4c00",
-                "secondary-fixed-dim": "#aacfbe", "error": "#ba1a1a", "on-secondary": "#ffffff",
-                "surface": "#f7f9ff", "on-surface-variant": "#424936",
-                "tertiary-container": "#ff82fb", "background": "#f7f9ff",
-                "on-primary-fixed-variant": "#314f00", "surface-container-high": "#e0e9f5",
-                "surface-variant": "#dae3f0", "surface-container-low": "#edf4ff",
-                "surface-bright": "#f7f9ff", "on-secondary-fixed": "#002117",
-                "primary-container": "#81c408", "outline-variant": "#c2cab0",
-                "on-tertiary-fixed-variant": "#800084", "on-primary": "#ffffff",
-                "inverse-surface": "#28313b", "on-background": "#141c25"
+                // Tông màu Chính (Primary) - Xanh lá cây tươi, organic
+                "primary": "#65a30d",             // Xanh lục đậm vừa (Lime 600)
+                "primary-container": "#84cc16",   // Xanh lục sáng (Lime 500)
+                "on-primary": "#ffffff",
+                "on-primary-container": "#f7fee7",
+
+                // Tông màu Phụ (Secondary) - Cam/Đỏ cho Flash Sale, Nổi bật
+                "secondary": "#ea580c",           // Cam tươi (Orange 600)
+                "secondary-container": "#fb923c", // Cam sáng
+
+                // Tông màu Nền (Background & Surface) - Sáng, sạch sẽ
+                "background": "#f8fafc",          // Xám rất nhạt (Slate 50)
+                "on-background": "#0f172a",
+                "surface": "#ffffff",             // Trắng tinh
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f8fafc",
+                "surface-container": "#f1f5f9",
+                "surface-container-high": "#e2e8f0",
+                "on-surface": "#1e293b",          // Chữ đen xám dịu mắt
+                "on-surface-variant": "#64748b",  // Chữ xám nhạt (Slate 500)
+
+                // Tông màu Viền & Trạng thái
+                "outline": "#cbd5e1",
+                "outline-variant": "#e2e8f0",
+                "error": "#ef4444",               // Đỏ tươi (Red 500)
+                "error-container": "#fee2e2",
+                "on-error": "#ffffff",
+                "on-error-container": "#b91c1c"
             },
-            borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-            spacing: { "base-unit": "8px", "margin-mobile": "16px", "container-max-width": "1320px", "margin-desktop": "48px", "gutter": "24px" },
+            boxShadow: {
+                // Hiệu ứng bóng đổ mềm mại, không bị cứng như mặc định
+                'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                'glow': '0 0 15px rgba(132, 204, 22, 0.4)',
+            },
+            keyframes: {
+                // Định nghĩa các chuyển động (Animations)
+                fadeIn: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+                slideUp: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-8px)' },
+                },
+                pulseSoft: {
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.8' },
+                }
+            },
+            animation: {
+                // Các class để gọi trực tiếp trên HTML (ví dụ: class="animate-slide-up")
+                'fade-in': 'fadeIn 0.5s ease-out',
+                'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                'float': 'float 3s ease-in-out infinite',
+                'pulse-soft': 'pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
+            spacing: { "base-unit": "8px", "margin-mobile": "16px", "container-max-width": "1280px", "margin-desktop": "48px", "gutter": "24px" },
             fontFamily: {
-                "body-lg": ["Inter", "sans-serif"], "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
-                "headline-md": ["Plus Jakarta Sans", "sans-serif"], "body-md": ["Inter", "sans-serif"],
-                "label-bold": ["Inter", "sans-serif"], "display-lg": ["Plus Jakarta Sans", "sans-serif"],
+                "body-lg": ["Inter", "sans-serif"],
+                "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
+                "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+                "body-md": ["Inter", "sans-serif"],
+                "label-bold": ["Inter", "sans-serif"],
+                "display-lg": ["Plus Jakarta Sans", "sans-serif"],
                 "price-tag": ["Plus Jakarta Sans", "sans-serif"]
             },
             fontSize: {
                 "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
                 "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
                 "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
-                "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], // Giảm nhẹ 1px cho tinh tế
                 "label-bold": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
                 "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
                 "price-tag": ["20px", { "lineHeight": "24px", "fontWeight": "700" }]

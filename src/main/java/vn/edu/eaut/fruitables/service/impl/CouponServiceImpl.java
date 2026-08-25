@@ -27,4 +27,29 @@ public class CouponServiceImpl implements ICouponService {
         }
         return null;
     }
+
+    @Override
+    public CouponModel findById(Integer id) {
+        return couponDAO.findById(id);
+    }
+
+    @Override
+    public void update(CouponModel coupon) {
+        couponDAO.update(coupon);
+    }
+
+    @Override
+    public void softDelete(Integer id) {
+        couponDAO.softDelete(id);
+    }
+
+    @Override
+    public void restore(Integer id) {
+        couponDAO.restore(id);
+    }
+
+    @Override
+    public void hardDelete(Integer id) {
+        couponDAO.hardDelete(id);
+    }
 }

@@ -61,12 +61,12 @@
 </nav>
 
 <!-- HERO BANNER KHUYẾN MÃI -->
-<section class="relative w-full text-white py-20 bg-[url('https://images.unsplash.com/photo-1608686207856-001b95cf60ca?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
+<section class="relative w-full text-white py-20 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop](https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
   <div class="absolute inset-0 bg-black/60"></div> <!-- Lớp màng đen tối màu -->
   <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center z-10">
     <span class="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-6 inline-block shadow-lg">Săn Voucher & Flash Sale</span>
     <h1 class="font-display-lg text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">Kho Ưu Đãi Độc Quyền</h1>
-    <p class="font-body-lg text-gray-200 max-w-xl mx-auto drop-shadow">Khám phá các mã giảm giá và hàng loạt sản phẩm hữu cơ đang được xả kho với mức giá cực sốc.</p>
+    <p class="font-body-lg text-gray-200 max-w-xl mx-auto drop-shadow">Khám phá các mã giảm giá và hàng loạt sản phẩm trái cây, nông sản hữu cơ đang được xả kho với mức giá cực sốc.</p>
   </div>
 </section>
 

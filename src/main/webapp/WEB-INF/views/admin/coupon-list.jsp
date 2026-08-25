@@ -105,13 +105,14 @@
           <th class="py-3 px-4">Điều kiện tối thiểu</th>
           <th class="py-3 px-4">Thời gian áp dụng</th>
           <th class="py-3 px-4 text-center">Trạng thái</th>
+          <th class="py-3 px-4 text-center">Thao tác</th> <!-- Đã bổ sung cột Thao tác -->
         </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 text-sm">
 
         <!-- Vòng lặp JSTL đổ dữ liệu thật từ DB -->
         <c:forEach var="coupon" items="${coupons}">
-          <tr>
+          <tr class="hover:bg-gray-50 transition-colors">
             <td class="py-3 px-4 font-bold text-primary uppercase"><c:out value="${coupon.code}"/></td>
 
             <td class="py-3 px-4 text-red-500 font-bold">
@@ -129,6 +130,7 @@
             <td class="py-3 px-4 text-gray-500">
               Đến <fmt:formatDate value="${coupon.endDate}" pattern="dd/MM/yyyy HH:mm"/>
             </td>
+
             <td class="py-3 px-4 text-center">
               <c:choose>
                 <c:when test="${coupon.status}">
@@ -139,6 +141,35 @@
                 </c:otherwise>
               </c:choose>
             </td>
+
+            <!-- NỘI DUNG CỘT THAO TÁC -->
+            <td class="py-3 px-4 text-center">
+              <c:choose>
+                <c:when test="${coupon.status}">
+                  <!-- TRẠNG THÁI ACTIVE: Sửa và Ẩn (Soft Delete) -->
+                  <a href="${pageContext.request.contextPath}/admin/coupons/edit?id=${coupon.id}" class="text-blue-500 hover:text-blue-700 mx-1 transition-colors" title="Chỉnh sửa">
+                    <span class="material-symbols-outlined text-xl">edit_square</span>
+                  </a>
+                  <a href="${pageContext.request.contextPath}/admin/coupons/toggle-status?id=${coupon.id}&action=hide" onclick="return confirm('Bạn có muốn khóa/ẩn mã ${coupon.code} này đi không?');" class="text-orange-500 hover:text-orange-700 mx-1 transition-colors" title="Khóa/Ẩn mã">
+                    <span class="material-symbols-outlined text-xl">visibility_off</span>
+                  </a>
+                </c:when>
+
+                <c:otherwise>
+                  <!-- TRẠNG THÁI INACTIVE (ĐÃ ẨN): Khôi phục, Sửa và Xóa Vĩnh Viễn (Hard Delete) -->
+                  <a href="${pageContext.request.contextPath}/admin/coupons/toggle-status?id=${coupon.id}&action=restore" class="text-green-500 hover:text-green-700 mx-1 transition-colors" title="Khôi phục mã">
+                    <span class="material-symbols-outlined text-xl">restore</span>
+                  </a>
+                  <a href="${pageContext.request.contextPath}/admin/coupons/edit?id=${coupon.id}" class="text-blue-500 hover:text-blue-700 mx-1 transition-colors" title="Chỉnh sửa">
+                    <span class="material-symbols-outlined text-xl">edit_square</span>
+                  </a>
+                  <a href="${pageContext.request.contextPath}/admin/coupons/hard-delete?id=${coupon.id}" onclick="return confirm('CẢNH BÁO MẤT DỮ LIỆU: Bạn có chắc muốn XÓA VĨNH VIỄN mã ${coupon.code} này? Hành động này không thể hoàn tác!');" class="text-red-500 hover:text-red-700 mx-1 transition-colors" title="Xóa vĩnh viễn">
+                    <span class="material-symbols-outlined text-xl">delete_forever</span>
+                  </a>
+                </c:otherwise>
+              </c:choose>
+            </td>
+
           </tr>
         </c:forEach>
 
