@@ -5,4 +5,5 @@ public interface IDashboardDAO {
     int getTotalOrders();
     int getTotalProducts();
     int getOutOfStockProducts();
+    java.util.Map<String, Double> getRevenueChartData(String filterType);
 }

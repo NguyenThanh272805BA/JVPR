@@ -35,15 +35,16 @@
             </a>
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                    <div class="group relative cursor-pointer">
+                    <!-- Đã fix class Navbar User Dropdown đồng bộ với home.jsp -->
+                    <div class="group relative cursor-pointer py-2">
                         <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
                         </div>
-                        <div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant">
+                        <div class="absolute right-0 top-full w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant z-50 overflow-hidden">
                             <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-2 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
+                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
                             </c:if>
-                            <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-2 text-error hover:bg-error-container transition-colors">Đăng xuất</a>
+                            <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
                         </div>
                     </div>
                 </c:when>
@@ -138,14 +139,20 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <c:forEach var="item" items="${products}">
                     <div class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow border border-outline-variant overflow-hidden group flex flex-col">
-                        <div class="relative w-full h-48 bg-surface-container overflow-hidden">
+                        <!-- Product Image Clickable -->
+                        <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="relative w-full h-48 bg-surface-container overflow-hidden block">
                             <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             <div class="absolute top-3 left-3 bg-primary-container text-white text-xs font-bold px-2 py-1 rounded">
                                 <c:out value="${item.categoryName}"/>
                             </div>
-                        </div>
+                        </a>
+
                         <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="font-label-bold text-lg text-on-surface mb-2"><c:out value="${item.name}"/></h3>
+                            <!-- Product Title Clickable -->
+                            <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="hover:text-primary transition-colors">
+                                <h3 class="font-label-bold text-lg text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
+                            </a>
+
                             <div class="mt-auto flex items-center justify-between">
                                 <span class="font-price-tag text-price-tag text-primary">
                                     <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
@@ -223,7 +230,8 @@
                                     </div>
                                 `;
                                 li.addEventListener('click', () => {
-                                    window.location.href = `${pageContext.request.contextPath}/shop?keyword=` + encodeURIComponent(product.name);
+                                    //Khi click vào kết quả sẽ nhảy thẳng vào trang chi tiết thay vì trang shop
+                                    window.location.href = `${pageContext.request.contextPath}/product-detail?id=` + product.id;
                                 });
                                 searchDropdown.appendChild(li);
                             });

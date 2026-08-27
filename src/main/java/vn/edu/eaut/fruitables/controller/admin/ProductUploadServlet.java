@@ -47,6 +47,16 @@ public class ProductUploadServlet extends HttpServlet {
             String description = request.getParameter("description");
             boolean status = request.getParameter("status") != null;
 
+            // Xử lý bắt tham số Thuế (Mới)
+            double taxRate = 0.0;
+            String taxRateStr = request.getParameter("taxRate");
+            if (taxRateStr != null && !taxRateStr.trim().isEmpty()) {
+                taxRate = Double.parseDouble(taxRateStr);
+            }
+
+            // Xử lý bắt tham số Mô tả chi tiết CKEditor (Mới)
+            String detailedDescription = request.getParameter("detailedDescription");
+
             // Xử lý File Upload
             Part filePart = request.getPart("imageFile");
             String fileName = extractFileName(filePart);
@@ -75,8 +85,10 @@ public class ProductUploadServlet extends HttpServlet {
             product.setName(name);
             product.setCategoryId(categoryId);
             product.setPrice(price);
+            product.setTaxRate(taxRate); // Thêm thuế
             product.setStock(stock);
             product.setDescription(description);
+            product.setDetailedDescription(detailedDescription); // Thêm mô tả chi tiết
             product.setStatus(status);
             product.setImageUrl(dbImageUrl);
 

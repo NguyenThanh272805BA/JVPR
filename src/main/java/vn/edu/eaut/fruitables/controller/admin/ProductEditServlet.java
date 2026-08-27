@@ -49,6 +49,21 @@ public class ProductEditServlet extends HttpServlet {
             String name = request.getParameter("name");
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
             double price = Double.parseDouble(request.getParameter("price"));
+
+            // --- BẮT ĐẦU: LẤY DỮ LIỆU CÁC TRƯỜNG MỚI TỪ FORM ---
+            double taxRate = 0.0;
+            if (request.getParameter("taxRate") != null && !request.getParameter("taxRate").trim().isEmpty()) {
+                taxRate = Double.parseDouble(request.getParameter("taxRate"));
+            }
+
+            double discountPrice = 0.0;
+            if (request.getParameter("discountPrice") != null && !request.getParameter("discountPrice").trim().isEmpty()) {
+                discountPrice = Double.parseDouble(request.getParameter("discountPrice"));
+            }
+
+            String detailedDescription = request.getParameter("detailedDescription");
+            // --- KẾT THÚC ---
+
             int stock = Integer.parseInt(request.getParameter("stock"));
             String description = request.getParameter("description");
             boolean status = request.getParameter("status") != null;
@@ -69,16 +84,21 @@ public class ProductEditServlet extends HttpServlet {
                 dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + fileName;
             }
 
+            // Bind dữ liệu vào Model
             ProductModel product = new ProductModel();
             product.setId(id);
             product.setName(name);
             product.setCategoryId(categoryId);
             product.setPrice(price);
+            product.setTaxRate(taxRate); // Gán dữ liệu thuế
+            product.setDiscountPrice(discountPrice); // Gán dữ liệu giảm giá
             product.setStock(stock);
             product.setDescription(description);
+            product.setDetailedDescription(detailedDescription); // Gán dữ liệu mô tả chi tiết
             product.setStatus(status);
             product.setImageUrl(dbImageUrl);
 
+            // Cập nhật CSDL
             productService.updateProduct(product);
             response.sendRedirect(request.getContextPath() + "/admin/products?message=UpdateSuccess");
 

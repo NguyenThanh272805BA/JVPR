@@ -9,9 +9,9 @@ public class SessionTimeoutListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        // Thiết lập timeout cứng là 30 phút (1800 giây) bằng code Java
+        // Thiết lập timeout cứng là 30 phút
         se.getSession().setMaxInactiveInterval(30 * 60);
-        System.out.println("✅ Một Session mới được tạo: " + se.getSession().getId());
+        System.out.println("Một Session mới được tạo: " + se.getSession().getId());
     }
 
     @Override

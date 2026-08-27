@@ -57,7 +57,6 @@ tailwind.config = {
                 }
             },
             animation: {
-                // Các class để gọi trực tiếp trên HTML (ví dụ: class="animate-slide-up")
                 'fade-in': 'fadeIn 0.5s ease-out',
                 'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                 'float': 'float 3s ease-in-out infinite',
@@ -78,7 +77,7 @@ tailwind.config = {
                 "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
                 "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
                 "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
-                "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], // Giảm nhẹ 1px cho tinh tế
+                "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }],
                 "label-bold": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
                 "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
                 "price-tag": ["20px", { "lineHeight": "24px", "fontWeight": "700" }]

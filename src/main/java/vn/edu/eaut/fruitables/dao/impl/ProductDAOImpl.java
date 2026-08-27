@@ -18,22 +18,23 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
     }
     @Override
     public Long save(ProductModel product) {
-        String sql = "INSERT INTO products (category_id, name, slug, description, price, discount_price, stock, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (category_id, name, slug, description, detailed_description, price, tax_rate, discount_price, stock, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return insert(sql,
                 product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
-                product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(),
+                product.getDescription(), product.getDetailedDescription(), product.getPrice(), product.getTaxRate(), product.getDiscountPrice(), product.getStock(),
                 product.getImageUrl(), product.getStatus());
     }
+
     @Override
     public void updateProduct(ProductModel product) {
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, discount_price = ?, stock = ?, image_url = ?, status = ? WHERE id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, detailed_description = ?, price = ?, tax_rate = ?, discount_price = ?, stock = ?, image_url = ?, status = ? WHERE id = ?";
             update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
-                    product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(), product.getImageUrl(), product.getStatus(), product.getId());
+                    product.getDescription(), product.getDetailedDescription(), product.getPrice(), product.getTaxRate(), product.getDiscountPrice(), product.getStock(), product.getImageUrl(), product.getStatus(), product.getId());
         } else {
-            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, price = ?, discount_price = ?, stock = ?, status = ? WHERE id = ?";
+            String sql = "UPDATE products SET category_id = ?, name = ?, slug = ?, description = ?, detailed_description = ?, price = ?, tax_rate = ?, discount_price = ?, stock = ?, status = ? WHERE id = ?";
             update(sql, product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
-                    product.getDescription(), product.getPrice(), product.getDiscountPrice(), product.getStock(), product.getStatus(), product.getId());
+                    product.getDescription(), product.getDetailedDescription(), product.getPrice(), product.getTaxRate(), product.getDiscountPrice(), product.getStock(), product.getStatus(), product.getId());
         }
     }
     @Override

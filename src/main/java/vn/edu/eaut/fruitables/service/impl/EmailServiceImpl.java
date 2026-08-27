@@ -29,31 +29,31 @@ public class EmailServiceImpl {
     }
 
     public boolean sendOTP(String toEmail, String otpCode) {
-        // Nếu cấu hình lỗi, không cho gửi để tránh exception[cite: 2]
+        // Nếu cấu hình lỗi, không cho gửi để tránh exception
         if (fromEmail == null || password == null) {
             System.out.println("Chưa cấu hình Email hệ thống!");
             return false;
         }
 
         Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com"); //[cite: 2]
-        props.put("mail.smtp.port", "587"); //[cite: 2]
-        props.put("mail.smtp.auth", "true"); //[cite: 2]
-        props.put("mail.smtp.starttls.enable", "true"); //[cite: 2]
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(fromEmail, password); //[cite: 2]
+                return new PasswordAuthentication(fromEmail, password);
             }
         });
 
         try {
-            Message message = new MimeMessage(session); //[cite: 2]
-            message.setFrom(new InternetAddress(fromEmail)); //[cite: 2]
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail)); //[cite: 2]
-            message.setSubject("Mã OTP xác thực tài khoản Fruitables"); //[cite: 2]
-            message.setContent( //[cite: 2]
-                    "<h3>Chào mừng bạn đến với Fruitables!</h3>" + //[cite: 2]
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject("Mã OTP xác thực tài khoản Fruitables");
+            message.setContent(
+                    "<h3>Chào mừng bạn đến với Fruitables!</h3>" +
                             "<p>Mã OTP kích hoạt tài khoản của bạn là: <b style='color:green; font-size: 20px;'>" + otpCode + "</b></p>" + //[cite: 2]
                             "<p>Mã này có hiệu lực trong 5 phút. Không chia sẻ mã này cho bất kỳ ai.</p>", //[cite: 2]
                     "text/html; charset=utf-8" //[cite: 2]

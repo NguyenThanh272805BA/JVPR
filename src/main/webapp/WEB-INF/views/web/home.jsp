@@ -159,17 +159,20 @@
             <!-- LẶP DANH SÁCH SẢN PHẨM TỪ CONTROLLER -->
             <c:forEach var="item" items="${topProducts}">
                 <div class="bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-shadow border border-outline-variant overflow-hidden group">
-                    <!-- Product Image -->
-                    <div class="relative w-full h-56 bg-surface-container overflow-hidden">
+                    <!-- Product Image Clickable -->
+                    <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="relative w-full h-56 bg-surface-container overflow-hidden block">
                         <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                         <div class="absolute top-3 left-3 bg-primary-container text-white text-xs font-bold px-2 py-1 rounded">
                             <c:out value="${item.categoryName}"/>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Product Info -->
                     <div class="p-5 flex flex-col h-full">
-                        <h3 class="font-label-bold text-lg text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
+                        <!-- Product Title Clickable -->
+                        <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="hover:text-primary transition-colors">
+                            <h3 class="font-label-bold text-lg text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
+                        </a>
 
                         <!-- Đánh giá sao (Mặc định tĩnh) -->
                         <div class="flex items-center mb-4">

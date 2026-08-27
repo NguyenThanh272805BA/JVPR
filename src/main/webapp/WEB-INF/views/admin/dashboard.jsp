@@ -128,7 +128,15 @@
 
             <!-- Chart Section -->
             <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] flex flex-col mb-8">
-                <h2 class="font-label-bold text-label-bold text-on-surface mb-4">Biểu đồ doanh thu 6 tháng qua</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-label-bold text-label-bold text-on-surface">Biểu đồ doanh thu</h2>
+                    <select id="chartFilter" class="border border-outline-variant rounded-md px-3 py-1 font-body-md text-on-surface focus:border-primary outline-none">
+                        <option value="day">Theo ngày (7 ngày qua)</option>
+                        <option value="week">Theo tuần (5 tuần qua)</option>
+                        <option value="month" selected>Theo tháng (6 tháng qua)</option>
+                        <option value="quarter">Theo quý (4 quý qua)</option>
+                    </select>
+                </div>
                 <div class="relative h-[400px] w-full">
                     <canvas id="revenueChart"></canvas>
                 </div>
@@ -179,12 +187,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('${pageContext.request.contextPath}/api/chart-data')
+    let revenueChart = null;
+
+    function loadChartData(filter) {
+        fetch('${pageContext.request.contextPath}/api/chart-data?filter=' + filter)
             .then(response => response.json())
             .then(chartData => {
                 const ctx = document.getElementById('revenueChart').getContext('2d');
-                new Chart(ctx, {
+
+                // Hủy biểu đồ cũ trước khi vẽ lại để tránh lỗi hiển thị đè
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+
+                revenueChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: chartData.labels,
@@ -220,6 +236,16 @@
                 });
             })
             .catch(err => console.error('Lỗi khi vẽ biểu đồ:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tải dữ liệu mặc định lúc vừa vào trang (theo Tháng)
+        loadChartData('month');
+
+        // Bắt sự kiện khi Admin đổi tùy chọn trong Select Box
+        document.getElementById('chartFilter').addEventListener('change', function() {
+            loadChartData(this.value);
+        });
     });
 </script>
 </body>
