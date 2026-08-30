@@ -21,6 +21,10 @@ public class CouponModel {
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
 
+    private String targetAudience;
+    public String getTargetAudience() { return targetAudience; }
+    public void setTargetAudience(String targetAudience) { this.targetAudience = targetAudience; }
+
     public String getDiscountType() { return discountType; }
     public void setDiscountType(String discountType) { this.discountType = discountType; }
 

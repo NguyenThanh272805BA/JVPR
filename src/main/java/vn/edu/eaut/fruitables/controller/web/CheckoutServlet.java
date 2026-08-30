@@ -62,11 +62,17 @@ public class CheckoutServlet extends HttpServlet {
         Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
 
         if (cart != null && !cart.isEmpty()) {
-            // Tính tổng tiền đơn hàng
+            // Tính tổng tiền đơn hàng và tổng thuế
             double totalAmount = 0;
+            double totalTax = 0;
+
             for (CartItemDTO item : cart.values()) {
                 totalAmount += item.getSubTotal();
+                totalTax += item.getTaxAmount(); // Lấy tiền thuế của từng món
             }
+
+            // Cộng thuế vào tổng hóa đơn cuối cùng
+            totalAmount += totalTax;
 
             // XỬ LÝ MÃ GIẢM GIÁ (Trừ tiền nếu có Voucher trong Session)
             Double discountAmount = (Double) session.getAttribute("DISCOUNT_AMOUNT");

@@ -32,7 +32,11 @@ public class UserModel {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
+    private String loginType;
+    public String getLoginType() { return loginType; }
+    public void setLoginType(String loginType) { this.loginType = loginType; }
     public String getPhone() { return phone; }
+
     public void setPhone(String phone) { this.phone = phone; }
 
     public String getAddress() { return address; }

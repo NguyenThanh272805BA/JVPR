@@ -18,6 +18,7 @@ public class UserMapper implements IRowMapper<UserModel> {
             user.setAddress(rs.getString("address"));
             user.setStatus(rs.getString("status"));
             user.setCreatedAt(rs.getTimestamp("created_at"));
+            user.setLoginType(rs.getString("login_type"));
             return user;
         } catch (SQLException e) {
             e.printStackTrace();

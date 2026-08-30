@@ -19,6 +19,7 @@ public class CouponMapper implements IRowMapper<CouponModel> {
             coupon.setUsageLimit(rs.getInt("usage_limit"));
             coupon.setUsedCount(rs.getInt("used_count"));
             coupon.setStatus(rs.getBoolean("status"));
+            coupon.setTargetAudience(rs.getString("target_audience"));
             return coupon;
         } catch (SQLException e) {
             e.printStackTrace();

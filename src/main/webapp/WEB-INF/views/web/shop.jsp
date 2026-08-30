@@ -35,16 +35,20 @@
             </a>
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                    <!-- Đã fix class Navbar User Dropdown đồng bộ với home.jsp -->
+                    <!-- ĐÃ FIX CSS: Thêm thẻ đệm vô hình (pt-2) và nâng z-index để không bị mất hover -->
                     <div class="group relative cursor-pointer py-2">
                         <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
                         </div>
-                        <div class="absolute right-0 top-full w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant z-50 overflow-hidden">
-                            <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
-                            </c:if>
-                            <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
+                        <!-- Vùng đệm vô hình giữ hover -->
+                        <div class="absolute right-0 top-full pt-2 z-[100] hidden group-hover:block w-48">
+                            <div class="bg-surface-container-lowest rounded-md shadow-lg border border-outline-variant overflow-hidden">
+                                <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
+                                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
+                                </c:if>
+                                <a href="${pageContext.request.contextPath}/profile" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Thông tin cá nhân</a>
+                                <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
+                            </div>
                         </div>
                     </div>
                 </c:when>
@@ -73,7 +77,7 @@
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col md:flex-row gap-8">
 
         <!-- SIDEBAR -->
-        <aside class="w-full md:w-1/4 flex flex-col gap-6">
+        <aside class="w-full md:w-1/4 flex flex-col gap-6 relative z-10">
             <!-- Tích hợp AJAX Live Search -->
             <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
                 <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Tìm kiếm</h3>
@@ -153,6 +157,27 @@
                                 <h3 class="font-label-bold text-lg text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
                             </a>
 
+                            <!-- ĐÃ BỔ SUNG: Render số sao động từ Database -->
+                            <div class="flex items-center mb-3">
+                                <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 0}" />
+                                <div class="flex text-yellow-500">
+                                    <c:forEach begin="1" end="5" var="i">
+                                        <c:choose>
+                                            <c:when test="${rating >= i}">
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                            </c:when>
+                                            <c:when test="${rating >= i - 0.5}">
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="material-symbols-outlined text-[16px] text-gray-300">star</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                </div>
+                                <span class="text-xs text-on-surface-variant ml-2">(${item.reviewCount != null ? item.reviewCount : 0})</span>
+                            </div>
+
                             <div class="mt-auto flex items-center justify-between">
                                 <span class="font-price-tag text-price-tag text-primary">
                                     <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
@@ -230,7 +255,7 @@
                                     </div>
                                 `;
                                 li.addEventListener('click', () => {
-                                    //Khi click vào kết quả sẽ nhảy thẳng vào trang chi tiết thay vì trang shop
+                                    // Khi click vào kết quả sẽ nhảy thẳng vào trang chi tiết thay vì trang shop
                                     window.location.href = `${pageContext.request.contextPath}/product-detail?id=` + product.id;
                                 });
                                 searchDropdown.appendChild(li);

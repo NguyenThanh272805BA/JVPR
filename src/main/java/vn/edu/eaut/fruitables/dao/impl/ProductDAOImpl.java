@@ -9,8 +9,10 @@ import java.util.ArrayList;
 public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProductDAO {
 
     // Câu SQL cơ bản: JOIN với bảng categories để lấy category_name hiển thị ra UI
-    private final String BASE_SQL = "SELECT p.*, c.name AS category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id";
-
+    private final String BASE_SQL = "SELECT p.*, c.name AS category_name, " +
+            "(SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id) AS avg_rating, " +
+            "(SELECT COUNT(*) FROM reviews WHERE product_id = p.id) AS review_count " +
+            "FROM products p LEFT JOIN categories c ON p.category_id = c.id";
     @Override
     public List<ProductModel> findAll() {
         String sql = BASE_SQL + " ORDER BY p.id DESC";

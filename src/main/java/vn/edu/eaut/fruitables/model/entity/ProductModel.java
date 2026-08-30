@@ -11,6 +11,15 @@ public class ProductModel {
     private Boolean status;
     private String categoryName;
     private Double discountPrice;
+
+    // Thuộc tính bổ sung: Chi tiết & Thuế
+    private String detailedDescription;
+    private Double taxRate;
+
+    // Thuộc tính bổ sung: Đánh giá & Số lượng bình luận
+    private Double avgRating;
+    private Integer reviewCount;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -40,14 +49,17 @@ public class ProductModel {
     public void setStatus(Boolean status) { this.status = status; }
 
     public String getCategoryName() { return categoryName; }
-
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
-    private String detailedDescription;
-    private Double taxRate;
 
     public String getDetailedDescription() { return detailedDescription; }
     public void setDetailedDescription(String detailedDescription) { this.detailedDescription = detailedDescription; }
 
     public Double getTaxRate() { return taxRate; }
     public void setTaxRate(Double taxRate) { this.taxRate = taxRate; }
+
+    public Double getAvgRating() { return avgRating; }
+    public void setAvgRating(Double avgRating) { this.avgRating = avgRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

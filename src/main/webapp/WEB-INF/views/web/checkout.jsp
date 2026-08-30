@@ -86,9 +86,31 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block font-label-bold text-on-surface mb-2">Địa chỉ nhận hàng (Chi tiết) *</label>
-                        <textarea name="address" required rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
-                                  class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.address : ''}</textarea>
+                        <label class="block font-label-bold text-on-surface mb-2">Địa chỉ nhận hàng *</label>
+
+                        <!-- 3 Dropdown chọn Tỉnh/Quận/Phường -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <select id="province" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface">
+                                <option value="">-- Chọn Tỉnh/Thành --</option>
+                            </select>
+                            <select id="district" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface" disabled>
+                                <option value="">-- Chọn Quận/Huyện --</option>
+                            </select>
+                            <select id="ward" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface" disabled>
+                                <option value="">-- Chọn Phường/Xã --</option>
+                            </select>
+                        </div>
+
+                        <!-- Ô nhập số nhà -->
+                        <input type="text" id="street" placeholder="Số nhà, tên đường, tòa nhà..." class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface mb-2">
+
+                        <!-- Input ẩn để gộp toàn bộ chuỗi địa chỉ gửi về Servlet -->
+                        <input type="hidden" name="address" id="fullAddress" value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.address : ''}" required>
+
+                        <!-- Hiển thị lại địa chỉ đã lưu (nếu có) -->
+                        <c:if test="${not empty sessionScope.USERMODEL.address}">
+                            <p class="text-sm text-primary font-label-bold mt-2">Địa chỉ mặc định: ${sessionScope.USERMODEL.address} (Bạn có thể chọn lại ở trên để thay đổi)</p>
+                        </c:if>
                     </div>
                 </div>
 
@@ -135,8 +157,11 @@
                     <!-- List Sản phẩm -->
                     <div class="space-y-4 mb-6 border-b border-surface-variant pb-6">
                         <c:set var="totalAmount" value="0"/>
+                        <c:set var="totalTaxValue" value="0"/>
+
                         <c:forEach var="item" items="${sessionScope.CART.values()}">
                             <c:set var="totalAmount" value="${totalAmount + item.subTotal}"/>
+                            <c:set var="totalTaxValue" value="${totalTaxValue + (item.taxAmount != null ? item.taxAmount : 0)}"/>
 
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center gap-3">
@@ -157,8 +182,12 @@
 
                     <!-- Tính tiền -->
                     <div class="flex justify-between items-center mb-4 text-on-surface-variant font-body-md">
-                        <span>Tạm tính</span>
+                        <span>Tạm tính (chưa thuế)</span>
                         <span class="font-medium text-on-surface"><fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true"/> ₫</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4 text-error font-body-md">
+                        <span>Thuế VAT áp dụng</span>
+                        <span class="font-medium text-error">+ <fmt:formatNumber value="${totalTaxValue}" type="number" groupingUsed="true"/> ₫</span>
                     </div>
                     <div class="flex justify-between items-center mb-4 text-on-surface-variant font-body-md border-b border-surface-variant pb-4">
                         <span>Phí giao hàng</span>
@@ -168,7 +197,7 @@
                     <div class="flex justify-between items-center mb-8">
                         <span class="font-label-bold text-on-surface text-lg">Tổng thanh toán</span>
                         <span class="font-price-tag text-2xl text-primary">
-                                <fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true"/> ₫
+                                <fmt:formatNumber value="${totalAmount + totalTaxValue}" type="number" groupingUsed="true"/> ₫
                             </span>
                     </div>
 
@@ -205,5 +234,77 @@
         </c:choose>
     </div>
 </main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('province');
+        const districtSelect = document.getElementById('district');
+        const wardSelect = document.getElementById('ward');
+        const streetInput = document.getElementById('street');
+        const fullAddressInput = document.getElementById('fullAddress');
+
+        // Gọi API lấy toàn bộ Tỉnh/Thành phố
+        axios.get('https://provinces.open-api.vn/api/?depth=3')
+            .then(response => {
+                const data = response.data;
+                data.forEach(province => {
+                    provinceSelect.add(new Option(province.name, province.code));
+                });
+
+                // Khi đổi Tỉnh
+                provinceSelect.addEventListener('change', function() {
+                    districtSelect.length = 1;
+                    wardSelect.length = 1;
+                    districtSelect.disabled = false;
+                    wardSelect.disabled = true;
+
+                    const selectedProvince = data.find(p => p.code == this.value);
+                    if(selectedProvince) {
+                        selectedProvince.districts.forEach(district => {
+                            districtSelect.add(new Option(district.name, district.code));
+                        });
+                    }
+                    updateFullAddress();
+                });
+
+                // Khi đổi Quận/Huyện
+                districtSelect.addEventListener('change', function() {
+                    wardSelect.length = 1;
+                    wardSelect.disabled = false;
+
+                    const selectedProvince = data.find(p => p.code == provinceSelect.value);
+                    const selectedDistrict = selectedProvince.districts.find(d => d.code == this.value);
+                    if(selectedDistrict) {
+                        selectedDistrict.wards.forEach(ward => {
+                            wardSelect.add(new Option(ward.name, ward.code));
+                        });
+                    }
+                    updateFullAddress();
+                });
+
+                // Khi đổi Phường hoặc gõ Số nhà
+                wardSelect.addEventListener('change', updateFullAddress);
+                streetInput.addEventListener('input', updateFullAddress);
+            });
+
+        // Hàm nối chuỗi địa chỉ
+        function updateFullAddress() {
+            const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
+            const districtName = districtSelect.options[districtSelect.selectedIndex]?.text || '';
+            const wardName = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+            const street = streetInput.value.trim();
+
+            let finalAddress = [];
+            if (street) finalAddress.push(street);
+            if (wardSelect.value) finalAddress.push(wardName);
+            if (districtSelect.value) finalAddress.push(districtName);
+            if (provinceSelect.value) finalAddress.push(provinceName);
+
+            // Cập nhật giá trị vào input ẩn để gửi đi
+            fullAddressInput.value = finalAddress.join(', ');
+        }
+    });
+</script>
 </body>
 </html>
