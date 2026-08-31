@@ -59,7 +59,8 @@ public class AddToCartAPIServlet extends HttpServlet {
                             product.getName(),
                             product.getImageUrl(),
                             product.getPrice(),
-                            1
+                            1,
+                            product.getTaxRate() != null ? product.getTaxRate() : 0.0
                     );
                     cart.put(productId, newItem);
                 }

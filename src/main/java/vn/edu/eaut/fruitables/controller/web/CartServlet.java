@@ -56,13 +56,14 @@ public class CartServlet extends HttpServlet {
                         CartItemDTO existingItem = cart.get(productId);
                         existingItem.setQuantity(existingItem.getQuantity() + 1);
                     } else {
-                        // Chưa có -> Tạo Item mới dựa trên dữ liệu thật từ DB
+                        // ĐÃ SỬA LỖI Ở ĐÂY: Truyền thêm thuộc tính thứ 6 là getTaxRate()
                         CartItemDTO newItem = new CartItemDTO(
                                 product.getId(),
                                 product.getName(),
                                 product.getImageUrl(),
                                 product.getPrice(),
-                                1 // Số lượng mặc định ban đầu là 1
+                                1, // Số lượng mặc định ban đầu là 1
+                                product.getTaxRate() != null ? product.getTaxRate() : 0.0 // Lấy % thuế từ DB
                         );
                         cart.put(productId, newItem);
                     }
