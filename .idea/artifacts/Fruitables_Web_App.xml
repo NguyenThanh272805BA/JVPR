@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="Fruitables-Web-App">
+    <output-path>$PROJECT_DIR$/out/artifacts/Fruitables_Web_App</output-path>
+    <root id="root">
+      <element id="archive" name="Fruitables_Web_App.jar">
+        <element id="module-output" name="Fruitables-Web-App" />
+      </element>
+    </root>
+  </artifact>
+</component>

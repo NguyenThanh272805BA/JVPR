@@ -11,17 +11,37 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+.bg-pattern {
+    background-color: #f4fbf7;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0 60 Q 30 30, 60 60 T 120 60' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 120 Q 30 90, 60 120 T 120 120' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 0 Q 30 -30, 60 0 T 120 0' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    background-attachment: fixed;
+    animation: rollingWaves 25s linear infinite;
+}
+
+@keyframes rollingWaves {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: -160px 160px;
+    }
+}
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
+
 ::-webkit-scrollbar-track {
     background: #f1f5f9;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #cbd5e1;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
@@ -48,14 +68,16 @@ body {
 .hover-lift {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .hover-lift:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15), 0 8px 12px -6px rgba(0, 0, 0, 0.1);
 }
 
-.hover-zoom-img overflow-hidden img {
+.hover-zoom-img img {
     transition: transform 0.5s ease;
 }
+
 .hover-zoom-img:hover img {
     transform: scale(1.05);
 }

@@ -1,6 +1,7 @@
 package vn.edu.eaut.fruitables.model.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class OrderModel {
     private Long id;
@@ -13,6 +14,9 @@ public class OrderModel {
     private String status;
     private Timestamp createdAt;
     private String paymentStatus;
+
+    // Thuộc tính bổ sung để lưu danh sách sản phẩm của đơn hàng
+    private List<OrderDetailModel> details;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -44,4 +48,8 @@ public class OrderModel {
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+    // Getters and Setters cho danh sách chi tiết đơn hàng
+    public List<OrderDetailModel> getDetails() { return details; }
+    public void setDetails(List<OrderDetailModel> details) { this.details = details; }
 }

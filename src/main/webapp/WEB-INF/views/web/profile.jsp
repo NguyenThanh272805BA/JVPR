@@ -33,12 +33,22 @@
     <aside class="w-full md:w-1/4">
       <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm sticky top-28">
         <div class="flex items-center gap-4 mb-6 pb-6 border-b border-surface-variant">
-          <div class="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white text-2xl">
-            <span class="material-symbols-outlined">person</span>
+
+          <!-- HIỂN THỊ AVATAR ĐỘNG -->
+          <div class="w-16 h-16 rounded-full border-2 border-primary-container flex items-center justify-center bg-surface-container overflow-hidden shrink-0">
+            <c:choose>
+                <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
+                    <img src="${sessionScope.USERMODEL.avatarUrl}" alt="Avatar" class="w-full h-full object-cover">
+                </c:when>
+                <c:otherwise>
+                    <span class="material-symbols-outlined text-primary text-3xl">person</span>
+                </c:otherwise>
+            </c:choose>
           </div>
+
           <div>
             <p class="text-sm text-on-surface-variant">Tài khoản của</p>
-            <p class="font-label-bold text-lg text-on-surface">${sessionScope.USERMODEL.fullName}</p>
+            <p class="font-label-bold text-lg text-on-surface line-clamp-1">${sessionScope.USERMODEL.fullName}</p>
           </div>
         </div>
         <ul class="space-y-2 font-label-bold">
@@ -48,7 +58,8 @@
             </a>
           </li>
           <li>
-            <a href="#" class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+            <!-- ĐÃ SỬA LINK LỊCH SỬ ĐƠN HÀNG -->
+            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
               <span class="material-symbols-outlined">receipt_long</span> Quản lý đơn hàng
             </a>
           </li>
@@ -73,7 +84,16 @@
           </div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/profile" method="POST" class="space-y-6 max-w-2xl">
+        <!-- ĐÃ THÊM ENCTYPE MULTIPART ĐỂ UPLOAD FILE -->
+        <form action="${pageContext.request.contextPath}/profile" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
+
+          <!-- THÊM Ô CHỌN ẢNH ĐẠI DIỆN -->
+          <div class="mb-6">
+            <label class="block font-label-bold text-on-surface mb-2">Ảnh đại diện (Tùy chọn)</label>
+            <input type="file" name="avatarFile" accept="image/*"
+                   class="w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-label-bold file:bg-primary-container/20 file:text-primary hover:file:bg-primary-container/30 transition-colors">
+          </div>
+
           <div class="mb-6">
             <label class="block font-label-bold text-on-surface mb-2">Email đăng nhập <span class="text-error">*</span></label>
             <div class="relative">

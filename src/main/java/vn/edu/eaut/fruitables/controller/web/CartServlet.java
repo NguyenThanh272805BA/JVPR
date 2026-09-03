@@ -56,7 +56,6 @@ public class CartServlet extends HttpServlet {
                         CartItemDTO existingItem = cart.get(productId);
                         existingItem.setQuantity(existingItem.getQuantity() + 1);
                     } else {
-                        // ĐÃ SỬA LỖI Ở ĐÂY: Truyền thêm thuộc tính thứ 6 là getTaxRate()
                         CartItemDTO newItem = new CartItemDTO(
                                 product.getId(),
                                 product.getName(),

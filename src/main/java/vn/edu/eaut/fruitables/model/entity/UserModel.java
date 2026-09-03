@@ -12,6 +12,8 @@ public class UserModel {
     private String address;
     private String status;
     private Timestamp createdAt;
+    private String avatarUrl;
+    private String loginType;
 
     // Constructors
     public UserModel() {}
@@ -32,11 +34,7 @@ public class UserModel {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    private String loginType;
-    public String getLoginType() { return loginType; }
-    public void setLoginType(String loginType) { this.loginType = loginType; }
     public String getPhone() { return phone; }
-
     public void setPhone(String phone) { this.phone = phone; }
 
     public String getAddress() { return address; }
@@ -47,4 +45,10 @@ public class UserModel {
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+    public String getLoginType() { return loginType; }
+    public void setLoginType(String loginType) { this.loginType = loginType; }
 }

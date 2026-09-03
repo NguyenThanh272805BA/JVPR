@@ -9,4 +9,5 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     List<OrderModel> findAll();
     OrderModel findById(Long id);
     OrderModel findByOrderCode(String orderCode);
+    List<OrderModel> findByUserId(Long userId);
 }
