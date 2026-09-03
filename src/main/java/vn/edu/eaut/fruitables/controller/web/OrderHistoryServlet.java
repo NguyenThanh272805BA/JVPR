@@ -28,15 +28,29 @@ public class OrderHistoryServlet extends HttpServlet {
             return;
         }
 
-        // 1. Lấy danh sách các đơn hàng của user
         List<OrderModel> orders = orderDAO.findByUserId(user.getId());
-
-        // 2. Duyệt qua từng đơn hàng, lấy chi tiết các món hàng nhét vào trong OrderModel
         for (OrderModel order : orders) {
             order.setDetails(orderDAO.findOrderDetailsByOrderId(order.getId()));
         }
 
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("/WEB-INF/views/web/order-history.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        // Bắt sự kiện Khách hàng bấm nút "Đã nhận được hàng"
+        if ("confirm_received".equals(action)) {
+            try {
+                Long orderId = Long.parseLong(request.getParameter("orderId"));
+                // Chuyển thẳng sang COMPLETED
+                orderDAO.updateOrderStatus(orderId, "COMPLETED");
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        response.sendRedirect(request.getContextPath() + "/order-history");
     }
 }

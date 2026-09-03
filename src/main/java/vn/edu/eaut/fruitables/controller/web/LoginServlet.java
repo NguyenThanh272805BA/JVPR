@@ -31,54 +31,51 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Chuyển hướng tới trang JSP hiển thị form
         request.getRequestDispatcher("/WEB-INF/views/web/login.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String remember = request.getParameter("remember"); // Lấy giá trị checkbox Remember Me
+        // Lấy identifier (có thể là username, phone, hoặc email) - Cần đảm bảo JSP cũng dùng name="identifier" ở Giai đoạn 3
+        String identifier = request.getParameter("identifier");
 
-        UserModel user = userService.login(email, password);
+        // Backup: Nếu chưa sửa kịp bên JSP thì lấy tạm bằng name "email"
+        if (identifier == null || identifier.trim().isEmpty()) {
+            identifier = request.getParameter("email");
+        }
+
+        String password = request.getParameter("password");
+        String remember = request.getParameter("remember");
+
+        UserModel user = userService.login(identifier, password);
 
         if (user != null) {
-            // Đăng nhập thành công, lưu thông tin vào Session
             HttpSession session = request.getSession();
             session.setAttribute("USERMODEL", user);
 
-            // 1. Xử lý Remember Me bằng Cookie (Lưu 7 ngày)
             if ("on".equals(remember)) {
-                // Thực tế nên lưu Token mã hóa, ở đây lưu email phục vụ demo
-                Cookie cookieEmail = new Cookie("rememberEmail", email);
-                cookieEmail.setMaxAge(60 * 60 * 24 * 7); // Thời hạn 7 ngày
-                response.addCookie(cookieEmail);
+                Cookie cookieUser = new Cookie("rememberIdentifier", identifier);
+                cookieUser.setMaxAge(60 * 60 * 24 * 7);
+                response.addCookie(cookieUser);
             }
 
-            // 2. Đồng bộ giỏ hàng Session vào Database (Cho khách vãng lai)
             @SuppressWarnings("unchecked")
             Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
-
             if (cart != null && !cart.isEmpty()) {
                 syncCartToDB(user.getId(), cart);
             }
 
-            // Chuyển hướng về trang chủ
             response.sendRedirect(request.getContextPath() + "/home");
         } else {
-            // Thất bại, trả về trang login kèm thông báo lỗi
-            request.setAttribute("message", "Email hoặc mật khẩu không chính xác.");
+            request.setAttribute("message", "Tài khoản hoặc mật khẩu không chính xác.");
             request.getRequestDispatcher("/WEB-INF/views/web/login.jsp").forward(request, response);
         }
     }
 
-    // Hàm phụ trợ đẩy dữ liệu giỏ hàng vào bảng cart_items
     private void syncCartToDB(Long userId, Map<Long, CartItemDTO> sessionCart) {
         String sqlCheck = "SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?";
         String sqlUpdate = "UPDATE cart_items SET quantity = quantity + ? WHERE user_id = ? AND product_id = ?";
         String sqlInsert = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)";
-
         try (Connection conn = DBConnectionUtil.getConnection()) {
             for (CartItemDTO item : sessionCart.values()) {
                 try (PreparedStatement psCheck = conn.prepareStatement(sqlCheck)) {
@@ -86,7 +83,6 @@ public class LoginServlet extends HttpServlet {
                     psCheck.setLong(2, item.getProductId());
                     try (ResultSet rs = psCheck.executeQuery()) {
                         if (rs.next()) {
-                            // Đã có -> Cập nhật cộng dồn số lượng
                             try (PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate)) {
                                 psUpdate.setInt(1, item.getQuantity());
                                 psUpdate.setLong(2, userId);
@@ -94,7 +90,6 @@ public class LoginServlet extends HttpServlet {
                                 psUpdate.executeUpdate();
                             }
                         } else {
-                            // Chưa có -> Thêm mới
                             try (PreparedStatement psInsert = conn.prepareStatement(sqlInsert)) {
                                 psInsert.setLong(1, userId);
                                 psInsert.setLong(2, item.getProductId());

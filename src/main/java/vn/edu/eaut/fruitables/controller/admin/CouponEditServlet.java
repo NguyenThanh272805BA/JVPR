@@ -29,7 +29,6 @@ public class CouponEditServlet extends HttpServlet {
             }
 
             request.setAttribute("coupon", coupon);
-            // Forward dữ liệu sang giao diện JSP
             request.getRequestDispatcher("/WEB-INF/views/admin/coupon-form.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,10 +46,12 @@ public class CouponEditServlet extends HttpServlet {
             coupon.setDiscountValue(Double.parseDouble(request.getParameter("discountValue")));
             coupon.setMinOrderValue(Double.parseDouble(request.getParameter("minOrderValue")));
 
-            // Xử lý format thời gian từ HTML datetime-local sang Timestamp của SQL
+            // Thêm trường đối tượng áp dụng
+            String targetAudience = request.getParameter("targetAudience");
+            coupon.setTargetAudience(targetAudience != null ? targetAudience : "ALL");
+
             String startDateStr = request.getParameter("startDate").replace("T", " ");
             String endDateStr = request.getParameter("endDate").replace("T", " ");
-            // Thêm giây nếu HTML5 không gửi kèm giây
             if (startDateStr.length() == 16) startDateStr += ":00";
             if (endDateStr.length() == 16) endDateStr += ":00";
 
@@ -58,7 +59,7 @@ public class CouponEditServlet extends HttpServlet {
             coupon.setEndDate(Timestamp.valueOf(endDateStr));
 
             coupon.setUsageLimit(Integer.parseInt(request.getParameter("usageLimit")));
-            coupon.setStatus(request.getParameter("status") != null); // Checkbox
+            coupon.setStatus(request.getParameter("status") != null);
 
             couponService.update(coupon);
             response.sendRedirect(request.getContextPath() + "/admin/coupons?message=Success");

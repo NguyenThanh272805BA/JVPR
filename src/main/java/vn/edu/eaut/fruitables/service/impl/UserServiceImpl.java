@@ -15,10 +15,9 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserModel login(String email, String password) {
-        UserModel user = userDAO.findByEmail(email);
+    public UserModel login(String identifier, String password) {
+        UserModel user = userDAO.findByUsernameOrPhoneOrEmail(identifier);
         if (user != null) {
-            // Mã hóa password người dùng nhập và so sánh với DB
             String hashInput = SecurityUtil.hashPassword(password);
             if (user.getPasswordHash().equals(hashInput)) {
                 return user;
@@ -29,7 +28,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserModel register(UserModel userModel) {
-        // Mã hóa mật khẩu trước khi lưu
         String hashedPassword = SecurityUtil.hashPassword(userModel.getPasswordHash());
         userModel.setPasswordHash(hashedPassword);
 

@@ -23,7 +23,7 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
     @Override
     public void saveOrderDetail(Long orderId, Long productId, Double price, Integer quantity, Double subTotal) {
         String sql = "INSERT INTO order_details (order_id, product_id, price, quantity, sub_total) VALUES (?, ?, ?, ?, ?)";
-        insert(sql, orderId, productId, price, quantity, subTotal); // Tái sử dụng hàm insert của AbstractDAO
+        insert(sql, orderId, productId, price, quantity, subTotal);
     }
 
     @Override
@@ -52,7 +52,18 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
         return query(sql, new OrderMapper(), userId);
     }
 
-    // BỔ SUNG: Lấy danh sách sản phẩm chi tiết trong 1 đơn hàng cụ thể kèm tên và ảnh
+    @Override
+    public List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode) {
+        String sql = "SELECT * FROM orders WHERE phone = ? OR order_code = ? ORDER BY created_at DESC";
+        return query(sql, new OrderMapper(), phone, orderCode);
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, String status) {
+        String sql = "UPDATE orders SET status = ? WHERE id = ?";
+        update(sql, status, orderId);
+    }
+
     public List<OrderDetailModel> findOrderDetailsByOrderId(Long orderId) {
         String sql = "SELECT od.*, p.name AS product_name, p.image_url AS product_image " +
                 "FROM order_details od " +
@@ -72,11 +83,8 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                     detail.setPrice(rs.getDouble("price"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setSubTotal(rs.getDouble("sub_total"));
-
-                    // Lấy thêm thông tin tên và ảnh sản phẩm từ bảng products
                     detail.setProductName(rs.getString("product_name"));
                     detail.setProductImageUrl(rs.getString("product_image"));
-
                     list.add(detail);
                 }
             }

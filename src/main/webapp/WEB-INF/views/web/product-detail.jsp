@@ -14,47 +14,8 @@
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col">
 
-<!-- NAVBAR -->
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-    <a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg font-extrabold text-primary" href="${pageContext.request.contextPath}/home">
-      Fruitables
-    </a>
-    <div class="hidden md:flex space-x-8 items-center">
-      <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/home">Trang chủ</a>
-      <a class="font-body-md text-primary font-semibold border-b-2 border-primary pb-1" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
-      <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
-    </div>
-    <div class="flex items-center space-x-4">
-      <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-          ${not empty sessionScope.CART_TOTAL_ITEMS ? sessionScope.CART_TOTAL_ITEMS : 0}
-        </span>
-      </a>
-      <c:choose>
-        <c:when test="${not empty sessionScope.USERMODEL}">
-          <div class="group relative cursor-pointer">
-            <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-            </div>
-            <div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant z-50 overflow-hidden">
-              <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
-              </c:if>
-              <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
-            </div>
-          </div>
-        </c:when>
-        <c:otherwise>
-          <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-            <span class="material-symbols-outlined">person</span>
-          </a>
-        </c:otherwise>
-      </c:choose>
-    </div>
-  </div>
-</nav>
+<!-- NAVBAR CHUNG -->
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <main class="flex-grow py-12 bg-surface">
   <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
@@ -152,7 +113,7 @@
       </div>
     </div>
 
-    <!-- TABS MÔ TẢ & ĐÁNH GIÁ -->
+    <!-- TABS MÔ TẢ & ĐÁNH GIÁ (GIỮ NGUYÊN GỐC 100%) -->
     <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 md:p-10 shadow-sm">
 
       <!-- Tab Headers -->
@@ -238,7 +199,7 @@
             </div>
           </div>
 
-          <!-- Danh sách Comment (Bên Phải) -->
+          <!-- Danh sách Comment (Bên Phải) - ĐÃ BỔ SUNG AVATAR THỰC TẾ -->
           <div class="lg:col-span-2">
             <h3 class="font-headline-md text-xl mb-6 text-on-surface">Khách hàng đánh giá</h3>
 
@@ -249,10 +210,19 @@
                     <div class="bg-surface-container-lowest p-5 rounded-xl border border-surface-variant hover:shadow-md transition-shadow">
                       <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
-                          <!-- Avatar chữ cái đầu -->
-                          <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold text-lg uppercase">
-                              ${rv.userName.substring(0,1)}
-                          </div>
+                          <!-- AVATAR ĐỘNG TỪ DATABASE HOẶC CHỮ CÁI ĐẦU NẾU KHÔNG CÓ ẢNH -->
+                          <c:choose>
+                            <c:when test="${not empty rv.avatarUrl}">
+                              <div class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden">
+                                <img src="${rv.avatarUrl}" alt="Avatar" class="w-full h-full object-cover">
+                              </div>
+                            </c:when>
+                            <c:otherwise>
+                              <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold text-lg uppercase">
+                                  ${rv.userName != null ? rv.userName.substring(0,1) : 'U'}
+                              </div>
+                            </c:otherwise>
+                          </c:choose>
                           <div>
                             <div class="font-label-bold text-on-surface"><c:out value="${rv.userName}"/></div>
                             <div class="text-xs text-on-surface-variant"><fmt:formatDate value="${rv.createdAt}" pattern="dd/MM/yyyy HH:mm"/></div>
@@ -294,6 +264,10 @@
   </div>
 </main>
 
+<!-- FOOTER CHUNG -->
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
+
+<!-- KỊCH BẢN CHUYỂN TABS (GIỮ NGUYÊN GỐC 100%) -->
 <script>
   function switchTab(tabName) {
     const tabDesc = document.getElementById('tab-desc');

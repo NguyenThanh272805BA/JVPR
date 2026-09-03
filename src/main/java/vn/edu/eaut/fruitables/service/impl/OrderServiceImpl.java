@@ -19,13 +19,10 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public OrderModel createOrder(OrderModel orderModel, Map<Long, CartItemDTO> cart) {
-        // 1. Lưu Order vào bảng orders và lấy lại ID tự sinh
         Long orderId = orderDAO.saveOrder(orderModel);
 
         if (orderId != null) {
             orderModel.setId(orderId);
-
-            // 2. Duyệt qua giỏ hàng và lưu từng sản phẩm vào bảng order_details
             for (CartItemDTO item : cart.values()) {
                 orderDAO.saveOrderDetail(
                         orderId,
@@ -48,5 +45,15 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public OrderModel findByOrderCode(String orderCode) {
         return orderDAO.findByOrderCode(orderCode);
+    }
+
+    @Override
+    public List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode) {
+        return orderDAO.findByPhoneOrOrderCode(phone, orderCode);
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, String status) {
+        orderDAO.updateOrderStatus(orderId, status);
     }
 }

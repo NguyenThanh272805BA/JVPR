@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html class="light" lang="vi">
 <head>
@@ -86,7 +87,7 @@
                 <h1 class="font-headline-md text-headline-md text-on-surface">Tổng quan hệ thống</h1>
             </div>
 
-            <!-- Stats Row -->
+            <!-- Stats Row: Format tiền tệ VNĐ liền mạch -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
@@ -95,7 +96,9 @@
                             <span class="material-symbols-outlined">payments</span>
                         </div>
                     </div>
-                    <div class="font-price-tag text-price-tag text-primary">${totalRevenue} ₫</div>
+                    <div class="font-price-tag text-price-tag text-primary">
+                        <fmt:formatNumber value="${totalRevenue}" type="number" groupingUsed="true"/> ₫
+                    </div>
                 </div>
                 <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
@@ -142,7 +145,7 @@
                 </div>
             </div>
 
-            <!-- Recent Products -->
+            <!-- Recent Products (Khối đã được giữ lại trọn vẹn) -->
             <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-6 border-b border-surface-variant flex justify-between items-center">
                     <h2 class="font-label-bold text-label-bold text-on-surface">Sản phẩm mới thêm</h2>
@@ -195,7 +198,6 @@
             .then(chartData => {
                 const ctx = document.getElementById('revenueChart').getContext('2d');
 
-                // Hủy biểu đồ cũ trước khi vẽ lại để tránh lỗi hiển thị đè
                 if (revenueChart) {
                     revenueChart.destroy();
                 }
@@ -239,10 +241,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Tải dữ liệu mặc định lúc vừa vào trang (theo Tháng)
         loadChartData('month');
 
-        // Bắt sự kiện khi Admin đổi tùy chọn trong Select Box
         document.getElementById('chartFilter').addEventListener('change', function() {
             loadChartData(this.value);
         });

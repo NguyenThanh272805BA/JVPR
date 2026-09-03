@@ -10,4 +10,6 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     OrderModel findById(Long id);
     OrderModel findByOrderCode(String orderCode);
     List<OrderModel> findByUserId(Long userId);
+    List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode);
+    void updateOrderStatus(Long orderId, String status);
 }

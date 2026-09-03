@@ -11,10 +11,10 @@ import java.util.List;
 
 public class ReviewDAOImpl {
 
-    // Lấy danh sách đánh giá kèm tên khách hàng
     public List<ReviewModel> findByProductId(Long productId) {
         List<ReviewModel> list = new ArrayList<>();
-        String sql = "SELECT r.*, u.full_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC";
+        // Đã sửa câu truy vấn JOIN thêm trường avatar_url
+        String sql = "SELECT r.*, u.full_name, u.avatar_url FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, productId);
@@ -28,6 +28,7 @@ public class ReviewDAOImpl {
                     rv.setComment(rs.getString("comment"));
                     rv.setCreatedAt(rs.getTimestamp("created_at"));
                     rv.setUserName(rs.getString("full_name"));
+                    rv.setAvatarUrl(rs.getString("avatar_url")); // Map avatar
                     list.add(rv);
                 }
             }
@@ -35,7 +36,6 @@ public class ReviewDAOImpl {
         return list;
     }
 
-    // Kiểm tra xem user có đơn hàng COMPLETED nào chứa sản phẩm này chưa
     public Long getValidOrderIdForReview(Long userId, Long productId) {
         String sql = "SELECT o.id FROM orders o JOIN order_details od ON o.id = od.order_id " +
                 "WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'COMPLETED' LIMIT 1";
@@ -47,10 +47,9 @@ public class ReviewDAOImpl {
                 if (rs.next()) return rs.getLong("id");
             }
         } catch (Exception e) { e.printStackTrace(); }
-        return null; // Trả về null nếu chưa mua hoặc đơn chưa hoàn thành
+        return null;
     }
 
-    // Lưu đánh giá mới
     public boolean insertReview(ReviewModel review) {
         String sql = "INSERT INTO reviews (user_id, product_id, order_id, rating, comment) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnectionUtil.getConnection();

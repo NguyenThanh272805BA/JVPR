@@ -20,6 +20,10 @@ public class UserMapper implements IRowMapper<UserModel> {
             user.setCreatedAt(rs.getTimestamp("created_at"));
 
             try {
+                user.setUsername(rs.getString("username"));
+            } catch (SQLException e) {}
+
+            try {
                 user.setLoginType(rs.getString("login_type"));
             } catch (SQLException e) {}
 

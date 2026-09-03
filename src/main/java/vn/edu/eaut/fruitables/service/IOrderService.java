@@ -10,4 +10,6 @@ public interface IOrderService {
     OrderModel createOrder(OrderModel orderModel, Map<Long, CartItemDTO> cart);
     List<OrderModel> findAll();
     OrderModel findByOrderCode(String orderCode);
+    List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode);
+    void updateOrderStatus(Long orderId, String status);
 }

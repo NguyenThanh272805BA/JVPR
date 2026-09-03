@@ -16,7 +16,7 @@
     </properties>
 
     <dependencies>
-        <!-- 1. Java Servlet API (Bắt buộc cho Tầng Controller) -->
+        <!-- 1. Java Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -24,7 +24,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- 2. JSP và JSTL (Bắt buộc để chống XSS trên Giao diện) -->
+        <!-- 2. JSP và JSTL -->
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
@@ -37,21 +37,21 @@
             <version>1.2</version>
         </dependency>
 
-        <!-- 3. MySQL Connector (Để kết nối Database cho Tầng DAO) -->
+        <!-- 3. MySQL Connector  -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
 
-        <!-- 4. HikariCP (Connection Pool - Yêu cầu bắt buộc để chống sập DB) -->
+        <!-- 4. HikariCP  -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version>
         </dependency>
 
-        <!-- 5. Gson (Dùng để xử lý JSON cho Live Search và biểu đồ) -->
+        <!-- 5. Gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

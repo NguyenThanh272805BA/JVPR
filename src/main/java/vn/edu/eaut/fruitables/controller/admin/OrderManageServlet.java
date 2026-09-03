@@ -23,10 +23,29 @@ public class OrderManageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lấy danh sách toàn bộ đơn hàng
         List<OrderModel> orders = orderService.findAll();
-
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("/WEB-INF/views/admin/order-list.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        // Cập nhật trạng thái đơn hàng từ Admin/Shipper
+        if ("updateStatus".equals(action)) {
+            try {
+                Long orderId = Long.parseLong(request.getParameter("orderId"));
+                String newStatus = request.getParameter("status"); // DELIVERED, RETURNED, FAILED
+
+                if (newStatus != null && !newStatus.trim().isEmpty()) {
+                    orderService.updateOrderStatus(orderId, newStatus);
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        // Sau khi xử lý xong, tải lại trang danh sách
+        response.sendRedirect(request.getContextPath() + "/admin/orders");
     }
 }

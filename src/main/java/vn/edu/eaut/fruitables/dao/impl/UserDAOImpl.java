@@ -12,30 +12,26 @@ import java.util.List;
 public class UserDAOImpl extends AbstractDAO<UserModel> implements IUserDAO {
 
     @Override
-    public UserModel findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        List<UserModel> users = query(sql, new UserMapper(), email);
+    public UserModel findByUsernameOrPhoneOrEmail(String identifier) {
+        String sql = "SELECT * FROM users WHERE username = ? OR phone = ? OR email = ?";
+        List<UserModel> users = query(sql, new UserMapper(), identifier, identifier, identifier);
         return users.isEmpty() ? null : users.get(0);
     }
 
     @Override
     public Long save(UserModel userModel) {
-        // Tạm thời set role_id = 3 (Quyền USER thông thường)
-        String sql = "INSERT INTO users (role_id, full_name, email, password_hash, status) VALUES (3, ?, ?, ?, 'ACTIVE')";
-        return insert(sql, userModel.getFullName(), userModel.getEmail(), userModel.getPasswordHash());
+        // Hỗ trợ đăng ký không bắt buộc email. Nếu email trống sẽ insert NULL để không vi phạm ràng buộc UNIQUE.
+        String emailToSave = (userModel.getEmail() != null && !userModel.getEmail().trim().isEmpty()) ? userModel.getEmail() : null;
+
+        String sql = "INSERT INTO users (role_id, username, full_name, email, password_hash, phone, status) VALUES (3, ?, ?, ?, ?, ?, 'ACTIVE')";
+        return insert(sql, userModel.getUsername(), userModel.getFullName(), emailToSave, userModel.getPasswordHash(), userModel.getPhone());
     }
 
-    // =================================================================
-    // TÍNH NĂNG QUẢN LÝ NGƯỜI DÙNG (ADMIN)
-    // =================================================================
-
-    // Lấy danh sách toàn bộ người dùng
     public List<UserModel> findAllUsers() {
         String sql = "SELECT * FROM users ORDER BY created_at DESC";
         return query(sql, new UserMapper());
     }
 
-    // Cập nhật quyền và trạng thái (Block/Active)
     public boolean updateUserRoleAndStatus(Long userId, Integer roleId, String status) {
         String sql = "UPDATE users SET role_id = ?, status = ? WHERE id = ?";
         try (Connection conn = DBConnectionUtil.getConnection();

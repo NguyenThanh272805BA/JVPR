@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class UserModel {
     private Long id;
     private Integer roleId;
+    private String username;
     private String fullName;
     private String email;
     private String passwordHash;
@@ -15,15 +16,16 @@ public class UserModel {
     private String avatarUrl;
     private String loginType;
 
-    // Constructors
     public UserModel() {}
 
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public Integer getRoleId() { return roleId; }
     public void setRoleId(Integer roleId) { this.roleId = roleId; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

@@ -17,30 +17,8 @@
 
 <body class="min-h-screen flex flex-col bg-background text-on-background">
 
-<!-- Navbar -->
-<nav class="bg-surface dark:bg-on-background w-full sticky top-0 shadow-sm dark:bg-surface-container-low z-50">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <a class="font-display-lg text-display-lg font-extrabold text-primary dark:text-primary-fixed" href="${pageContext.request.contextPath}/home">Fruitables</a>
-
-        <div class="hidden md:flex space-x-8 items-center">
-            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
-            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Danh mục</a>
-            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Khuyến mãi</a>
-        </div>
-
-        <div class="flex items-center space-x-4">
-            <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-                <span class="material-symbols-outlined">shopping_cart</span>
-            </a>
-            <button class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors hidden md:block">
-                <span class="material-symbols-outlined">favorite</span>
-            </button>
-            <button class="text-primary border-b-2 border-primary pb-1 active:scale-95 hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-            </button>
-        </div>
-    </div>
-</nav>
+<!-- NAVBAR CHUNG -->
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <!-- Main Content: Split Screen Login -->
 <main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop">
@@ -68,7 +46,6 @@
                     <span class="material-symbols-outlined mr-2">check_circle</span>
                     <c:out value="${sessionScope.successMsg}"/>
                 </div>
-                <!-- Xóa session báo thành công đi để F5 trang không hiện lại nữa -->
                 <c:remove var="successMsg" scope="session" />
             </c:if>
 
@@ -80,12 +57,12 @@
                 </div>
             </c:if>
 
-            <!-- BẮT ĐẦU FORM XỬ LÝ ĐĂNG NHẬP -->
+            <!-- BẮT ĐẦU FORM XỬ LÝ ĐĂNG NHẬP (HỖ TRỢ USERNAME / SĐT / EMAIL) -->
             <form action="${pageContext.request.contextPath}/login" method="POST" class="space-y-6">
                 <div>
-                    <label class="block font-label-bold text-label-bold text-on-surface mb-1" for="email">Email</label>
+                    <label class="block font-label-bold text-label-bold text-on-surface mb-1" for="identifier">Tài khoản</label>
                     <input class="w-full rounded-md border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-primary-container focus:ring-1 transition-colors px-4 py-3"
-                           id="email" name="email" placeholder="nhap@email.com" type="email" required />
+                           id="identifier" name="identifier" placeholder="Tên đăng nhập, SĐT hoặc Email" type="text" required />
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
@@ -110,7 +87,7 @@
                 </button>
             </form>
 
-            <!-- Dải phân cách mạng xã hội -->
+            <!-- Dải phân cách mạng xã hội (Giữ nguyên gốc) -->
             <div class="mt-8">
                 <div class="relative">
                     <div class="absolute inset-0 flex items-center">
@@ -139,15 +116,8 @@
     </div>
 </main>
 
-<!-- Footer -->
-<footer class="bg-surface-container dark:bg-surface-container-highest w-full mt-auto border-t border-outline-variant">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-12 max-w-container-max-width mx-auto">
-        <div class="col-span-1 md:col-span-1">
-            <a class="font-display-lg text-display-lg font-extrabold text-primary mb-4 block" href="/">Fruitables</a>
-            <p class="font-body-md text-body-md text-on-surface-variant">© 2024 Fruitables. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
+<!-- FOOTER CHUNG -->
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
 <!-- Script nhỏ xử lý việc Ẩn/Hiện mật khẩu -->
 <script>

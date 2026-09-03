@@ -15,52 +15,8 @@
 
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- NAVBAR -->
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg font-extrabold text-primary" href="${pageContext.request.contextPath}/home">
-            Fruitables
-        </a>
-        <div class="hidden md:flex space-x-8 items-center">
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a class="font-body-md text-primary font-semibold border-b-2 border-primary pb-1" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
-        </div>
-        <div class="flex items-center space-x-4">
-            <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative">
-                <span class="material-symbols-outlined">shopping_cart</span>
-                <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                    ${not empty sessionScope.CART_TOTAL_ITEMS ? sessionScope.CART_TOTAL_ITEMS : 0}
-                </span>
-            </a>
-            <c:choose>
-                <c:when test="${not empty sessionScope.USERMODEL}">
-                    <!-- ĐÃ FIX CSS: Thêm thẻ đệm vô hình (pt-2) và nâng z-index để không bị mất hover -->
-                    <div class="group relative cursor-pointer py-2">
-                        <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-                        </div>
-                        <!-- Vùng đệm vô hình giữ hover -->
-                        <div class="absolute right-0 top-full pt-2 z-[100] hidden group-hover:block w-48">
-                            <div class="bg-surface-container-lowest rounded-md shadow-lg border border-outline-variant overflow-hidden">
-                                <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
-                                </c:if>
-                                <a href="${pageContext.request.contextPath}/profile" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Thông tin cá nhân</a>
-                                <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
-                            </div>
-                        </div>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-                        <span class="material-symbols-outlined">person</span>
-                    </a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-</nav>
+<!-- NAVBAR CHUNG -->
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <!-- SHOP HERO BANNER -->
 <section class="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-hidden">
@@ -157,7 +113,7 @@
                                 <h3 class="font-label-bold text-lg text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
                             </a>
 
-                            <!-- ĐÃ BỔ SUNG: Render số sao động từ Database -->
+                            <!-- Render số sao động từ Database -->
                             <div class="flex items-center mb-3">
                                 <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 0}" />
                                 <div class="flex text-yellow-500">
@@ -196,7 +152,7 @@
                 </c:forEach>
             </div>
 
-            <!-- Phân trang -->
+            <!-- Phân trang (Giữ nguyên gốc 100%) -->
             <div class="mt-12 flex justify-center space-x-2">
                 <button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface-variant transition-colors">
                     <span class="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -212,14 +168,10 @@
     </div>
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
-    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center text-on-surface-variant font-body-md">
-        <p>© 2026 Fruitables.</p>
-    </div>
-</footer>
+<!-- FOOTER CHUNG -->
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
-<!-- SCRIPT: Xử lý gọi AJAX Fetch API cho tính năng Live Search -->
+<!-- SCRIPT: Xử lý gọi AJAX Fetch API cho tính năng Live Search (Giữ nguyên gốc) -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('liveSearchInput');
@@ -255,7 +207,6 @@
                                     </div>
                                 `;
                                 li.addEventListener('click', () => {
-                                    // Khi click vào kết quả sẽ nhảy thẳng vào trang chi tiết thay vì trang shop
                                     window.location.href = `${pageContext.request.contextPath}/product-detail?id=` + product.id;
                                 });
                                 searchDropdown.appendChild(li);
@@ -278,7 +229,7 @@
     });
 </script>
 
-<!-- JAVASCRIPT AJAX ADD TO CART & TOAST NOTIFICATION -->
+<!-- JAVASCRIPT AJAX ADD TO CART & TOAST NOTIFICATION (Giữ nguyên gốc) -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const addCartForms = document.querySelectorAll('form[action$="/cart"]');

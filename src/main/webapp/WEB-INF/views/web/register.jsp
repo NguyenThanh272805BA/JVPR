@@ -8,20 +8,16 @@
   <title>Đăng ký - Fruitables</title>
 
   <!-- Nhúng CSS & Cấu hình Tailwind dùng chung -->
-  <link rel="stylesheet" href="/assets/web/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script src="/assets/web/js/tailwind-config.js"></script>
+  <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- Header/Navbar (Tương tự login) -->
-<header class="w-full sticky top-0 bg-surface shadow-sm z-50">
-  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-    <a class="font-display-lg text-display-lg font-extrabold text-primary" href="/home">Fruitables</a>
-  </div>
-</header>
+<!-- NAVBAR CHUNG -->
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop w-full max-w-container-max-width mx-auto">
+<main class="flex-grow flex items-center justify-center p-margin-mobile md:p-margin-desktop w-full max-w-container-max-width mx-auto py-12">
   <div class="w-full flex flex-col lg:flex-row bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden min-h-[700px]">
 
     <!-- Left Side: Image -->
@@ -46,66 +42,96 @@
           </div>
         </c:if>
 
-        <form action="/register" method="POST" class="space-y-6">
+        <form action="${pageContext.request.contextPath}/register" method="POST" class="space-y-5">
+          <!-- BỔ SUNG: Tên đăng nhập -->
           <div>
-            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-2" for="fullname">Họ và tên</label>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="username">Tên đăng nhập *</label>
             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                                    <span class="material-symbols-outlined">person_outline</span>
-                                </span>
-              <input class="w-full pl-10 pr-4 py-3 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">badge</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                     id="username" name="username" placeholder="Nhập tên tài khoản" type="text" required/>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="fullname">Họ và tên *</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">person_outline</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
                      id="fullname" name="fullname" placeholder="Nhập họ và tên của bạn" type="text" required/>
             </div>
           </div>
 
+          <!-- BỔ SUNG: Số điện thoại -->
           <div>
-            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-2" for="email">Email</label>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="phone">Số điện thoại *</label>
             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                                    <span class="material-symbols-outlined">mail</span>
-                                </span>
-              <input class="w-full pl-10 pr-4 py-3 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-                     id="email" name="email" placeholder="ví dụ: ten@email.com" type="email" required/>
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">call</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                     id="phone" name="phone" placeholder="VD: 0988888888" type="tel" required/>
+            </div>
+          </div>
+
+          <!-- Email (Đổi thành Tùy chọn) -->
+          <div>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="email">
+              Email <span class="text-xs text-on-surface-variant font-normal">(Không bắt buộc)</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">mail</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                     id="email" name="email" placeholder="ví dụ: ten@email.com" type="email"/>
             </div>
           </div>
 
           <div>
-            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-2" for="password">Mật khẩu</label>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="password">Mật khẩu *</label>
             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                                    <span class="material-symbols-outlined">lock</span>
-                                </span>
-              <input class="w-full pl-10 pr-4 py-3 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">lock</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
                      id="password" name="password" placeholder="Tạo mật khẩu mạnh" type="password" required/>
             </div>
           </div>
 
           <div>
-            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-2" for="confirm_password">Xác nhận mật khẩu</label>
+            <label class="block font-label-bold text-label-bold text-on-surface-variant mb-1" for="confirm_password">Xác nhận mật khẩu *</label>
             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                                    <span class="material-symbols-outlined">check_circle</span>
-                                </span>
-              <input class="w-full pl-10 pr-4 py-3 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+                  <span class="material-symbols-outlined">check_circle</span>
+              </span>
+              <input class="w-full pl-10 pr-4 py-2.5 bg-background border border-outline-variant rounded-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
                      id="confirm_password" name="confirm_password" placeholder="Nhập lại mật khẩu" type="password" required/>
             </div>
           </div>
 
-          <div>
-            <button type="submit" class="w-full flex justify-center py-4 px-4 rounded-full shadow-[0px_4px_20px_rgba(129,196,8,0.15)] font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-all duration-300">
+          <div class="pt-2">
+            <button type="submit" class="w-full flex justify-center py-3.5 px-4 rounded-full shadow-[0px_4px_20px_rgba(129,196,8,0.15)] font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-all duration-300">
               Đăng ký
             </button>
           </div>
         </form>
 
-        <div class="mt-8 text-center">
-          <p class="font-body-md text-body-md text-on-surface-variant">
-            Đã có tài khoản? <a href="/login" class="font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors ml-1">Đăng nhập</a>
+        <div class="mt-6 text-center">
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm">
+            Đã có tài khoản? <a href="${pageContext.request.contextPath}/login" class="font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors ml-1">Đăng nhập</a>
           </p>
         </div>
       </div>
     </div>
   </div>
 </main>
+
+<!-- FOOTER CHUNG -->
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 </body>
 </html>
