@@ -15,147 +15,131 @@
 
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- NAVBAR -->
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <a class="font-display-lg-mobile font-extrabold text-primary" href="${pageContext.request.contextPath}/home">Fruitables</a>
-        <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center">
-            <span class="material-symbols-outlined mr-2">arrow_back</span>
-            <span class="font-label-bold hidden md:inline">Quay lại Giỏ hàng</span>
-        </a>
-    </div>
-</nav>
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<!-- MAIN CHECKOUT CONTENT -->
-<main class="flex-grow py-12">
+<main class="flex-grow py-10 md:py-12">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <h1 class="font-headline-md text-3xl text-on-surface mb-8 font-bold">Chi tiết thanh toán</h1>
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-surface-variant">
+            <h1 class="font-headline-md text-2xl md:text-3xl text-on-surface font-extrabold flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">fact_check</span> Chi tiết thanh toán
+            </h1>
+            <a href="${pageContext.request.contextPath}/cart" class="text-on-surface-variant hover:text-primary transition-colors text-sm font-label-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-base">arrow_back</span> Quay lại Giỏ hàng
+            </a>
+        </div>
 
-        <!-- BANNER KHUYẾN KHÍCH ĐĂNG NHẬP DÀNH CHO KHÁCH VÃNG LAI -->
+        <!-- Banner mời đăng nhập đối với Khách vãng lai -->
         <c:if test="${empty sessionScope.USERMODEL}">
-            <div class="mb-8 bg-inverse-primary/20 border border-primary-container p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="mb-8 bg-primary/10 border border-primary/30 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white flex-shrink-0">
                         <span class="material-symbols-outlined">redeem</span>
                     </div>
                     <div>
-                        <h4 class="font-label-bold text-on-surface text-lg">Bạn có mã giảm giá hoặc điểm tích lũy?</h4>
-                        <p class="font-body-md text-on-surface-variant text-sm">Đăng nhập ngay để sử dụng ưu đãi và theo dõi đơn hàng dễ dàng hơn.</p>
+                        <h4 class="font-label-bold text-on-surface text-base">Bạn là khách hàng mới?</h4>
+                        <p class="font-body-md text-on-surface-variant text-xs">Đăng nhập tài khoản giúp bạn lưu lịch sử đơn hàng, dùng Voucher giảm giá và tích điểm nhận ưu đãi.</p>
                     </div>
                 </div>
-                <a href="${pageContext.request.contextPath}/login" class="whitespace-nowrap px-6 py-2 bg-primary text-white font-label-bold rounded-full hover:bg-primary-container transition-colors shadow-md">
+                <a href="${pageContext.request.contextPath}/login" class="whitespace-nowrap px-5 py-2 bg-primary text-white font-label-bold rounded-full hover:bg-primary-container transition-colors shadow-sm text-xs">
                     Đăng nhập ngay
                 </a>
             </div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/checkout" method="POST" class="flex flex-col lg:flex-row gap-8">
-
-            <!-- CỘT TRÁI: Form điền thông tin -->
+        <form action="${pageContext.request.contextPath}/checkout" method="POST" class="flex flex-col lg:flex-row gap-8 items-start">
+            <!-- CỘT TRÁI: Form điền thông tin khách hàng -->
             <div class="w-full lg:w-2/3 space-y-6">
-                <div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm border border-outline-variant">
-                    <h2 class="font-headline-md text-xl text-on-surface mb-6 border-b border-surface-variant pb-4">Thông tin giao hàng</h2>
+                <div class="bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant">
+                    <h2 class="font-headline-md text-lg text-on-surface mb-6 border-b border-surface-variant pb-3 font-bold">1. Thông tin giao nhận hàng</h2>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                         <div>
-                            <label class="block font-label-bold text-on-surface mb-2">Họ và tên *</label>
+                            <label class="block font-label-bold text-sm text-on-surface mb-1.5">Họ và tên người nhận <span class="text-error">*</span></label>
                             <input type="text" name="fullName" required value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.fullName : ''}"
-                                   class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                                   class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
                         </div>
                         <div>
-                            <label class="block font-label-bold text-on-surface mb-2">Số điện thoại *</label>
+                            <label class="block font-label-bold text-sm text-on-surface mb-1.5">Số điện thoại liên hệ <span class="text-error">*</span></label>
                             <input type="tel" name="phone" required value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.phone : ''}"
-                                   class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                                   placeholder="VD: 0988888888"
+                                   class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
                         </div>
                     </div>
 
-                    <div class="mb-6">
-                        <label class="block font-label-bold text-on-surface mb-2">Địa chỉ Email</label>
+                    <div class="mb-5">
+                        <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ Email (Để nhận biên nhận & hóa đơn)</label>
                         <c:choose>
                             <c:when test="${not empty sessionScope.USERMODEL}">
-                                <!-- Đã đăng nhập -> Khóa ô Email -->
                                 <input type="email" name="email" readonly value="${sessionScope.USERMODEL.email}"
-                                       class="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed">
+                                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm">
                             </c:when>
                             <c:otherwise>
-                                <!-- Khách vãng lai -> Cho phép nhập Email -->
-                                <input type="email" name="email" placeholder="Nhập địa chỉ email của bạn..."
-                                       class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                                <input type="email" name="email" placeholder="example@email.com"
+                                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
                             </c:otherwise>
                         </c:choose>
                     </div>
 
-                    <div class="mb-6">
-                        <label class="block font-label-bold text-on-surface mb-2">Địa chỉ nhận hàng *</label>
+                    <div class="mb-2">
+                        <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ giao hàng chi tiết <span class="text-error">*</span></label>
 
-                        <!-- 3 Dropdown chọn Tỉnh/Quận/Phường -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <select id="province" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                            <select id="province" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs">
                                 <option value="">-- Chọn Tỉnh/Thành --</option>
                             </select>
-                            <select id="district" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface" disabled>
+                            <select id="district" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs" disabled>
                                 <option value="">-- Chọn Quận/Huyện --</option>
                             </select>
-                            <select id="ward" class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface" disabled>
+                            <select id="ward" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs" disabled>
                                 <option value="">-- Chọn Phường/Xã --</option>
                             </select>
                         </div>
 
-                        <!-- Ô nhập số nhà -->
-                        <input type="text" id="street" placeholder="Số nhà, tên đường, tòa nhà..." class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface mb-2">
-
-                        <!-- Input ẩn để gộp toàn bộ chuỗi địa chỉ gửi về Servlet -->
+                        <input type="text" id="street" placeholder="Số nhà, tên ngõ, tên đường..." class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm mb-2">
                         <input type="hidden" name="address" id="fullAddress" value="${sessionScope.USERMODEL != null ? sessionScope.USERMODEL.address : ''}" required>
 
-                        <!-- Hiển thị lại địa chỉ đã lưu (nếu có) -->
                         <c:if test="${not empty sessionScope.USERMODEL.address}">
-                            <p class="text-sm text-primary font-label-bold mt-2">Địa chỉ mặc định: ${sessionScope.USERMODEL.address} (Bạn có thể chọn lại ở trên để thay đổi)</p>
+                            <p class="text-xs text-primary font-label-bold mt-1.5 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">home_pin</span> Địa chỉ hồ sơ: ${sessionScope.USERMODEL.address} (Có thể chọn lại nếu muốn giao tới nơi khác)
+                            </p>
                         </c:if>
                     </div>
                 </div>
 
                 <!-- PHƯƠNG THỨC THANH TOÁN -->
-                <div class="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm border border-outline-variant">
-                    <h2 class="font-headline-md text-xl text-on-surface mb-6 border-b border-surface-variant pb-4">Phương thức thanh toán</h2>
-
-                    <div class="space-y-4">
-                        <!-- COD -->
-                        <label class="flex items-center p-4 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors">
-                            <input type="radio" name="paymentMethod" value="COD" checked class="w-5 h-5 text-primary focus:ring-primary border-outline-variant">
-                            <span class="ml-4 font-label-bold text-on-surface flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">local_shipping</span>
-                                    Thanh toán khi nhận hàng (COD)
-                                </span>
+                <div class="bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant">
+                    <h2 class="font-headline-md text-lg text-on-surface mb-6 border-b border-surface-variant pb-3 font-bold">2. Phương thức thanh toán</h2>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                            <input type="radio" name="paymentMethod" value="COD" checked class="w-4 h-4 text-primary focus:ring-primary border-outline-variant">
+                            <span class="ml-3 font-label-bold text-on-surface text-sm flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">local_shipping</span> Thanh toán tiền mặt khi nhận hàng (COD)
+                            </span>
                         </label>
 
-                        <!-- VNPAY -->
-                        <label class="flex items-center p-4 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors">
-                            <input type="radio" name="paymentMethod" value="VNPAY" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant">
-                            <span class="ml-4 font-label-bold text-on-surface flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-primary">qr_code_scanner</span>
-                                    Thanh toán qua VNPAY-QR
-                                </span>
+                        <label class="flex items-center p-4 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                            <input type="radio" name="paymentMethod" value="VNPAY" class="w-4 h-4 text-primary focus:ring-primary border-outline-variant">
+                            <span class="ml-3 font-label-bold text-on-surface text-sm flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">qr_code_scanner</span> Quét mã VNPAY-QR (Hỗ trợ tất cả ngân hàng)
+                            </span>
                         </label>
 
-                        <!-- MoMo -->
-                        <label class="flex items-center p-4 border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container transition-colors">
-                            <input type="radio" name="paymentMethod" value="MOMO" class="w-5 h-5 text-primary focus:ring-primary border-outline-variant">
-                            <span class="ml-4 font-label-bold text-on-surface flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-[#a50064]">account_balance_wallet</span>
-                                    Thanh toán qua Ví MoMo
-                                </span>
+                        <label class="flex items-center p-4 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+                            <input type="radio" name="paymentMethod" value="MOMO" class="w-4 h-4 text-primary focus:ring-primary border-outline-variant">
+                            <span class="ml-3 font-label-bold text-on-surface text-sm flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[#a50064]">account_balance_wallet</span> Thanh toán trực tuyến qua Ví MoMo
+                            </span>
                         </label>
                     </div>
                 </div>
             </div>
 
-            <!-- CỘT PHẢI: Box Tóm tắt đơn hàng -->
-            <div class="w-full lg:w-1/3">
-                <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant sticky top-28">
-                    <h3 class="font-headline-md text-xl text-on-surface border-b border-surface-variant pb-4 mb-4">Đơn hàng của bạn</h3>
+            <!-- CỘT PHẢI: Box Tóm tắt đơn hàng & Xác nhận -->
+            <div class="w-full lg:w-1/3 flex flex-col gap-6 sticky top-28">
+                <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant">
+                    <h3 class="font-headline-md text-lg text-on-surface border-b border-surface-variant pb-3 mb-4 font-bold">Đơn hàng của bạn</h3>
 
-                    <!-- List Sản phẩm -->
-                    <div class="space-y-4 mb-6 border-b border-surface-variant pb-6">
+                    <div class="space-y-3 mb-5 border-b border-surface-variant pb-4 max-h-64 overflow-y-auto">
                         <c:set var="totalAmount" value="0"/>
                         <c:set var="totalTaxValue" value="0"/>
 
@@ -163,77 +147,55 @@
                             <c:set var="totalAmount" value="${totalAmount + item.subTotal}"/>
                             <c:set var="totalTaxValue" value="${totalTaxValue + (item.taxAmount != null ? item.taxAmount : 0)}"/>
 
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <div class="relative w-12 h-12 rounded-md border border-outline-variant overflow-hidden">
+                            <div class="flex justify-between items-center text-xs">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="relative w-11 h-11 rounded-lg border border-outline-variant overflow-hidden flex-shrink-0">
                                         <img src="${item.imageUrl}" class="w-full h-full object-cover">
-                                        <span class="absolute -top-1 -right-1 bg-surface-variant text-on-surface-variant text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
-                                                <c:out value="${item.quantity}"/>
-                                            </span>
+                                        <span class="absolute -top-1 -right-1 bg-surface-variant text-on-surface-variant text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                            <c:out value="${item.quantity}"/>
+                                        </span>
                                     </div>
-                                    <span class="font-body-md text-on-surface line-clamp-1"><c:out value="${item.name}"/></span>
+                                    <span class="font-medium text-on-surface line-clamp-1 max-w-[150px]"><c:out value="${item.name}"/></span>
                                 </div>
-                                <span class="font-label-bold text-on-surface">
-                                        <fmt:formatNumber value="${item.subTotal}" type="number" groupingUsed="true"/> ₫
-                                    </span>
+                                <span class="font-label-bold text-on-surface whitespace-nowrap">
+                                    <fmt:formatNumber value="${item.subTotal}" type="number" groupingUsed="true"/> ₫
+                                </span>
                             </div>
                         </c:forEach>
                     </div>
 
-                    <!-- Tính tiền -->
-                    <div class="flex justify-between items-center mb-4 text-on-surface-variant font-body-md">
-                        <span>Tạm tính (chưa thuế)</span>
-                        <span class="font-medium text-on-surface"><fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true"/> ₫</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-4 text-error font-body-md">
-                        <span>Thuế VAT áp dụng</span>
-                        <span class="font-medium text-error">+ <fmt:formatNumber value="${totalTaxValue}" type="number" groupingUsed="true"/> ₫</span>
-                    </div>
-                    <div class="flex justify-between items-center mb-4 text-on-surface-variant font-body-md border-b border-surface-variant pb-4">
-                        <span>Phí giao hàng</span>
-                        <span class="font-medium text-on-surface">Miễn phí</span>
-                    </div>
-
-                    <div class="flex justify-between items-center mb-8">
-                        <span class="font-label-bold text-on-surface text-lg">Tổng thanh toán</span>
-                        <span class="font-price-tag text-2xl text-primary">
-                                <fmt:formatNumber value="${totalAmount + totalTaxValue}" type="number" groupingUsed="true"/> ₫
-                            </span>
+                    <div class="space-y-2.5 text-xs text-on-surface-variant mb-4 border-b border-surface-variant pb-4">
+                        <div class="flex justify-between items-center">
+                            <span>Tạm tính hàng hóa</span>
+                            <span class="font-semibold text-on-surface"><fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true"/> ₫</span>
+                        </div>
+                        <div class="flex justify-between items-center text-error">
+                            <span>Thuế VAT tính thêm</span>
+                            <span class="font-semibold">+ <fmt:formatNumber value="${totalTaxValue}" type="number" groupingUsed="true"/> ₫</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Phí vận chuyển</span>
+                            <span class="font-semibold text-primary">Miễn phí</span>
+                        </div>
                     </div>
 
-                    <button type="submit" class="w-full flex items-center justify-center bg-primary-container text-white py-4 rounded-full font-label-bold hover:bg-primary transition-all duration-300 shadow-md hover:-translate-y-1">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="font-label-bold text-on-surface text-sm">Tổng thanh toán</span>
+                        <span class="font-price-tag text-2xl text-primary font-extrabold">
+                            <fmt:formatNumber value="${totalAmount + totalTaxValue}" type="number" groupingUsed="true"/> ₫
+                        </span>
+                    </div>
+
+                    <button type="submit" class="w-full flex items-center justify-center bg-primary text-white py-3.5 rounded-full font-label-bold text-base hover:bg-primary-container transition-all shadow-md hover:-translate-y-0.5">
                         Xác nhận đặt hàng
                     </button>
                 </div>
             </div>
         </form>
     </div>
-    <!-- BỘ KHUNG NHẬP VOUCHER -->
-    <div class="mt-6 pt-6 border-t border-surface-variant">
-        <label class="block font-label-bold text-on-surface mb-2">Mã giảm giá / Voucher</label>
-
-        <c:choose>
-            <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP: Bắt buộc đăng nhập để dùng voucher --%>
-            <c:when test="${empty sessionScope.USERMODEL}">
-                <div class="p-3 bg-surface-container rounded-lg text-sm text-on-surface-variant flex items-center justify-between">
-                    <span>Đăng nhập để sử dụng Voucher độc quyền cho thành viên!</span>
-                    <a href="${pageContext.request.contextPath}/login" class="text-primary font-label-bold hover:underline whitespace-nowrap ml-2">Đăng nhập</a>
-                </div>
-            </c:when>
-
-            <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP: Cho phép nhập mã voucher --%>
-            <c:otherwise>
-                <form action="${pageContext.request.contextPath}/apply-coupon" method="POST" class="flex gap-2">
-                    <input type="text" name="couponCode" placeholder="Nhập mã (VD: FRUIT50K)"
-                           class="flex-1 px-3 py-2 rounded-md border border-outline-variant outline-none focus:border-primary text-sm bg-surface-container-lowest">
-                    <button type="submit" class="px-4 py-2 bg-primary text-white font-label-bold rounded-md hover:bg-primary-container transition-colors text-sm">
-                        Áp dụng
-                    </button>
-                </form>
-            </c:otherwise>
-        </c:choose>
-    </div>
 </main>
+
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
 <script>
@@ -244,51 +206,40 @@
         const streetInput = document.getElementById('street');
         const fullAddressInput = document.getElementById('fullAddress');
 
-        // Gọi API lấy toàn bộ Tỉnh/Thành phố
         axios.get('https://provinces.open-api.vn/api/?depth=3')
-            .then(response => {
-                const data = response.data;
-                data.forEach(province => {
-                    provinceSelect.add(new Option(province.name, province.code));
-                });
+            .then(res => {
+                const data = res.data;
+                data.forEach(p => provinceSelect.add(new Option(p.name, p.code)));
 
-                // Khi đổi Tỉnh
                 provinceSelect.addEventListener('change', function() {
                     districtSelect.length = 1;
                     wardSelect.length = 1;
                     districtSelect.disabled = false;
                     wardSelect.disabled = true;
 
-                    const selectedProvince = data.find(p => p.code == this.value);
-                    if(selectedProvince) {
-                        selectedProvince.districts.forEach(district => {
-                            districtSelect.add(new Option(district.name, district.code));
-                        });
+                    const selProvince = data.find(p => p.code == this.value);
+                    if(selProvince) {
+                        selProvince.districts.forEach(d => districtSelect.add(new Option(d.name, d.code)));
                     }
                     updateFullAddress();
                 });
 
-                // Khi đổi Quận/Huyện
                 districtSelect.addEventListener('change', function() {
                     wardSelect.length = 1;
                     wardSelect.disabled = false;
 
-                    const selectedProvince = data.find(p => p.code == provinceSelect.value);
-                    const selectedDistrict = selectedProvince.districts.find(d => d.code == this.value);
-                    if(selectedDistrict) {
-                        selectedDistrict.wards.forEach(ward => {
-                            wardSelect.add(new Option(ward.name, ward.code));
-                        });
+                    const selProvince = data.find(p => p.code == provinceSelect.value);
+                    const selDistrict = selProvince?.districts.find(d => d.code == this.value);
+                    if(selDistrict) {
+                        selDistrict.wards.forEach(w => wardSelect.add(new Option(w.name, w.code)));
                     }
                     updateFullAddress();
                 });
 
-                // Khi đổi Phường hoặc gõ Số nhà
                 wardSelect.addEventListener('change', updateFullAddress);
                 streetInput.addEventListener('input', updateFullAddress);
             });
 
-        // Hàm nối chuỗi địa chỉ
         function updateFullAddress() {
             const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
             const districtName = districtSelect.options[districtSelect.selectedIndex]?.text || '';
@@ -301,8 +252,9 @@
             if (districtSelect.value) finalAddress.push(districtName);
             if (provinceSelect.value) finalAddress.push(provinceName);
 
-            // Cập nhật giá trị vào input ẩn để gửi đi
-            fullAddressInput.value = finalAddress.join(', ');
+            if (finalAddress.length > 0) {
+                fullAddressInput.value = finalAddress.join(', ');
+            }
         }
     });
 </script>

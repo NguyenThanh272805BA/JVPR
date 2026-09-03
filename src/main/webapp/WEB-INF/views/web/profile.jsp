@@ -12,30 +12,16 @@
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
 
-<!-- NAVBAR (Chuẩn của Fruitables Web) -->
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-    <a class="font-display-lg-mobile font-extrabold text-primary" href="${pageContext.request.contextPath}/home">Fruitables</a>
-    <div class="flex items-center space-x-4">
-      <a href="${pageContext.request.contextPath}/shop" class="text-on-surface-variant hover:text-primary font-label-bold mr-4 hidden md:block transition-colors">Tiếp tục mua sắm</a>
-      <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative flex items-center">
-        <span class="material-symbols-outlined">shopping_cart</span>
-      </a>
-    </div>
-  </div>
-</nav>
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<!-- MAIN CONTENT -->
-<main class="flex-grow py-12">
-  <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col md:flex-row gap-8">
+<main class="flex-grow py-10 md:py-12">
+  <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col md:flex-row gap-8 items-start">
 
-    <!-- SIDEBAR TÀI KHOẢN -->
+    <!-- SIDEBAR THÔNG TIN TÀI KHOẢN -->
     <aside class="w-full md:w-1/4">
-      <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm sticky top-28">
+      <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm sticky top-28">
         <div class="flex items-center gap-4 mb-6 pb-6 border-b border-surface-variant">
-
-          <!-- HIỂN THỊ AVATAR ĐỘNG -->
-          <div class="w-16 h-16 rounded-full border-2 border-primary-container flex items-center justify-center bg-surface-container overflow-hidden shrink-0">
+          <div class="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center bg-surface-container overflow-hidden shrink-0">
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
                     <img src="${sessionScope.USERMODEL.avatarUrl}" alt="Avatar" class="w-full h-full object-cover">
@@ -46,87 +32,91 @@
             </c:choose>
           </div>
 
-          <div>
-            <p class="text-sm text-on-surface-variant">Tài khoản của</p>
-            <p class="font-label-bold text-lg text-on-surface line-clamp-1">${sessionScope.USERMODEL.fullName}</p>
+          <div class="overflow-hidden">
+            <p class="text-xs text-on-surface-variant">Tài khoản</p>
+            <p class="font-label-bold text-base text-on-surface truncate">${sessionScope.USERMODEL.fullName}</p>
           </div>
         </div>
-        <ul class="space-y-2 font-label-bold">
+
+        <ul class="space-y-2 font-label-bold text-sm">
           <li>
-            <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-3 p-3 rounded-lg bg-primary-container/10 text-primary-container">
-              <span class="material-symbols-outlined">manage_accounts</span> Thông tin tài khoản
+            <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary">
+              <span class="material-symbols-outlined text-[20px]">manage_accounts</span> Thông tin tài khoản
             </a>
           </li>
           <li>
-            <!-- ĐÃ SỬA LINK LỊCH SỬ ĐƠN HÀNG -->
-            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined">receipt_long</span> Quản lý đơn hàng
+            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-[20px]">receipt_long</span> Quản lý đơn hàng
             </a>
           </li>
           <li>
-            <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-3 p-3 rounded-lg text-error hover:bg-error-container transition-colors mt-4">
-              <span class="material-symbols-outlined">logout</span> Đăng xuất
+            <a href="${pageContext.request.contextPath}/guest-tracking" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-[20px]">local_shipping</span> Tra cứu đơn hàng
+            </a>
+          </li>
+          <li>
+            <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-3 p-3 rounded-xl text-error hover:bg-error-container transition-colors mt-2 border-t border-surface-variant pt-4">
+              <span class="material-symbols-outlined text-[20px]">logout</span> Đăng xuất
             </a>
           </li>
         </ul>
       </div>
     </aside>
 
-    <!-- FORM CẬP NHẬT -->
+    <!-- FORM CẬP NHẬT HỒ SƠ -->
     <div class="w-full md:w-3/4">
-      <div class="bg-surface-container-lowest p-6 md:p-10 rounded-xl shadow-sm border border-outline-variant">
-        <h1 class="font-headline-md text-2xl text-on-surface mb-6 border-b border-surface-variant pb-4">Hồ sơ cá nhân</h1>
+      <div class="bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-outline-variant">
+        <h1 class="font-headline-md text-2xl text-on-surface mb-6 border-b border-surface-variant pb-4 font-bold">Thông tin cá nhân</h1>
 
         <c:if test="${not empty message}">
-          <div class="mb-6 bg-primary-container/20 border border-primary-container text-primary p-4 rounded-xl flex items-center gap-3 shadow-sm">
+          <div class="mb-6 bg-primary/10 border border-primary/40 text-primary p-4 rounded-xl flex items-center gap-3 shadow-sm text-sm font-label-bold">
             <span class="material-symbols-outlined">check_circle</span>
-            <span class="font-label-bold">${message}</span>
+            <span>${message}</span>
           </div>
         </c:if>
 
-        <!-- ĐÃ THÊM ENCTYPE MULTIPART ĐỂ UPLOAD FILE -->
         <form action="${pageContext.request.contextPath}/profile" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
-
-          <!-- THÊM Ô CHỌN ẢNH ĐẠI DIỆN -->
-          <div class="mb-6">
-            <label class="block font-label-bold text-on-surface mb-2">Ảnh đại diện (Tùy chọn)</label>
+          <div>
+            <label class="block font-label-bold text-sm text-on-surface mb-2">Ảnh đại diện mới</label>
             <input type="file" name="avatarFile" accept="image/*"
-                   class="w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-label-bold file:bg-primary-container/20 file:text-primary hover:file:bg-primary-container/30 transition-colors">
+                   class="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-label-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer">
           </div>
 
-          <div class="mb-6">
-            <label class="block font-label-bold text-on-surface mb-2">Email đăng nhập <span class="text-error">*</span></label>
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Tên đăng nhập</label>
+              <input type="text" value="${sessionScope.USERMODEL.username}" disabled
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm">
+            </div>
+            <div>
+              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ Email</label>
               <input type="email" value="${sessionScope.USERMODEL.email}" disabled
-                     class="w-full pl-12 pr-4 py-3 rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed">
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm">
             </div>
-            <p class="text-xs text-on-surface-variant mt-2">Email không thể thay đổi để đảm bảo bảo mật tài khoản.</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label class="block font-label-bold text-on-surface mb-2">Họ và tên <span class="text-error">*</span></label>
+              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Họ và tên <span class="text-error">*</span></label>
               <input type="text" name="fullName" value="${sessionScope.USERMODEL.fullName}" required
-                     class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
             </div>
             <div>
-              <label class="block font-label-bold text-on-surface mb-2">Số điện thoại</label>
+              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Số điện thoại</label>
               <input type="tel" name="phone" value="${sessionScope.USERMODEL.phone}"
-                     class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">
+                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
             </div>
           </div>
 
           <div>
-            <label class="block font-label-bold text-on-surface mb-2">Địa chỉ nhận hàng mặc định</label>
-            <textarea name="address" rows="3" placeholder="Nhập địa chỉ của bạn (Số nhà, đường, xã/phường...)"
-                      class="w-full px-4 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface transition-colors">${sessionScope.USERMODEL.address}</textarea>
+            <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ nhận hàng mặc định</label>
+            <textarea name="address" rows="3" placeholder="Nhập địa chỉ nhà của bạn..."
+                      class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm leading-relaxed">${sessionScope.USERMODEL.address}</textarea>
           </div>
 
-          <div class="pt-4">
-            <button type="submit" class="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-label-bold hover:bg-primary-container transition-all duration-300 shadow-md hover:-translate-y-1">
-              <span class="material-symbols-outlined">save</span>
-              Lưu thay đổi
+          <div class="pt-2">
+            <button type="submit" class="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-label-bold hover:bg-primary-container transition-all shadow-md hover:-translate-y-0.5 text-sm">
+              <span class="material-symbols-outlined text-[18px]">save</span> Lưu thay đổi
             </button>
           </div>
         </form>
@@ -134,5 +124,7 @@
     </div>
   </div>
 </main>
+
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 </body>
 </html>
