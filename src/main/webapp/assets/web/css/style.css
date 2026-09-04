@@ -6,35 +6,53 @@ html {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    color: #1e293b;
+
+    /* Hiệu ứng nền đa tầng: Ánh sáng Mesh Gradient kết hợp vân sóng hữu cơ */
+    background-color: #eef7ee !important;
+    background-image:
+            radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.14) 0px, transparent 45%),
+            radial-gradient(at 100% 15%, rgba(234, 88, 12, 0.08) 0px, transparent 40%),
+            radial-gradient(at 50% 60%, rgba(101, 163, 13, 0.07) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(132, 204, 22, 0.12) 0px, transparent 45%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0 60 Q 30 35, 60 60 T 120 60' fill='none' stroke='%2365a30d' stroke-width='1.5' stroke-opacity='0.08'/%3E%3Cpath d='M0 120 Q 30 95, 60 120 T 120 120' fill='none' stroke='%2365a30d' stroke-width='1.5' stroke-opacity='0.08'/%3E%3Cpath d='M0 0 Q 30 -25, 60 0 T 120 0' fill='none' stroke='%2365a30d' stroke-width='1.5' stroke-opacity='0.08'/%3E%3C/svg%3E") !important;
+    background-size: auto, auto, auto, auto, 120px 120px !important;
+    background-attachment: fixed !important;
 }
 
+/* Nền chuyển động động nâng cao (Dành cho các trang cần điểm nhấn đặc biệt) */
 .bg-pattern {
-    background-color: #f4fbf7;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0 60 Q 30 30, 60 60 T 120 60' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 120 Q 30 90, 60 120 T 120 120' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 0 Q 30 -30, 60 0 T 120 0' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3C/svg%3E");
-    background-size: 160px 160px;
-    background-attachment: fixed;
-    animation: rollingWaves 25s linear infinite;
+    background-color: #edf7ed !important;
+    background-image:
+            radial-gradient(circle at 20% 20%, rgba(132, 204, 22, 0.18) 0%, transparent 35%),
+            radial-gradient(circle at 80% 80%, rgba(251, 146, 60, 0.12) 0%, transparent 35%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0 60 Q 30 30, 60 60 T 120 60' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 120 Q 30 90, 60 120 T 120 120' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3Cpath d='M0 0 Q 30 -30, 60 0 T 120 0' fill='none' stroke='%2384cc16' stroke-width='2' stroke-opacity='0.12'/%3E%3C/svg%3E") !important;
+    background-size: auto, auto, 160px 160px !important;
+    background-attachment: fixed !important;
+    animation: rollingWaves 30s linear infinite !important;
 }
 
 @keyframes rollingWaves {
     0% {
-        background-position: 0 0;
+        background-position: 0 0, 0 0, 0 0;
     }
     100% {
-        background-position: -160px 160px;
+        background-position: 0 0, 0 0, -160px 160px;
     }
 }
 
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #eef5ee;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -46,6 +64,7 @@ body {
     background: #94a3b8;
 }
 
+/* Material Symbols Icon */
 .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
     font-weight: normal;
@@ -65,13 +84,14 @@ body {
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
+/* Card hover lift & shadows */
 .hover-lift {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hover-lift:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15), 0 8px 12px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 28px -6px rgba(101, 163, 13, 0.12), 0 8px 12px -6px rgba(0, 0, 0, 0.06);
 }
 
 .hover-zoom-img img {

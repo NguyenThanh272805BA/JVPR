@@ -17,7 +17,7 @@
 <!-- NAVBAR CHUNG -->
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<main class="flex-grow py-12 bg-surface">
+<main class="flex-grow py-12">
   <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
 
     <!-- Breadcrumb -->

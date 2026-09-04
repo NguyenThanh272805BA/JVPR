@@ -11,30 +11,29 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
 </head>
-<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
-
+<body class="bg-surface-container bg-pattern min-h-screen flex flex-col antialiased">
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <main class="flex-grow py-12">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
         <div class="max-w-2xl mx-auto text-center mb-10">
             <h1 class="font-headline-md text-3xl font-extrabold text-on-surface mb-3">Tra cứu tiến độ đơn hàng</h1>
-            <p class="text-on-surface-variant text-sm">Dành cho khách hàng chưa có tài khoản hoặc muốn theo dõi trạng thái giao hàng nhanh chóng qua Số điện thoại hoặc Mã đơn.</p>
+            <p class="text-on-surface-variant text-sm">Dành cho khách hàng chưa có tài khoản hoặc muốn theo dõi trạng thái giao hàng nhanh chóng.</p>
         </div>
 
         <!-- Form tra cứu -->
         <div class="max-w-xl mx-auto bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant mb-12">
             <form action="${pageContext.request.contextPath}/guest-tracking" method="POST" class="space-y-4">
                 <div>
-                    <label class="block font-label-bold text-on-surface mb-1.5">Số điện thoại đặt hàng</label>
-                    <input type="tel" name="phone" placeholder="VD: 0988888888" value="${param.phone}"
-                           class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface">
+                    <label class="block font-label-bold text-on-surface mb-1.5">Số điện thoại đã dùng để đặt hàng</label>
+                    <input type="tel" name="phone" placeholder="Nhập số điện thoại đã dùng để đặt hàng (VD: 0375162932)" value="${param.phone}"
+                           class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
                 </div>
                 <div class="text-center font-label-bold text-xs text-on-surface-variant">--- HOẶC ---</div>
                 <div>
-                    <label class="block font-label-bold text-on-surface mb-1.5">Mã đơn hàng</label>
-                    <input type="text" name="orderCode" placeholder="VD: ORD-1729000000" value="${param.orderCode}"
-                           class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface uppercase">
+                    <label class="block font-label-bold text-on-surface mb-1.5">Mã đơn hàng của bạn</label>
+                    <input type="text" name="orderCode" placeholder="Nhập mã đơn hàng của bạn (VD: ORD-1729000000)" value="${param.orderCode}"
+                           class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface uppercase text-sm">
                 </div>
                 <button type="submit" class="w-full bg-primary hover:bg-primary-container text-white py-3.5 rounded-xl font-label-bold text-base transition-all shadow-md mt-2 flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined">search</span> Tra cứu ngay

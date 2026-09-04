@@ -8,131 +8,189 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Khuyến mãi & Ưu đãi - Fruitables</title>
 
+  <!-- Google Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
+
+  <style>
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(35px, -45px) scale(1.08); }
+      66% { transform: translate(-25px, 25px) scale(0.94); }
+    }
+    .animate-float-slow {
+      animation: floatOrb 14s infinite ease-in-out;
+    }
+    .animate-float-reverse {
+      animation: floatOrb 18s infinite ease-in-out reverse;
+    }
+    .ticket-cutout-left {
+      position: absolute;
+      left: -10px;
+      bottom: 58px;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background-color: #f8fafc;
+      box-shadow: inset -2px 0 3px rgba(0,0,0,0.04);
+    }
+    .ticket-cutout-right {
+      position: absolute;
+      right: -10px;
+      bottom: 58px;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background-color: #f8fafc;
+      box-shadow: inset 2px 0 3px rgba(0,0,0,0.04);
+    }
+  </style>
 </head>
 
-<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<body class="bg-[#f8fafc] text-[#1e293b] font-body-md min-h-screen flex flex-col antialiased relative selection:bg-primary/20 selection:text-primary">
 
-<!-- NAVBAR ĐỒNG BỘ -->
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-  <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-    <a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg font-extrabold text-primary" href="${pageContext.request.contextPath}/home">
-      Fruitables
-    </a>
-    <div class="hidden md:flex space-x-8 items-center">
-      <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/home">Trang chủ</a>
-      <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
-      <a class="font-body-md text-primary font-semibold border-b-2 border-primary pb-1" href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
-    </div>
-    <div class="flex items-center space-x-4">
-      <a href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <c:if test="${not empty sessionScope.CART_TOTAL_ITEMS && sessionScope.CART_TOTAL_ITEMS > 0}">
-                    <span class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        <c:out value="${sessionScope.CART_TOTAL_ITEMS}"/>
-                    </span>
-        </c:if>
-      </a>
-      <c:choose>
-        <c:when test="${not empty sessionScope.USERMODEL}">
-          <div class="group relative cursor-pointer py-2">
-            <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
-              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-              <span class="font-label-bold text-label-bold hidden md:block"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
-            </div>
-            <div class="absolute right-0 top-full w-48 bg-surface-container-lowest rounded-md shadow-lg hidden group-hover:block border border-outline-variant z-50 overflow-hidden">
-              <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                <a href="${pageContext.request.contextPath}/admin/dashboard" class="block px-4 py-3 text-on-surface hover:bg-surface-container transition-colors">Trang Quản Trị</a>
-              </c:if>
-              <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-3 text-error hover:bg-error-container transition-colors border-t border-surface-variant">Đăng xuất</a>
-            </div>
-          </div>
-        </c:when>
-        <c:otherwise>
-          <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors" title="Đăng nhập">
-            <span class="material-symbols-outlined">person</span>
-          </a>
-        </c:otherwise>
-      </c:choose>
-    </div>
-  </div>
-</nav>
+<!-- HIỆU ỨNG NỀN ĐỘNG AMBIENT GLOW -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+  <div class="absolute -top-32 -left-32 w-[34rem] h-[34rem] bg-[#81c408]/15 rounded-full blur-[110px] animate-float-slow"></div>
+  <div class="absolute top-1/3 -right-36 w-[30rem] h-[30rem] bg-amber-300/15 rounded-full blur-[120px] animate-float-reverse"></div>
+  <div class="absolute -bottom-36 left-1/4 w-[38rem] h-[38rem] bg-emerald-400/15 rounded-full blur-[130px] animate-float-slow"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-35"></div>
+</div>
 
-<!-- HERO BANNER KHUYẾN MÃI -->
-<section class="relative w-full text-white py-20 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop](https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
-  <div class="absolute inset-0 bg-black/60"></div> <!-- Lớp màng đen tối màu -->
+<!-- NHÚNG NAVBAR ĐỒNG BỘ -->
+<jsp:include page="/WEB-INF/views/components/navbar.jsp" />
+
+<!-- HERO BANNER KHUYẾN MÃI (GIỮ NGUYÊN ẢNH GỐC & CẤU TRÚC BANNER) -->
+<section class="relative w-full text-white py-16 md:py-24 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/80 backdrop-blur-[1px]"></div>
   <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center z-10">
-    <span class="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-6 inline-block shadow-lg">Săn Voucher & Flash Sale</span>
-    <h1 class="font-display-lg text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">Kho Ưu Đãi Độc Quyền</h1>
-    <p class="font-body-lg text-gray-200 max-w-xl mx-auto drop-shadow">Khám phá các mã giảm giá và hàng loạt sản phẩm trái cây, nông sản hữu cơ đang được xả kho với mức giá cực sốc.</p>
+    <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-[#6ca305] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 shadow-lg shadow-primary/30 border border-white/20">
+      <span class="material-symbols-outlined text-[16px] animate-pulse">local_fire_department</span>
+      Săn Voucher & Flash Sale Mỗi Ngày
+    </div>
+    <h1 class="font-display-lg text-3xl md:text-5xl font-black mb-3.5 tracking-tight text-white drop-shadow-lg">
+      Kho Ưu Đãi Độc Quyền
+    </h1>
+    <p class="font-body-lg text-slate-200 text-sm md:text-base max-w-xl mx-auto leading-relaxed drop-shadow">
+      Khám phá các mã giảm giá và hàng loạt sản phẩm trái cây, nông sản hữu cơ đang được trợ giá với mức chiết khấu cực sốc.
+    </p>
   </div>
 </section>
 
 <!-- MAIN CONTENT: DANH SÁCH VOUCHER & FLASH SALE -->
-<main class="flex-grow py-12 bg-background">
+<main class="flex-grow py-12">
   <div class="max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop">
 
     <!-- THÔNG BÁO CHO KHÁCH CHƯA ĐĂNG NHẬP -->
     <c:if test="${empty sessionScope.USERMODEL}">
-      <div class="mb-8 p-4 bg-surface-container-high border-l-4 border-primary rounded-r-lg flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-primary text-3xl">info</span>
+      <div class="mb-10 p-5 bg-white/80 backdrop-blur-md border border-primary/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-primary/40 transition-all duration-300">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-2xl">loyalty</span>
+          </div>
           <div>
-            <h4 class="font-label-bold text-on-surface">Bạn chưa đăng nhập!</h4>
-            <p class="text-sm text-on-surface-variant">Hãy đăng nhập tài khoản thành viên để có thể áp dụng các mã giảm giá này khi thanh toán đơn hàng.</p>
+            <h4 class="font-label-bold text-gray-900 text-base">Bạn chưa kích hoạt quyền lợi thành viên?</h4>
+            <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Đăng nhập tài khoản để nhận và áp dụng mã giảm giá trực tiếp vào hóa đơn thanh toán.</p>
           </div>
         </div>
-        <a href="${pageContext.request.contextPath}/login" class="px-6 py-2 bg-primary text-white font-label-bold rounded-full hover:bg-primary-container transition-colors whitespace-nowrap">Đăng nhập ngay</a>
+        <a href="${pageContext.request.contextPath}/login" class="px-6 py-2.5 bg-gradient-to-r from-primary to-[#6ca305] text-white text-xs sm:text-sm font-label-bold rounded-full hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap">
+          Đăng nhập ngay
+        </a>
       </div>
     </c:if>
 
-    <!-- DANH SÁCH VOUCHER -->
+    <!-- TIÊU ĐỀ PHẦN VOUCHER -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="font-headline-md text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-primary text-3xl">redeem</span> Mã Giảm Giá Đang Có Sẵn
+        </h2>
+        <p class="text-xs md:text-sm text-gray-500 mt-1">Lưu hoặc sao chép mã voucher và dán vào bước thanh toán đơn hàng</p>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH VOUCHER DẠNG TICKET NGHỆ THUẬT -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <c:forEach var="coupon" items="${coupons}">
-        <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col relative hover:shadow-md transition-shadow">
-          <!-- Decor viền trái màu xanh -->
-          <div class="absolute left-0 top-0 bottom-0 w-3 bg-primary-container"></div>
+        <div class="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200/90 hover:border-primary/50 hover:shadow-[0_12px_30px_rgba(129,196,8,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden">
+          <!-- Dải ruy băng góc trái -->
+          <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-primary to-[#6ca305]"></div>
 
-          <div class="p-6 pl-8 flex flex-col flex-grow">
-            <div class="flex justify-between items-start mb-3">
-                            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 bg-surface-container text-primary rounded">
-                                <c:choose>
-                                  <c:when test="${coupon.discountType == 'FIXED'}">Giảm trực tiếp</c:when>
-                                  <c:otherwise>Giảm theo phần trăm</c:otherwise>
-                                </c:choose>
-                            </span>
-              <span class="text-xs text-on-surface-variant font-medium">HSD: <fmt:formatDate value="${coupon.endDate}" pattern="dd/MM/yyyy"/></span>
+          <!-- Lỗ khuyết vé coupon -->
+          <div class="ticket-cutout-left"></div>
+          <div class="ticket-cutout-right"></div>
+
+          <div class="p-6 pl-7 flex flex-col flex-grow">
+            <!-- Header vé -->
+            <div class="flex justify-between items-start mb-4 gap-2">
+              <div class="flex flex-wrap gap-1.5 items-center">
+                <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md">
+                  <c:choose>
+                    <c:when test="${coupon.discountType == 'FIXED'}">Tiền mặt</c:when>
+                    <c:otherwise>Theo %</c:otherwise>
+                  </c:choose>
+                </span>
+
+                <c:choose>
+                  <c:when test="${coupon.targetAudience == 'GMAIL'}">
+                    <span class="text-[11px] font-bold px-2.5 py-1 bg-rose-50 text-rose-600 rounded-md border border-rose-100">Dành riêng Gmail</span>
+                  </c:when>
+                  <c:when test="${coupon.targetAudience == 'REGULAR'}">
+                    <span class="text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">Thành viên thường</span>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="text-[11px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">Tất cả khách hàng</span>
+                  </c:otherwise>
+                </c:choose>
+              </div>
+
+              <span class="text-[11px] font-medium text-slate-400 whitespace-nowrap bg-slate-50 px-2 py-0.5 rounded">
+                HSD: <fmt:formatDate value="${coupon.endDate}" pattern="dd/MM/yyyy"/>
+              </span>
             </div>
 
-            <h3 class="font-headline-md text-2xl text-on-surface font-extrabold mb-1">
-              <c:choose>
-                <c:when test="${coupon.discountType == 'FIXED'}">
-                  -<fmt:formatNumber value="${coupon.discountValue}" type="number" groupingUsed="true"/> ₫
-                </c:when>
-                <c:otherwise>
-                  -<c:out value="${coupon.discountValue}"/>%
-                </c:otherwise>
-              </c:choose>
-            </h3>
+            <!-- Giá trị Voucher -->
+            <div class="my-1">
+              <span class="text-xs text-slate-400 font-medium block mb-0.5">Mức chiết khấu</span>
+              <h3 class="font-headline-md text-3xl text-primary font-black tracking-tight group-hover:scale-[1.02] transition-transform">
+                <c:choose>
+                  <c:when test="${coupon.discountType == 'FIXED'}">
+                    -<fmt:formatNumber value="${coupon.discountValue}" type="number" groupingUsed="true"/> ₫
+                  </c:when>
+                  <c:otherwise>
+                    -<c:out value="${coupon.discountValue}"/>%
+                  </c:otherwise>
+                </c:choose>
+              </h3>
+            </div>
 
-            <p class="text-sm text-on-surface-variant mb-6">Đơn hàng tối thiểu: <b class="text-on-surface"><fmt:formatNumber value="${coupon.minOrderValue}" type="number" groupingUsed="true"/> ₫</b></p>
+            <p class="text-xs text-slate-500 mb-6">
+              Áp dụng đơn từ: <b class="text-slate-800 font-bold"><fmt:formatNumber value="${coupon.minOrderValue}" type="number" groupingUsed="true"/> ₫</b>
+            </p>
 
-            <div class="mt-auto pt-4 border-t border-surface-variant flex items-center justify-between">
-              <div class="bg-surface-container px-3 py-1.5 rounded border border-outline-variant font-mono font-bold text-primary tracking-widest select-all">
-                <c:out value="${coupon.code}"/>
+            <!-- Đường cắt đứt khúc vé -->
+            <div class="border-t border-dashed border-slate-200 -mx-6 mb-4"></div>
+
+            <!-- Bottom: Mã Code & Thao tác -->
+            <div class="mt-auto flex items-center justify-between gap-3">
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-dashed border-slate-300 hover:border-primary px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+                   onclick="copyCode('${coupon.code}', this)" title="Bấm để sao chép mã">
+                <span class="font-mono font-extrabold text-slate-800 text-sm tracking-widest uppercase"><c:out value="${coupon.code}"/></span>
+                <span class="material-symbols-outlined text-slate-400 text-base group-hover:text-primary">content_copy</span>
               </div>
 
               <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                  <a href="${pageContext.request.contextPath}/shop" class="text-xs bg-primary text-white px-4 py-2 rounded-full font-label-bold hover:bg-primary-container transition-colors">
+                  <a href="${pageContext.request.contextPath}/shop" class="text-xs bg-primary hover:bg-[#6ca305] text-white px-4 py-2 rounded-full font-label-bold transition-all shadow-sm hover:shadow hover:-translate-y-0.5">
                     Dùng ngay
                   </a>
                 </c:when>
                 <c:otherwise>
-                  <a href="${pageContext.request.contextPath}/login" class="text-xs bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-bold hover:text-primary transition-colors">
-                    Đăng nhập để dùng
+                  <a href="${pageContext.request.contextPath}/login" class="text-xs bg-slate-100 text-slate-600 px-3.5 py-2 rounded-full font-label-bold hover:bg-primary hover:text-white transition-all">
+                    Đăng nhập
                   </a>
                 </c:otherwise>
               </c:choose>
@@ -144,43 +202,59 @@
 
     <!-- FLASH SALE SECTION -->
     <c:if test="${not empty flashSaleProducts}">
-      <div class="mt-20 mb-8 border-t border-surface-variant pt-12">
+      <div class="mt-20 border-t border-slate-200/80 pt-12">
         <div class="flex items-center justify-between mb-8">
-          <h2 class="font-display-md text-3xl font-extrabold text-on-surface flex items-center gap-2">
-            <span class="material-symbols-outlined text-red-500 text-4xl">local_fire_department</span>
-            Sản Phẩm Flash Sale
-          </h2>
-          <a href="${pageContext.request.contextPath}/shop" class="text-primary font-semibold hover:underline transition-colors">Xem tất cả ></a>
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-rose-500 mb-1">
+              <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> Giờ vàng giá sốc
+            </div>
+            <h2 class="font-display-md text-2xl md:text-3xl font-black text-slate-900 flex items-center gap-2">
+              <span class="material-symbols-outlined text-rose-500 text-3xl md:text-4xl">local_fire_department</span>
+              Sản Phẩm Flash Sale
+            </h2>
+          </div>
+          <a href="${pageContext.request.contextPath}/shop" class="group text-primary font-bold hover:text-[#6ca305] text-sm flex items-center gap-1 transition-colors">
+            Xem tất cả <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </a>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-6">
           <c:forEach var="product" items="${flashSaleProducts}">
-            <div class="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden hover:shadow-md transition-shadow relative group">
+            <div class="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200/90 overflow-hidden hover:shadow-[0_14px_30px_rgba(244,63,94,0.12)] hover:border-rose-300 hover:-translate-y-1 transition-all duration-300 flex flex-col relative">
 
-              <!-- Nhãn giảm giá % -->
-              <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10 shadow-sm">
-                - <fmt:formatNumber value="${(product.price - product.discountPrice) / product.price * 100}" maxFractionDigits="0"/>%
+              <!-- Badge % Giảm Sốc -->
+              <div class="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[11px] font-black px-2.5 py-1 rounded-lg z-10 shadow-md flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[13px]">bolt</span>
+                -<fmt:formatNumber value="${(product.price - product.discountPrice) / product.price * 100}" maxFractionDigits="0"/>%
               </div>
 
-              <!-- Ảnh sản phẩm -->
-              <div class="aspect-square bg-gray-50 overflow-hidden relative">
-                <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-              </div>
+              <!-- Product Image -->
+              <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}" class="aspect-square bg-slate-50 overflow-hidden block relative">
+                <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
+              </a>
 
-              <!-- Thông tin sản phẩm -->
-              <div class="p-4 flex flex-col h-full">
-                <p class="text-sm text-gray-500 mb-1"><c:out value="${product.categoryName}"/></p>
-                <h3 class="font-bold text-gray-800 mb-2 truncate" title="${product.name}"><c:out value="${product.name}"/></h3>
+              <!-- Card Body -->
+              <div class="p-4 md:p-5 flex flex-col flex-grow">
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-1"><c:out value="${product.categoryName}"/></p>
+                <a href="${pageContext.request.contextPath}/product-detail?id=${product.id}">
+                  <h3 class="font-bold text-slate-800 text-sm md:text-base mb-2 truncate group-hover:text-primary transition-colors" title="${product.name}">
+                    <c:out value="${product.name}"/>
+                  </h3>
+                </a>
 
-                <div class="flex flex-wrap items-center gap-2 mb-4">
-                  <span class="text-red-600 font-bold text-lg"><fmt:formatNumber value="${product.discountPrice}" type="number" groupingUsed="true"/> ₫</span>
-                  <span class="text-gray-400 text-sm line-through"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> ₫</span>
+                <div class="flex flex-wrap items-baseline gap-2 mb-5">
+                  <span class="text-rose-600 font-black text-lg"><fmt:formatNumber value="${product.discountPrice}" type="number" groupingUsed="true"/> ₫</span>
+                  <span class="text-slate-400 text-xs line-through"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> ₫</span>
                 </div>
 
-                <!-- Nút Thêm vào giỏ -->
-                <button onclick="window.location.href='${pageContext.request.contextPath}/cart/add?id=${product.id}'" class="mt-auto w-full py-2 bg-red-50 text-red-600 font-bold rounded-lg border border-red-200 hover:bg-red-500 hover:text-white transition-colors flex justify-center items-center gap-2">
-                  <span class="material-symbols-outlined text-sm">shopping_cart</span> Thêm vào giỏ
-                </button>
+                <form action="${pageContext.request.contextPath}/cart" method="POST" class="mt-auto">
+                  <input type="hidden" name="action" value="add">
+                  <input type="hidden" name="productId" value="${product.id}">
+                  <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-rose-50 to-orange-50 text-rose-600 font-bold rounded-xl border border-rose-200/80 hover:from-rose-500 hover:to-orange-500 hover:text-white hover:border-transparent transition-all duration-300 flex justify-center items-center gap-1.5 text-xs md:text-sm shadow-sm">
+                    <span class="material-symbols-outlined text-base">add_shopping_cart</span> Thêm vào giỏ
+                  </button>
+                </form>
               </div>
             </div>
           </c:forEach>
@@ -191,12 +265,19 @@
   </div>
 </main>
 
-<!-- FOOTER -->
-<footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
-  <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto text-center text-on-surface-variant font-body-md">
-    <p>© 2026 Fruitables. Bài tập lớn công nghệ Java.</p>
-  </div>
-</footer>
+<!-- NHÚNG FOOTER ĐỒNG BỘ -->
+<jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
+<script>
+  function copyCode(code, el) {
+    navigator.clipboard.writeText(code).then(() => {
+      const originalHtml = el.innerHTML;
+      el.innerHTML = '<span class="text-primary font-bold text-xs">Đã sao chép!</span>';
+      setTimeout(() => {
+        el.innerHTML = originalHtml;
+      }, 1500);
+    });
+  }
+</script>
 </body>
 </html>

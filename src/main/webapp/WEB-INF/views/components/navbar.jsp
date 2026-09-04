@@ -8,12 +8,18 @@
             Fruitables
         </a>
 
-        <!-- Menu điều hướng -->
+        <!-- Menu điều hướng đồng bộ icon -->
         <div class="hidden md:flex space-x-8 items-center">
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/shop">Cửa hàng</a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="${pageContext.request.contextPath}/promotions">Khuyến mãi</a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1" href="${pageContext.request.contextPath}/guest-tracking">
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/home">
+                <span class="material-symbols-outlined text-[18px]">home</span> Trang chủ
+            </a>
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/shop">
+                <span class="material-symbols-outlined text-[18px]">storefront</span> Cửa hàng
+            </a>
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/promotions">
+                <span class="material-symbols-outlined text-[18px]">redeem</span> Khuyến mãi
+            </a>
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/guest-tracking">
                 <span class="material-symbols-outlined text-[18px]">local_shipping</span> Tra cứu đơn hàng
             </a>
         </div>
@@ -66,8 +72,8 @@
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center gap-1" title="Đăng nhập">
-                        <span class="material-symbols-outlined">person</span>
+                    <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center gap-1.5" title="Đăng nhập">
+                        <span class="material-symbols-outlined text-[18px]">person</span>
                         <span class="font-label-bold text-sm hidden md:inline">Đăng nhập</span>
                     </a>
                 </c:otherwise>

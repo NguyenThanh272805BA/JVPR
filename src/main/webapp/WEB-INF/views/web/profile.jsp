@@ -10,8 +10,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
 </head>
-<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
-
+<body class="bg-surface-container bg-pattern min-h-screen flex flex-col antialiased">
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <main class="flex-grow py-10 md:py-12">

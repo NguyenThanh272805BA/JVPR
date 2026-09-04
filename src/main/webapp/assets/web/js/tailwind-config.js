@@ -9,24 +9,30 @@ tailwind.config = {
                 "on-primary-container": "#f7fee7",
                 "secondary": "#ea580c",
                 "secondary-container": "#fb923c",
-                "background": "#f8fafc",
+
+                /* Tông màu nền đã tinh chỉnh hơi phớt xanh hữu cơ nhẹ, làm nổi bật nền card #ffffff */
+                "background": "#eef7ee",
                 "on-background": "#0f172a",
+
                 "surface": "#ffffff",
                 "surface-container-lowest": "#ffffff",
-                "surface-container-low": "#f8fafc",
-                "surface-container": "#f1f5f9",
-                "surface-container-high": "#e2e8f0",
+                "surface-container-low": "#f4faf3",
+                "surface-container": "#e8f3e7",
+                "surface-container-high": "#dbeade",
+
                 "on-surface": "#1e293b",
                 "on-surface-variant": "#64748b",
                 "outline": "#cbd5e1",
-                "outline-variant": "#e2e8f0",
+                "outline-variant": "#dbeade",
+
                 "error": "#ef4444",
                 "error-container": "#fee2e2",
                 "on-error": "#ffffff",
                 "on-error-container": "#b91c1c"
             },
             boxShadow: {
-                'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                'soft': '0 4px 20px -2px rgba(101, 163, 13, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+                'card': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02)',
                 'glow': '0 0 15px rgba(132, 204, 22, 0.4)',
             },
             keyframes: {
@@ -53,8 +59,20 @@ tailwind.config = {
                 'float': 'float 3s ease-in-out infinite',
                 'pulse-soft': 'pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
-            borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
-            spacing: { "base-unit": "8px", "margin-mobile": "16px", "container-max-width": "1280px", "margin-desktop": "48px", "gutter": "24px" },
+            borderRadius: {
+                "DEFAULT": "0.5rem",
+                "lg": "0.75rem",
+                "xl": "1rem",
+                "2xl": "1.25rem",
+                "full": "9999px"
+            },
+            spacing: {
+                "base-unit": "8px",
+                "margin-mobile": "16px",
+                "container-max-width": "1280px",
+                "margin-desktop": "48px",
+                "gutter": "24px"
+            },
             fontFamily: {
                 "body-lg": ["Inter", "sans-serif"],
                 "display-lg-mobile": ["Plus Jakarta Sans", "sans-serif"],
