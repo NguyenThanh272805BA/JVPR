@@ -70,6 +70,30 @@
                                             </c:choose>
                                         </div>
                                     </div>
+
+                                    <!-- DANH SÁCH SẢN PHẨM ĐÃ MUA KÈM HÌNH ẢNH -->
+                                    <c:if test="${not empty order.details}">
+                                        <div class="space-y-3 py-2 border-b border-surface-variant">
+                                            <p class="text-xs font-label-bold text-on-surface-variant uppercase tracking-wider">Sản phẩm trong đơn hàng:</p>
+                                            <c:forEach var="item" items="${order.details}">
+                                                <div class="flex items-center gap-4 py-2">
+                                                    <div class="w-16 h-16 rounded-lg border border-outline-variant overflow-hidden flex-shrink-0 bg-surface-container">
+                                                        <img src="${item.productImageUrl}" alt="${item.productName}" class="w-full h-full object-cover">
+                                                    </div>
+                                                    <div class="flex-grow">
+                                                        <h4 class="font-label-bold text-on-surface text-sm line-clamp-1 hover:text-primary">
+                                                            <a href="${pageContext.request.contextPath}/product-detail?id=${item.productId}"><c:out value="${item.productName}"/></a>
+                                                        </h4>
+                                                        <p class="text-xs text-on-surface-variant mt-1">Số lượng: <span class="font-bold text-on-surface">x${item.quantity}</span></p>
+                                                    </div>
+                                                    <div class="font-price-tag text-sm text-on-surface font-semibold">
+                                                        <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </c:if>
+
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                         <div>
                                             <p class="text-on-surface-variant">SĐT người nhận:</p>

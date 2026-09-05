@@ -44,12 +44,22 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public OrderModel findByOrderCode(String orderCode) {
-        return orderDAO.findByOrderCode(orderCode);
+        OrderModel order = orderDAO.findByOrderCode(orderCode);
+        if (order != null) {
+            order.setDetails(orderDAO.findOrderDetailsByOrderId(order.getId()));
+        }
+        return order;
     }
 
     @Override
     public List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode) {
-        return orderDAO.findByPhoneOrOrderCode(phone, orderCode);
+        List<OrderModel> orders = orderDAO.findByPhoneOrOrderCode(phone, orderCode);
+        if (orders != null) {
+            for (OrderModel order : orders) {
+                order.setDetails(orderDAO.findOrderDetailsByOrderId(order.getId()));
+            }
+        }
+        return orders;
     }
 
     @Override

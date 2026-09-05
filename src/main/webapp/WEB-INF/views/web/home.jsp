@@ -8,6 +8,8 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Trang chủ - Fruitables</title>
 
+    <!-- Nạp font Material Symbols hỗ trợ trục FILL phục vụ render sao động -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
@@ -196,12 +198,25 @@
                             <h3 class="font-label-bold text-base text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
                         </a>
 
-                        <div class="flex items-center gap-1 text-yellow-500 mb-3">
-                            <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 5}" />
-                            <c:forEach begin="1" end="5" var="i">
-                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' ${rating >= i ? 1 : 0};">star</span>
-                            </c:forEach>
-                            <span class="text-xs text-on-surface-variant ml-1">(${item.reviewCount != null ? item.reviewCount : 0})</span>
+                        <!-- ĐÃ CẬP NHẬT: Render số sao chính xác (Hỗ trợ sao nguyên, nửa sao, sao rỗng và tổng review thực tế) -->
+                        <div class="flex items-center gap-1.5 mb-3">
+                            <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 0}" />
+                            <div class="flex items-center text-yellow-500">
+                                <c:forEach begin="1" end="5" var="i">
+                                    <c:choose>
+                                        <c:when test="${rating >= i}">
+                                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        </c:when>
+                                        <c:when test="${rating >= i - 0.5}">
+                                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="material-symbols-outlined text-[16px] text-gray-300">star</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+                            </div>
+                            <span class="text-xs text-on-surface-variant font-medium ml-0.5">(${item.reviewCount != null ? item.reviewCount : 0})</span>
                         </div>
 
                         <div class="mt-auto flex items-center justify-between pt-2">
@@ -246,7 +261,7 @@
                     const formData = new FormData(this);
                     const data = new URLSearchParams(formData);
 
-                    fetch(`${pageContext.request.contextPath}/api/add-to-cart`, {
+                    fetch('${pageContext.request.contextPath}/api/add-to-cart', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: data.toString()
