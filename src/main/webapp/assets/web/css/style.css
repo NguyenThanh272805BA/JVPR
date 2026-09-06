@@ -101,3 +101,37 @@ body {
 .hover-zoom-img:hover img {
     transform: scale(1.05);
 }
+
+/* Cart bounce and shake animations for Add-to-Cart interaction */
+@keyframes cart-shake {
+    0% { transform: scale(1) rotate(0deg); }
+    20% { transform: scale(1.3) rotate(-15deg); }
+    40% { transform: scale(1.3) rotate(15deg); }
+    60% { transform: scale(1.2) rotate(-8deg); }
+    80% { transform: scale(1.1) rotate(8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-cart-shake {
+    animation: cart-shake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+}
+
+@keyframes badge-pop {
+    0% { transform: scale(0.6); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+.animate-badge-pop {
+    animation: badge-pop 0.35s ease-out both !important;
+}
+
+.fly-item {
+    position: fixed;
+    z-index: 999999;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    transition: all 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+    object-fit: cover;
+}

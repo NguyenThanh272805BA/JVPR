@@ -10,7 +10,10 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
 
     private final String BASE_SQL = "SELECT p.*, c.name AS category_name, " +
             "(SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id) AS avg_rating, " +
-            "(SELECT COUNT(*) FROM reviews WHERE product_id = p.id) AS review_count " +
+            "(SELECT COUNT(*) FROM reviews WHERE product_id = p.id) AS review_count, " +
+            "(SELECT COALESCE(SUM(od.quantity), 0) FROM order_details od " +
+            " JOIN orders o ON od.order_id = o.id " +
+            " WHERE od.product_id = p.id AND o.status NOT IN ('CANCELLED')) AS total_sold " +
             "FROM products p LEFT JOIN categories c ON p.category_id = c.id";
 
     @Override
@@ -84,6 +87,11 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
 
     @Override
     public List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption) {
+        return filterProducts(keyword, categoryId, sortOption, null, null);
+    }
+
+    @Override
+    public List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption, Double minPrice, Double maxPrice) {
         StringBuilder sql = new StringBuilder(BASE_SQL + " WHERE p.status = 1 ");
         List<Object> params = new ArrayList<>();
 
@@ -97,10 +105,20 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
             params.add(categoryId);
         }
 
+        if (minPrice != null && minPrice > 0) {
+            sql.append("AND (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) >= ? ");
+            params.add(minPrice);
+        }
+
+        if (maxPrice != null && maxPrice > 0) {
+            sql.append("AND (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) <= ? ");
+            params.add(maxPrice);
+        }
+
         if ("price_asc".equals(sortOption)) {
-            sql.append("ORDER BY p.price ASC");
+            sql.append("ORDER BY (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) ASC");
         } else if ("price_desc".equals(sortOption)) {
-            sql.append("ORDER BY p.price DESC");
+            sql.append("ORDER BY (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) DESC");
         } else {
             sql.append("ORDER BY p.id DESC");
         }

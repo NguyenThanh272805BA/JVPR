@@ -7,7 +7,6 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Giỏ hàng - Fruitables</title>
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
@@ -38,7 +37,7 @@
 
             <c:otherwise>
                 <div class="flex flex-col lg:flex-row gap-8 items-start">
-                    <!-- Danh sách sản phẩm trong giỏ -->
+                    <!-- Danh sách sản phẩm -->
                     <div class="w-full lg:w-2/3 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left">
@@ -96,7 +95,7 @@
                         </div>
                     </div>
 
-                    <!-- Hộp tổng kết thanh toán & Voucher -->
+                    <!-- Cột tính toán tổng thanh toán -->
                     <div class="w-full lg:w-1/3 flex flex-col gap-6">
                         <div class="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant sticky top-28">
                             <h3 class="font-headline-md text-lg text-on-surface border-b border-surface-variant pb-3 mb-4 font-bold">Tổng quan đơn hàng</h3>
@@ -107,15 +106,30 @@
                                     <fmt:formatNumber value="${cartTotal}" type="number" groupingUsed="true"/> ₫
                                 </span>
                             </div>
+
+                            <!-- XỬ LÝ HIỂN THỊ TIỀN GIẢM TỪ VOUCHER -->
+                            <c:set var="discount" value="${sessionScope.DISCOUNT_AMOUNT != null ? sessionScope.DISCOUNT_AMOUNT : 0}"/>
+                            <c:set var="finalTotal" value="${cartTotal - discount > 0 ? cartTotal - discount : 0}"/>
+
+                            <c:if test="${discount > 0}">
+                                <div class="flex justify-between items-center mb-3 text-emerald-600 text-sm font-semibold">
+                                    <span class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">sell</span> Giảm giá (${sessionScope.APPLIED_COUPON_CODE})
+                                    </span>
+                                    <span>- <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫</span>
+                                </div>
+                            </c:if>
+
                             <div class="flex justify-between items-center mb-4 text-on-surface-variant text-sm border-b border-surface-variant pb-3">
                                 <span>Phí vận chuyển</span>
                                 <span class="font-semibold text-primary">Miễn phí</span>
                             </div>
 
+                            <!-- TỔNG THANH TOÁN SAU GIẢM GIÁ -->
                             <div class="flex justify-between items-center mb-6">
                                 <span class="font-label-bold text-on-surface text-base">Tổng thanh toán</span>
                                 <span class="font-price-tag text-2xl text-primary font-extrabold">
-                                    <fmt:formatNumber value="${cartTotal}" type="number" groupingUsed="true"/> ₫
+                                    <fmt:formatNumber value="${finalTotal}" type="number" groupingUsed="true"/> ₫
                                 </span>
                             </div>
 
@@ -126,9 +140,26 @@
                                 Tiếp tục mua sắm
                             </a>
 
-                            <!-- KHUNG NHẬP MÃ GIẢM GIÁ -->
+                            <!-- KHUNG NHẬP MÃ GIẢM GIÁ & HIỂN THỊ THÔNG BÁO -->
                             <div class="mt-6 pt-5 border-t border-surface-variant">
                                 <label class="block font-label-bold text-sm text-on-surface mb-2">Mã giảm giá (Voucher)</label>
+
+                                <c:if test="${not empty sessionScope.COUPON_MESSAGE}">
+                                    <div class="mb-3 p-2.5 bg-green-50 border border-green-200 text-green-700 text-xs rounded-lg flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">check_circle</span>
+                                        <span>${sessionScope.COUPON_MESSAGE}</span>
+                                    </div>
+                                    <c:remove var="COUPON_MESSAGE" scope="session"/>
+                                </c:if>
+
+                                <c:if test="${not empty sessionScope.COUPON_ERROR}">
+                                    <div class="mb-3 p-2.5 bg-red-50 border border-red-200 text-red-600 text-xs rounded-lg flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">error</span>
+                                        <span>${sessionScope.COUPON_ERROR}</span>
+                                    </div>
+                                    <c:remove var="COUPON_ERROR" scope="session"/>
+                                </c:if>
+
                                 <c:choose>
                                     <c:when test="${empty sessionScope.USERMODEL}">
                                         <div class="p-3 bg-surface-container rounded-xl text-xs text-on-surface-variant flex items-center justify-between">
@@ -138,9 +169,9 @@
                                     </c:when>
                                     <c:otherwise>
                                         <form action="${pageContext.request.contextPath}/apply-coupon" method="POST" class="flex gap-2">
-                                            <input type="text" name="couponCode" placeholder="Nhập mã (VD: SALE50K)"
+                                            <input type="text" name="couponCode" value="${sessionScope.APPLIED_COUPON_CODE}" placeholder="Nhập mã (VD: SALE50K)"
                                                    class="flex-1 px-3 py-2 rounded-xl border border-outline-variant outline-none focus:border-primary text-xs uppercase bg-surface-container-lowest">
-                                            <button type="submit" class="px-4 py-2 bg-primary text-white font-label-bold rounded-xl hover:bg-primary-container transition-colors text-xs">
+                                            <button type="submit" class="px-4 py-2 bg-primary text-white font-label-bold rounded-xl hover:bg-primary-container transition-colors text-xs whitespace-nowrap">
                                                 Áp dụng
                                             </button>
                                         </form>

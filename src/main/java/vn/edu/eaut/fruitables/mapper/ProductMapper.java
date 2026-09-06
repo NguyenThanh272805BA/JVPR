@@ -40,6 +40,13 @@ public class ProductMapper implements IRowMapper<ProductModel> {
                 product.setReviewCount(0);
             }
 
+            // Lấy thêm dữ liệu tổng số lượng đã bán (total_sold)
+            try {
+                product.setTotalSold(rs.getInt("total_sold"));
+            } catch (SQLException e) {
+                product.setTotalSold(0);
+            }
+
             return product;
         } catch (SQLException e) {
             e.printStackTrace();

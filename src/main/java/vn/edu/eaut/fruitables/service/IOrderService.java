@@ -12,4 +12,5 @@ public interface IOrderService {
     OrderModel findByOrderCode(String orderCode);
     List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode);
     void updateOrderStatus(Long orderId, String status);
+    boolean cancelOrderAndRestoreStock(Long orderId);
 }

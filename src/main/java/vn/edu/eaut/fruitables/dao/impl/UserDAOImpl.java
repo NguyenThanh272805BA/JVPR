@@ -46,4 +46,46 @@ public class UserDAOImpl extends AbstractDAO<UserModel> implements IUserDAO {
         }
         return false;
     }
+
+    @Override
+    public UserModel findByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) return null;
+        String sql = "SELECT * FROM users WHERE email = ?";
+        List<UserModel> users = query(sql, new UserMapper(), email.trim());
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
+    public int countByPhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) return 0;
+        String sql = "SELECT COUNT(*) FROM users WHERE phone = ?";
+        return count(sql, phone.trim());
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        if (username == null || username.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        return count(sql, username.trim()) > 0;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        return count(sql, email.trim()) > 0;
+    }
+
+    @Override
+    public boolean updatePasswordByEmail(String email, String newPasswordHash) {
+        if (email == null || email.trim().isEmpty() || newPasswordHash == null) return false;
+        String sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+        try {
+            update(sql, newPasswordHash, email.trim());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

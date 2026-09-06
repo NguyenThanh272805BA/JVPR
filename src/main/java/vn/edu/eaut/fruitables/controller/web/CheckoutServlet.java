@@ -107,6 +107,12 @@ public class CheckoutServlet extends HttpServlet {
                         productDAO.update("UPDATE products SET stock = stock - ? WHERE id = ?", item.getQuantity(), item.getProductId());
                     }
 
+                    // TĂNG SỐ LƯỢT ĐÃ DÙNG CHO VOUCHER
+                    String appliedCoupon = (String) session.getAttribute("APPLIED_COUPON_CODE");
+                    if (appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
+                        productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
+                    }
+
                     // Xóa giỏ hàng và dữ liệu mã giảm giá
                     session.removeAttribute("CART");
                     session.removeAttribute("CART_TOTAL_ITEMS");

@@ -1,6 +1,8 @@
 package vn.edu.eaut.fruitables.dao.impl;
 
 import vn.edu.eaut.fruitables.dao.IDashboardDAO;
+import vn.edu.eaut.fruitables.mapper.ProductMapper;
+import vn.edu.eaut.fruitables.model.entity.ProductModel;
 import vn.edu.eaut.fruitables.util.DBConnectionUtil;
 
 import java.sql.Connection;
@@ -107,5 +109,28 @@ public class DashboardDAOImpl implements IDashboardDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    @Override
+    public List<ProductModel> getLowStockProducts(int threshold) {
+        String sql = "SELECT p.*, c.name AS category_name, 0.0 AS avg_rating, 0 AS review_count, 0 AS total_sold " +
+                     "FROM products p " +
+                     "LEFT JOIN categories c ON p.category_id = c.id " +
+                     "WHERE p.stock <= ? " +
+                     "ORDER BY p.stock ASC, p.id DESC";
+        List<ProductModel> list = new ArrayList<>();
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, threshold);
+            try (ResultSet rs = ps.executeQuery()) {
+                ProductMapper mapper = new ProductMapper();
+                while (rs.next()) {
+                    list.add(mapper.mapRow(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

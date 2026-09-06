@@ -66,4 +66,9 @@ public class OrderServiceImpl implements IOrderService {
     public void updateOrderStatus(Long orderId, String status) {
         orderDAO.updateOrderStatus(orderId, status);
     }
+
+    @Override
+    public boolean cancelOrderAndRestoreStock(Long orderId) {
+        return orderDAO.cancelOrderAndRestoreStock(orderId);
+    }
 }

@@ -20,6 +20,9 @@ public class ProductModel {
     private Double avgRating;
     private Integer reviewCount;
 
+    // Thuộc tính bổ sung: Số lượt mua hàng (đã bán)
+    private Integer totalSold;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -62,4 +65,7 @@ public class ProductModel {
 
     public Integer getReviewCount() { return reviewCount; }
     public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
+
+    public Integer getTotalSold() { return totalSold; }
+    public void setTotalSold(Integer totalSold) { this.totalSold = totalSold; }
 }

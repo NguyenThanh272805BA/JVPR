@@ -34,19 +34,27 @@ public class HomeServlet extends HttpServlet {
 
             ProductModel p1 = new ProductModel();
             p1.setId(1L); p1.setName("Táo Gala Hữu Cơ"); p1.setCategoryName("Hoa quả");
-            p1.setPrice(115000.0); p1.setImageUrl("https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?w=500&auto=format&fit=crop");
+            p1.setPrice(115000.0); p1.setDiscountPrice(95000.0); p1.setStock(25);
+            p1.setAvgRating(4.9); p1.setReviewCount(42); p1.setTotalSold(128);
+            p1.setImageUrl("https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?w=500&auto=format&fit=crop");
 
             ProductModel p2 = new ProductModel();
             p2.setId(4L); p2.setName("Cà chua Cherry"); p2.setCategoryName("Rau củ");
-            p2.setPrice(105000.0); p2.setImageUrl("https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&auto=format&fit=crop");
+            p2.setPrice(105000.0); p2.setStock(18);
+            p2.setAvgRating(4.8); p2.setReviewCount(29); p2.setTotalSold(86);
+            p2.setImageUrl("https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&auto=format&fit=crop");
 
             ProductModel p3 = new ProductModel();
             p3.setId(3L); p3.setName("Bơ Hass Úc"); p3.setCategoryName("Hoa quả");
-            p3.setPrice(45000.0); p3.setImageUrl("https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=500&auto=format&fit=crop");
+            p3.setPrice(45000.0); p3.setDiscountPrice(39000.0); p3.setStock(0); // Test hết hàng
+            p3.setAvgRating(5.0); p3.setReviewCount(56); p3.setTotalSold(210);
+            p3.setImageUrl("https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=500&auto=format&fit=crop");
 
             ProductModel p4 = new ProductModel();
             p4.setId(5L); p4.setName("Cam Vàng Navel"); p4.setCategoryName("Hoa quả");
-            p4.setPrice(85000.0); p4.setImageUrl("https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=500&auto=format&fit=crop");
+            p4.setPrice(85000.0); p4.setStock(30);
+            p4.setAvgRating(4.7); p4.setReviewCount(15); p4.setTotalSold(64);
+            p4.setImageUrl("https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=500&auto=format&fit=crop");
 
             topProducts.add(p1);
             topProducts.add(p2);

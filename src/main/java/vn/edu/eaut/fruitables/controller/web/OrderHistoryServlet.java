@@ -28,7 +28,10 @@ public class OrderHistoryServlet extends HttpServlet {
             return;
         }
 
+        // Lấy danh sách các đơn hàng của User
         List<OrderModel> orders = orderDAO.findByUserId(user.getId());
+
+        // Lấy chi tiết món hàng và ảnh cho từng đơn
         for (OrderModel order : orders) {
             order.setDetails(orderDAO.findOrderDetailsByOrderId(order.getId()));
         }
@@ -39,18 +42,29 @@ public class OrderHistoryServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+        HttpSession session = request.getSession();
+        UserModel user = (UserModel) session.getAttribute("USERMODEL");
 
-        // Bắt sự kiện Khách hàng bấm nút "Đã nhận được hàng"
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String action = request.getParameter("action");
         if ("confirm_received".equals(action)) {
             try {
                 Long orderId = Long.parseLong(request.getParameter("orderId"));
-                // Chuyển thẳng sang COMPLETED
-                orderDAO.updateOrderStatus(orderId, "COMPLETED");
-            } catch (NumberFormatException e) {
+                OrderModel order = orderDAO.findById(orderId);
+
+                // Kiểm tra bảo mật: Đúng đơn hàng của user đăng nhập
+                if (order != null && order.getUserId().equals(user.getId())) {
+                    orderDAO.updateOrderStatus(orderId, "COMPLETED");
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         response.sendRedirect(request.getContextPath() + "/order-history");
     }
 }

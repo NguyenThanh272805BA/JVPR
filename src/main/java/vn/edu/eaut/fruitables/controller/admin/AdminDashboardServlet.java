@@ -26,12 +26,14 @@ public class AdminDashboardServlet extends HttpServlet {
         int totalOrders = dashboardDAO.getTotalOrders();
         int totalProducts = dashboardDAO.getTotalProducts();
         int outOfStock = dashboardDAO.getOutOfStockProducts();
+        java.util.List<vn.edu.eaut.fruitables.model.entity.ProductModel> lowStockProducts = dashboardDAO.getLowStockProducts(5);
 
         // Truyền dữ liệu sang JSP
         request.setAttribute("totalRevenue", totalRevenue);
         request.setAttribute("totalOrders", totalOrders);
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("outOfStock", outOfStock);
+        request.setAttribute("lowStockProducts", lowStockProducts);
 
         // Chuyển hướng tới giao diện JSP
         request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);

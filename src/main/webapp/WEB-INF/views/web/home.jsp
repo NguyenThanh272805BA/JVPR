@@ -185,22 +185,45 @@
         <!-- Products Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <c:forEach var="item" items="${topProducts}">
-                <div class="bg-surface-container-lowest/95 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/80 hover:border-primary/50 overflow-hidden group flex flex-col hover:-translate-y-1">
+                <c:set var="isOutOfStock" value="${item.stock != null && item.stock <= 0}" />
+                <c:set var="hasDiscount" value="${item.discountPrice != null && item.discountPrice > 0 && item.discountPrice < item.price}" />
+
+                <div class="bg-surface-container-lowest/95 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/80 hover:border-primary/50 overflow-hidden group flex flex-col hover:-translate-y-1 relative">
+                    <!-- Ảnh sản phẩm & Huy hiệu -->
                     <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="relative w-full h-52 bg-surface-container overflow-hidden block">
-                        <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-75' : ''}">
+
+                        <!-- Huy hiệu Danh mục -->
                         <div class="absolute top-3 left-3 bg-primary/95 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                             <c:out value="${item.categoryName != null ? item.categoryName : 'Nông sản'}"/>
                         </div>
+
+                        <!-- Huy hiệu Giảm giá (nếu có) -->
+                        <c:if test="${hasDiscount}">
+                            <div class="absolute top-3 right-3 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md animate-pulse">
+                                -<fmt:formatNumber value="${(item.price - item.discountPrice) / item.price * 100}" maxFractionDigits="0"/>%
+                            </div>
+                        </c:if>
+
+                        <!-- Huy hiệu Hết hàng -->
+                        <c:if test="${isOutOfStock}">
+                            <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                                <span class="bg-red-600 text-white font-label-bold text-xs uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[16px]">remove_shopping_cart</span> Tạm hết hàng
+                                </span>
+                            </div>
+                        </c:if>
                     </a>
 
                     <div class="p-5 flex flex-col flex-grow">
+                        <!-- Tên sản phẩm -->
                         <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="hover:text-primary transition-colors">
-                            <h3 class="font-label-bold text-base text-on-surface mb-2 line-clamp-1"><c:out value="${item.name}"/></h3>
+                            <h3 class="font-label-bold text-base text-on-surface mb-2 line-clamp-1" title="${item.name}"><c:out value="${item.name}"/></h3>
                         </a>
 
-                        <!-- ĐÃ CẬP NHẬT: Render số sao chính xác (Hỗ trợ sao nguyên, nửa sao, sao rỗng và tổng review thực tế) -->
-                        <div class="flex items-center gap-1.5 mb-3">
-                            <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 0}" />
+                        <!-- Đánh giá sao & Số lượt nhận xét -->
+                        <div class="flex items-center gap-2 mb-2">
+                            <c:set var="rating" value="${item.avgRating != null ? item.avgRating : 5.0}" />
                             <div class="flex items-center text-yellow-500">
                                 <c:forEach begin="1" end="5" var="i">
                                     <c:choose>
@@ -216,21 +239,61 @@
                                     </c:choose>
                                 </c:forEach>
                             </div>
-                            <span class="text-xs text-on-surface-variant font-medium ml-0.5">(${item.reviewCount != null ? item.reviewCount : 0})</span>
+                            <span class="text-xs font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                                <fmt:formatNumber value="${rating}" maxFractionDigits="1" minFractionDigits="1"/>
+                            </span>
+                            <span class="text-xs text-on-surface-variant font-medium">(${item.reviewCount != null ? item.reviewCount : 0})</span>
                         </div>
 
-                        <div class="mt-auto flex items-center justify-between pt-2">
-                            <span class="font-price-tag text-lg text-primary font-bold">
-                                <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                        <!-- Số lượt mua hàng (Đã bán) -->
+                        <div class="flex items-center gap-1.5 mb-3">
+                            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                                <span class="material-symbols-outlined text-[13px]">shopping_bag</span>
+                                Đã bán <span class="font-bold"><c:out value="${item.totalSold != null ? item.totalSold : 0}"/></span>
                             </span>
+                            <c:if test="${not isOutOfStock && item.stock != null && item.stock <= 10}">
+                                <span class="text-[11px] font-medium text-amber-600">Còn ${item.stock}</span>
+                            </c:if>
+                        </div>
 
-                            <form action="${pageContext.request.contextPath}/cart" method="POST">
-                                <input type="hidden" name="action" value="add">
-                                <input type="hidden" name="productId" value="${item.id}">
-                                <button type="submit" class="w-10 h-10 rounded-full bg-surface-container hover:bg-primary hover:text-white text-primary flex items-center justify-center transition-colors shadow-sm" title="Thêm vào giỏ">
-                                    <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
-                                </button>
-                            </form>
+                        <!-- Giá sản phẩm & Nút thêm giỏ / Hết hàng -->
+                        <div class="mt-auto flex items-center justify-between pt-2 border-t border-surface-variant/40">
+                            <div>
+                                <c:choose>
+                                    <c:when test="${hasDiscount}">
+                                        <div class="flex flex-col">
+                                            <span class="font-price-tag text-lg text-primary font-bold">
+                                                <fmt:formatNumber value="${item.discountPrice}" type="number" groupingUsed="true"/> ₫
+                                            </span>
+                                            <span class="text-xs text-on-surface-variant line-through -mt-1">
+                                                <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                            </span>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="font-price-tag text-lg text-primary font-bold">
+                                            <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                        </span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <c:choose>
+                                <c:when test="${isOutOfStock}">
+                                    <button type="button" onclick="triggerOutOfStockModal('${item.name}')" class="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-all duration-200 shadow-sm" title="Sản phẩm đã hết hàng">
+                                        <span class="material-symbols-outlined text-[20px]">production_quantity_limits</span>
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <form action="${pageContext.request.contextPath}/cart" method="POST">
+                                        <input type="hidden" name="action" value="add">
+                                        <input type="hidden" name="productId" value="${item.id}">
+                                        <button type="submit" class="w-10 h-10 rounded-full bg-surface-container hover:bg-primary hover:text-white text-primary flex items-center justify-center transition-colors shadow-sm active:scale-95" title="Thêm vào giỏ">
+                                            <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+                                        </button>
+                                    </form>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
@@ -245,12 +308,106 @@
     </div>
 </section>
 
+<!-- MODAL THÔNG BÁO HẾT HÀNG (POPUP NẢY LÊN GIỮA MÀN HÌNH) -->
+<div id="outOfStockModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="modalBox" class="bg-surface-container-lowest rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl text-center transform scale-90 transition-transform duration-300 border border-outline-variant/60 relative overflow-hidden">
+        <!-- Đốm trang trí nền -->
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-red-100 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-amber-100 rounded-full blur-2xl pointer-events-none"></div>
+
+        <!-- Icon nảy động -->
+        <div class="relative w-20 h-20 mx-auto mb-5 rounded-2xl bg-red-50 border border-red-200/80 flex items-center justify-center text-red-500 shadow-inner animate-bounce">
+            <span class="material-symbols-outlined text-4xl">remove_shopping_cart</span>
+        </div>
+
+        <!-- Nội dung thông báo -->
+        <h3 class="font-headline-md text-2xl font-extrabold text-on-surface mb-2">Sản phẩm đã hết hàng!</h3>
+        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+            Rất tiếc, sản phẩm <span id="modalProductName" class="font-bold text-red-600">này</span> tạm thời hết hàng do nhu cầu mua cao. Hệ thống sẽ chuyển hướng bạn đến <b class="text-primary">Cửa hàng</b> trong <span id="modalCountdown" class="font-bold text-primary text-base">3</span> giây để chọn các sản phẩm tươi ngon khác!
+        </p>
+
+        <!-- Thanh đếm tiến trình -->
+        <div class="w-full bg-surface-container rounded-full h-1.5 mb-6 overflow-hidden">
+            <div id="modalProgressBar" class="bg-primary h-full w-full transition-all duration-1000 ease-linear"></div>
+        </div>
+
+        <!-- Nút hành động -->
+        <div class="flex flex-col sm:flex-row gap-3">
+            <a href="${pageContext.request.contextPath}/shop" class="flex-1 inline-flex items-center justify-center gap-2 bg-primary text-white py-3 px-5 rounded-full font-label-bold text-sm hover:bg-primary-container transition-all shadow-[0_4px_16px_rgba(129,196,8,0.35)] hover:-translate-y-0.5">
+                <span>Đến Cửa hàng ngay</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+            <button type="button" onclick="closeOutOfStockModal()" class="inline-flex items-center justify-center py-3 px-5 rounded-full font-label-bold text-sm text-on-surface-variant hover:bg-surface-container transition-colors border border-outline-variant/60">
+                Ở lại trang này
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER DÙNG CHUNG -->
 <jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
-<!-- AJAX ADD TO CART & TOAST -->
+<!-- AJAX ADD TO CART & OUT OF STOCK MODAL SCRIPT -->
 <script>
+    let countdownTimer = null;
+
+    function triggerOutOfStockModal(productName) {
+        const modal = document.getElementById('outOfStockModal');
+        const box = document.getElementById('modalBox');
+        const nameEl = document.getElementById('modalProductName');
+        const countdownEl = document.getElementById('modalCountdown');
+        const progressBar = document.getElementById('modalProgressBar');
+
+        if (nameEl && productName) {
+            nameEl.textContent = '“' + productName + '”';
+        }
+
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100', 'pointer-events-auto');
+        box.classList.remove('scale-90');
+        box.classList.add('scale-100');
+
+        let secondsLeft = 3;
+        if (countdownEl) countdownEl.textContent = secondsLeft;
+        if (progressBar) progressBar.style.width = '100%';
+
+        if (countdownTimer) clearInterval(countdownTimer);
+
+        countdownTimer = setInterval(function() {
+            secondsLeft--;
+            if (countdownEl) countdownEl.textContent = secondsLeft;
+            if (progressBar) progressBar.style.width = (secondsLeft / 3 * 100) + '%';
+
+            if (secondsLeft <= 0) {
+                clearInterval(countdownTimer);
+                window.location.href = '${pageContext.request.contextPath}/shop';
+            }
+        }, 1000);
+    }
+
+    function closeOutOfStockModal() {
+        const modal = document.getElementById('outOfStockModal');
+        const box = document.getElementById('modalBox');
+
+        if (countdownTimer) clearInterval(countdownTimer);
+
+        modal.classList.remove('opacity-100', 'pointer-events-auto');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        box.classList.remove('scale-100');
+        box.classList.add('scale-90');
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Tự động bật Modal nếu URL có tham số ?outOfStock=1 hoặc có session báo hết hàng
+        const urlParams = new URLSearchParams(window.location.search);
+        <c:if test="${not empty sessionScope.OUT_OF_STOCK_PRODUCT_NAME}">
+            triggerOutOfStockModal('<c:out value="${sessionScope.OUT_OF_STOCK_PRODUCT_NAME}"/>');
+            <c:remove var="OUT_OF_STOCK_PRODUCT_NAME" scope="session"/>
+        </c:if>
+        if (urlParams.get('outOfStock') === '1') {
+            triggerOutOfStockModal('sản phẩm');
+        }
+
         const addCartForms = document.querySelectorAll('form[action$="/cart"]');
 
         addCartForms.forEach(form => {
@@ -258,7 +415,8 @@
             if (actionInput) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    const formData = new FormData(this);
+                    const currentForm = this;
+                    const formData = new FormData(currentForm);
                     const data = new URLSearchParams(formData);
 
                     fetch('${pageContext.request.contextPath}/api/add-to-cart', {
@@ -269,8 +427,14 @@
                     .then(res => res.json())
                     .then(res => {
                         if (res.status === 'success') {
-                            updateCartBadge(res.totalItems);
+                            const card = currentForm.closest('.group') || currentForm.closest('.product-card') || currentForm.parentElement;
+                            const img = card ? card.querySelector('img') : null;
+                            flyToCart(img, () => {
+                                updateCartBadge(res.totalItems);
+                            });
                             showToast(res.message, 'success');
+                        } else if (res.status === 'out_of_stock') {
+                            triggerOutOfStockModal(res.message);
                         } else {
                             showToast(res.message, 'error');
                         }
@@ -280,16 +444,72 @@
             }
         });
 
+        function flyToCart(imgElement, callback) {
+            const cartBtn = document.getElementById('navbar-cart-btn') || document.querySelector('a[href$="/cart"]');
+            const cartIcon = document.getElementById('navbar-cart-icon');
+            if (!imgElement || !cartBtn) {
+                if (callback) callback();
+                triggerCartShake();
+                return;
+            }
+
+            const imgRect = imgElement.getBoundingClientRect();
+            const cartRect = (cartIcon || cartBtn).getBoundingClientRect();
+
+            const clone = document.createElement('img');
+            clone.src = imgElement.src;
+            clone.className = 'fly-item';
+            clone.style.top = imgRect.top + 'px';
+            clone.style.left = imgRect.left + 'px';
+            clone.style.width = imgRect.width + 'px';
+            clone.style.height = imgRect.height + 'px';
+            document.body.appendChild(clone);
+
+            void clone.offsetWidth; // Trigger reflow
+
+            const targetX = cartRect.left + (cartRect.width / 2) - 16;
+            const targetY = cartRect.top + (cartRect.height / 2) - 16;
+
+            clone.style.top = targetY + 'px';
+            clone.style.left = targetX + 'px';
+            clone.style.width = '32px';
+            clone.style.height = '32px';
+            clone.style.opacity = '0.35';
+            clone.style.transform = 'scale(0.4) rotate(360deg)';
+
+            setTimeout(() => {
+                clone.remove();
+                if (callback) callback();
+                triggerCartShake();
+            }, 720);
+        }
+
+        function triggerCartShake() {
+            const cartIcon = document.getElementById('navbar-cart-icon') || document.getElementById('navbar-cart-btn');
+            if (cartIcon) {
+                cartIcon.classList.remove('animate-cart-shake');
+                void cartIcon.offsetWidth;
+                cartIcon.classList.add('animate-cart-shake');
+                setTimeout(() => cartIcon.classList.remove('animate-cart-shake'), 700);
+            }
+        }
+
         function updateCartBadge(total) {
-            const cartLink = document.querySelector('a[href$="/cart"]');
+            const cartLink = document.getElementById('navbar-cart-btn') || document.querySelector('a[href$="/cart"]');
             if (cartLink) {
-                let badge = cartLink.querySelector('span.bg-error');
+                let badge = document.getElementById('navbar-cart-badge') || cartLink.querySelector('span.bg-error');
                 if (!badge && total > 0) {
                     badge = document.createElement('span');
-                    badge.className = 'absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center';
+                    badge.id = 'navbar-cart-badge';
+                    badge.className = 'absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center transition-transform';
                     cartLink.appendChild(badge);
                 }
-                if (badge) badge.textContent = total;
+                if (badge) {
+                    badge.textContent = total;
+                    badge.classList.remove('animate-badge-pop');
+                    void badge.offsetWidth;
+                    badge.classList.add('animate-badge-pop');
+                }
             }
         }
 

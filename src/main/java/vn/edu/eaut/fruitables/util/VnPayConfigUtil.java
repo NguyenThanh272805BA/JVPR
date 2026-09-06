@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class VnPayConfigUtil {
-    // Thông tin tài khoản Sandbox VNPAY mặc định (Bạn có thể thay bằng cấu hình riêng)
+    // Thông tin tài khoản Sandbox VNPAY mặc định
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static String vnp_ReturnUrl = "http://localhost:8080/vnpay-return";
     public static String vnp_TmnCode = "CGXZR264";

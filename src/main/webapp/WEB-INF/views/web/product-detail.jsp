@@ -94,21 +94,40 @@
             </div>
           </div>
 
-          <!-- Form Thêm Giỏ Hàng -->
-          <form action="${pageContext.request.contextPath}/cart" method="POST" class="mt-auto flex flex-wrap gap-4">
-            <input type="hidden" name="action" value="add">
-            <input type="hidden" name="productId" value="${product.id}">
+          <!-- Xử lý Tồn kho & Form Thêm Giỏ Hàng -->
+          <c:choose>
+            <c:when test="${product.stock != null && product.stock <= 0}">
+              <div class="mt-auto flex flex-col gap-4">
+                <div class="bg-red-50 border border-red-200/80 px-5 py-4 rounded-2xl flex items-center gap-3 text-red-700 shadow-sm">
+                  <span class="material-symbols-outlined text-3xl text-red-500">production_quantity_limits</span>
+                  <div>
+                    <div class="font-label-bold text-base">Sản phẩm tạm thời hết hàng</div>
+                    <div class="text-xs text-red-600/90 mt-0.5">Mặt hàng này hiện không còn trong kho. Bạn vui lòng khám phá các sản phẩm tươi ngon khác nhé!</div>
+                  </div>
+                </div>
+                <a href="${pageContext.request.contextPath}/shop" class="h-14 bg-primary text-white rounded-full font-label-bold text-base flex items-center justify-center gap-2 hover:bg-primary-container transition-all duration-300 shadow-[0_4px_14px_0_rgba(129,196,8,0.39)] hover:-translate-y-0.5">
+                  <span class="material-symbols-outlined text-[22px]">storefront</span> Khám phá sản phẩm khác tại Cửa hàng
+                </a>
+              </div>
+            </c:when>
+            <c:otherwise>
+              <!-- Form Thêm Giỏ Hàng bình thường khi còn hàng -->
+              <form action="${pageContext.request.contextPath}/cart" method="POST" class="mt-auto flex flex-wrap gap-4">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="productId" value="${product.id}">
 
-            <div class="flex items-center border-2 border-outline-variant rounded-full overflow-hidden w-36 bg-surface-container-lowest h-14">
-              <button type="button" class="w-12 h-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors text-xl font-bold" onclick="this.nextElementSibling.stepDown()">-</button>
-              <input type="number" name="quantity" value="1" min="1" max="${product.stock}" class="w-12 text-center border-none focus:ring-0 text-on-surface bg-transparent font-label-bold p-0 text-lg">
-              <button type="button" class="w-12 h-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors text-xl font-bold" onclick="this.previousElementSibling.stepUp()">+</button>
-            </div>
+                <div class="flex items-center border-2 border-outline-variant rounded-full overflow-hidden w-36 bg-surface-container-lowest h-14">
+                  <button type="button" class="w-12 h-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors text-xl font-bold" onclick="this.nextElementSibling.stepDown()">-</button>
+                  <input type="number" name="quantity" value="1" min="1" max="${product.stock}" class="w-12 text-center border-none focus:ring-0 text-on-surface bg-transparent font-label-bold p-0 text-lg">
+                  <button type="button" class="w-12 h-full flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors text-xl font-bold" onclick="this.previousElementSibling.stepUp()">+</button>
+                </div>
 
-            <button type="submit" class="flex-1 min-w-[200px] h-14 bg-primary text-white rounded-full font-label-bold text-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-all duration-300 shadow-[0_4px_14px_0_rgba(129,196,8,0.39)] hover:shadow-[0_6px_20px_rgba(129,196,8,0.23)] hover:-translate-y-1">
-              <span class="material-symbols-outlined">add_shopping_cart</span> Thêm vào giỏ
-            </button>
-          </form>
+                <button type="submit" class="flex-1 min-w-[200px] h-14 bg-primary text-white rounded-full font-label-bold text-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-all duration-300 shadow-[0_4px_14px_0_rgba(129,196,8,0.39)] hover:shadow-[0_6px_20px_rgba(129,196,8,0.23)] hover:-translate-y-1">
+                  <span class="material-symbols-outlined">add_shopping_cart</span> Thêm vào giỏ
+                </button>
+              </form>
+            </c:otherwise>
+          </c:choose>
         </div>
       </div>
     </div>

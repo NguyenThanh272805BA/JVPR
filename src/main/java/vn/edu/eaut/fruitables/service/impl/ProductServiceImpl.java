@@ -43,6 +43,11 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption) {
         return productDAO.filterProducts(keyword, categoryId, sortOption);
     }
+
+    @Override
+    public List<ProductModel> filterProducts(String keyword, Integer categoryId, String sortOption, Double minPrice, Double maxPrice) {
+        return productDAO.filterProducts(keyword, categoryId, sortOption, minPrice, maxPrice);
+    }
     @Override
     public ProductModel save(ProductModel product) {
         Long newId = productDAO.save(product);

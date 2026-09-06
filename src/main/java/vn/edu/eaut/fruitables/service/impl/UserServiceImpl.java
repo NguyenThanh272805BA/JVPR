@@ -38,4 +38,31 @@ public class UserServiceImpl implements IUserService {
         }
         return null;
     }
+
+    @Override
+    public int countAccountsByPhone(String phone) {
+        return userDAO.countByPhone(phone);
+    }
+
+    @Override
+    public boolean isUsernameTaken(String username) {
+        return userDAO.existsByUsername(username);
+    }
+
+    @Override
+    public boolean isEmailTaken(String email) {
+        return userDAO.existsByEmail(email);
+    }
+
+    @Override
+    public UserModel findByEmail(String email) {
+        return userDAO.findByEmail(email);
+    }
+
+    @Override
+    public boolean resetPassword(String email, String rawNewPassword) {
+        if (email == null || rawNewPassword == null) return false;
+        String hashedPassword = SecurityUtil.hashPassword(rawNewPassword);
+        return userDAO.updatePasswordByEmail(email, hashedPassword);
+    }
 }

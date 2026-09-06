@@ -51,18 +51,36 @@ public class CartServlet extends HttpServlet {
                 ProductModel product = productService.findById(productId);
 
                 if (product != null) {
+                    // Kiểm tra tồn kho: Nếu hết hàng -> Chuyển hướng sang shop kèm thông báo
+                    if (product.getStock() != null && product.getStock() <= 0) {
+                        session.setAttribute("OUT_OF_STOCK_PRODUCT_NAME", product.getName());
+                        response.sendRedirect(request.getContextPath() + "/shop?outOfStock=1");
+                        return;
+                    }
+
+                    int qtyToAdd = 1;
+                    String qtyParam = request.getParameter("quantity");
+                    if (qtyParam != null && !qtyParam.trim().isEmpty()) {
+                        try {
+                            qtyToAdd = Math.max(1, Integer.parseInt(qtyParam.trim()));
+                        } catch (Exception ignored) {}
+                    }
+
+                    Double actualPrice = (product.getDiscountPrice() != null && product.getDiscountPrice() > 0)
+                            ? product.getDiscountPrice() : product.getPrice();
+
                     if (cart.containsKey(productId)) {
                         // Đã có trong giỏ -> Tăng số lượng
                         CartItemDTO existingItem = cart.get(productId);
-                        existingItem.setQuantity(existingItem.getQuantity() + 1);
+                        existingItem.setQuantity(existingItem.getQuantity() + qtyToAdd);
                     } else {
                         CartItemDTO newItem = new CartItemDTO(
                                 product.getId(),
                                 product.getName(),
                                 product.getImageUrl(),
-                                product.getPrice(),
-                                1, // Số lượng mặc định ban đầu là 1
-                                product.getTaxRate() != null ? product.getTaxRate() : 0.0 // Lấy % thuế từ DB
+                                actualPrice,
+                                qtyToAdd,
+                                product.getTaxRate() != null ? product.getTaxRate() : 0.0
                         );
                         cart.put(productId, newItem);
                     }

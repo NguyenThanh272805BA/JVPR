@@ -145,6 +145,100 @@
                 </div>
             </div>
 
+            <!-- Cảnh báo tồn kho: Sản phẩm sắp hết hàng (Mới bổ sung) -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden mb-8 border border-amber-200/70">
+                <div class="p-6 border-b border-surface-variant flex justify-between items-center bg-amber-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-xl">warning</span>
+                        </span>
+                        <div>
+                            <h2 class="font-label-bold text-base text-on-surface font-bold">Cảnh báo: Sản phẩm sắp hết hàng (Tồn kho &le; 5)</h2>
+                            <p class="text-xs text-on-surface-variant">Danh sách các sản phẩm cần nhập thêm hàng gấp để không gián đoạn kinh doanh</p>
+                        </div>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/admin/products" class="text-primary hover:text-primary-container text-xs font-label-bold flex items-center gap-1 transition-colors">
+                        Quản lý toàn bộ kho <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                        <tr class="bg-surface-container text-on-surface-variant font-label-bold text-xs uppercase tracking-wider">
+                            <th class="py-3.5 px-6">Mã SP</th>
+                            <th class="py-3.5 px-6">Sản phẩm</th>
+                            <th class="py-3.5 px-6">Danh mục</th>
+                            <th class="py-3.5 px-6">Giá bán</th>
+                            <th class="py-3.5 px-6">Tồn kho hiện tại</th>
+                            <th class="py-3.5 px-6 text-right">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-variant text-sm text-on-surface">
+                        <c:choose>
+                            <c:when test="${not empty lowStockProducts}">
+                                <c:forEach var="p" items="${lowStockProducts}">
+                                    <tr class="hover:bg-amber-50/40 transition-colors">
+                                        <td class="py-3.5 px-6 font-mono text-xs text-on-surface-variant">#PRD-${p.id}</td>
+                                        <td class="py-3.5 px-6">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant overflow-hidden flex-shrink-0">
+                                                    <c:choose>
+                                                        <c:when test="${not empty p.imageUrl}">
+                                                            <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="w-full h-full flex items-center justify-center text-outline">
+                                                                <span class="material-symbols-outlined text-sm">image</span>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                <span class="font-medium text-on-surface line-clamp-1">${p.name}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-6 text-on-surface-variant text-xs">${not empty p.categoryName ? p.categoryName : 'Chưa phân loại'}</td>
+                                        <td class="py-3.5 px-6 font-semibold">
+                                            <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> ₫
+                                        </td>
+                                        <td class="py-3.5 px-6">
+                                            <c:choose>
+                                                <c:when test="${p.stock <= 0}">
+                                                    <span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-xs border border-red-200 inline-flex items-center gap-1 animate-pulse">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Hết hàng (0)
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold rounded-full text-xs border border-amber-200 inline-flex items-center gap-1">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Còn ${p.stock} sản phẩm
+                                                    </span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td class="py-3.5 px-6 text-right">
+                                            <a href="${pageContext.request.contextPath}/admin/products" class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm">
+                                                <span class="material-symbols-outlined text-[16px]">edit_square</span> Nhập thêm
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-on-surface-variant text-sm">
+                                        <div class="flex flex-col items-center justify-center gap-1">
+                                            <span class="material-symbols-outlined text-emerald-500 text-3xl">check_circle</span>
+                                            <span class="font-medium text-emerald-700">Tuyệt vời! Hiện tại không có sản phẩm nào có lượng tồn kho dưới mức cảnh báo.</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </c:otherwise>
+                        </c:choose>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Recent Products (Khối đã được giữ lại trọn vẹn) -->
             <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-6 border-b border-surface-variant flex justify-between items-center">

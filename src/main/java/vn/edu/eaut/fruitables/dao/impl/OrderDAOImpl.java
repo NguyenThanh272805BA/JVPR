@@ -93,4 +93,74 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
         }
         return list;
     }
+
+    @Override
+    public boolean cancelOrderAndRestoreStock(Long orderId) {
+        Connection conn = null;
+        PreparedStatement psCheck = null;
+        PreparedStatement psOrder = null;
+        PreparedStatement psStock = null;
+        ResultSet rsCheck = null;
+        try {
+            conn = DBConnectionUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Kiểm tra trạng thái đơn hàng có phải PENDING không
+            String checkSql = "SELECT status FROM orders WHERE id = ? FOR UPDATE";
+            psCheck = conn.prepareStatement(checkSql);
+            psCheck.setLong(1, orderId);
+            rsCheck = psCheck.executeQuery();
+            if (!rsCheck.next()) {
+                conn.rollback();
+                return false;
+            }
+            String status = rsCheck.getString("status");
+            if (!"PENDING".equalsIgnoreCase(status)) {
+                // Đơn hàng không còn ở trạng thái PENDING -> không cho hủy
+                conn.rollback();
+                return false;
+            }
+
+            // 2. Lấy danh sách sản phẩm trong chi tiết đơn hàng
+            List<OrderDetailModel> details = findOrderDetailsByOrderId(orderId);
+
+            // 3. Hoàn trả tồn kho cho các sản phẩm
+            if (details != null && !details.isEmpty()) {
+                String stockSql = "UPDATE products SET stock = stock + ? WHERE id = ?";
+                psStock = conn.prepareStatement(stockSql);
+                for (OrderDetailModel item : details) {
+                    psStock.setInt(1, item.getQuantity());
+                    psStock.setLong(2, item.getProductId());
+                    psStock.addBatch();
+                }
+                psStock.executeBatch();
+            }
+
+            // 4. Cập nhật trạng thái đơn hàng thành CANCELLED
+            String updateOrderSql = "UPDATE orders SET status = 'CANCELLED' WHERE id = ?";
+            psOrder = conn.prepareStatement(updateOrderSql);
+            psOrder.setLong(1, orderId);
+            psOrder.executeUpdate();
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try { if (rsCheck != null) rsCheck.close(); } catch (Exception e) {}
+            try { if (psCheck != null) psCheck.close(); } catch (Exception e) {}
+            try { if (psStock != null) psStock.close(); } catch (Exception e) {}
+            try { if (psOrder != null) psOrder.close(); } catch (Exception e) {}
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (Exception e) {}
+        }
+    }
 }

@@ -29,6 +29,8 @@ public class ShopServlet extends HttpServlet {
         String keyword = request.getParameter("keyword");
         String categoryParam = request.getParameter("category");
         String sortOption = request.getParameter("sort");
+        String minPriceParam = request.getParameter("minPrice");
+        String maxPriceParam = request.getParameter("maxPrice");
 
         Integer categoryId = null;
         if (categoryParam != null && !categoryParam.trim().isEmpty()) {
@@ -39,8 +41,26 @@ public class ShopServlet extends HttpServlet {
             }
         }
 
-        // 2. Gọi DB thông qua bộ lọc động (Lọc đa chiều)
-        List<ProductModel> products = productService.filterProducts(keyword, categoryId, sortOption);
+        Double minPrice = null;
+        if (minPriceParam != null && !minPriceParam.trim().isEmpty()) {
+            try {
+                minPrice = Double.parseDouble(minPriceParam.trim());
+            } catch (NumberFormatException e) {
+                minPrice = null;
+            }
+        }
+
+        Double maxPrice = null;
+        if (maxPriceParam != null && !maxPriceParam.trim().isEmpty()) {
+            try {
+                maxPrice = Double.parseDouble(maxPriceParam.trim());
+            } catch (NumberFormatException e) {
+                maxPrice = null;
+            }
+        }
+
+        // 2. Gọi DB thông qua bộ lọc động (Lọc đa chiều theo từ khóa, danh mục, khoảng giá, sắp xếp)
+        List<ProductModel> products = productService.filterProducts(keyword, categoryId, sortOption, minPrice, maxPrice);
 
         // 3. TÍCH HỢP MOCK DATA: Nếu DB trống, tạo danh sách hiển thị tạm thời
         if (products == null || products.isEmpty()) {
@@ -76,6 +96,8 @@ public class ShopServlet extends HttpServlet {
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("selectedCategory", categoryId);
         request.setAttribute("selectedSort", sortOption);
+        request.setAttribute("selectedMinPrice", minPrice);
+        request.setAttribute("selectedMaxPrice", maxPrice);
 
         request.getRequestDispatcher("/WEB-INF/views/web/shop.jsp").forward(request, response);
     }

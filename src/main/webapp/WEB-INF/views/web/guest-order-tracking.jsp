@@ -21,6 +21,22 @@
             <p class="text-on-surface-variant text-sm">Dành cho khách hàng chưa có tài khoản hoặc muốn theo dõi trạng thái giao hàng nhanh chóng.</p>
         </div>
 
+        <!-- Flash messages -->
+        <c:if test="${not empty sessionScope.ORDER_MESSAGE_SUCCESS}">
+            <div class="max-w-xl mx-auto mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-3 shadow-sm">
+                <span class="material-symbols-outlined text-emerald-600 text-2xl">check_circle</span>
+                <div class="flex-grow font-medium text-sm"><c:out value="${sessionScope.ORDER_MESSAGE_SUCCESS}"/></div>
+            </div>
+            <c:remove var="ORDER_MESSAGE_SUCCESS" scope="session"/>
+        </c:if>
+        <c:if test="${not empty sessionScope.ORDER_MESSAGE_ERROR}">
+            <div class="max-w-xl mx-auto mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-3 shadow-sm">
+                <span class="material-symbols-outlined text-rose-600 text-2xl">error</span>
+                <div class="flex-grow font-medium text-sm"><c:out value="${sessionScope.ORDER_MESSAGE_ERROR}"/></div>
+            </div>
+            <c:remove var="ORDER_MESSAGE_ERROR" scope="session"/>
+        </c:if>
+
         <!-- Form tra cứu -->
         <div class="max-w-xl mx-auto bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant mb-12">
             <form action="${pageContext.request.contextPath}/guest-tracking" method="POST" class="space-y-4">
@@ -104,15 +120,24 @@
                                             <p class="font-semibold text-on-surface">${order.shippingAddress}</p>
                                         </div>
                                     </div>
-                                    <div class="flex justify-between items-center pt-4 border-t border-surface-variant text-sm">
+                                    <div class="flex flex-col sm:flex-row justify-between items-end gap-4 pt-4 border-t border-surface-variant text-sm">
                                         <div>
                                             <span class="text-on-surface-variant">Phương thức:</span>
                                             <span class="font-medium text-on-surface">${order.paymentMethod}</span>
                                             <span class="ml-2 font-bold ${order.paymentStatus == 'PAID' ? 'text-primary' : 'text-error'}">(${order.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
                                         </div>
-                                        <div class="text-right">
-                                            <span class="text-on-surface-variant mr-1">Tổng tiền:</span>
-                                            <span class="font-price-tag text-lg text-primary font-bold"><fmt:formatNumber value="${order.totalAmount}" type="number" groupingUsed="true"/> ₫</span>
+                                        <div class="flex items-center gap-4 flex-wrap">
+                                            <div class="text-right">
+                                                <span class="text-on-surface-variant mr-1">Tổng tiền:</span>
+                                                <span class="font-price-tag text-lg text-primary font-bold"><fmt:formatNumber value="${order.totalAmount}" type="number" groupingUsed="true"/> ₫</span>
+                                            </div>
+
+                                            <!-- Nút Hủy Đơn Hàng Dành Cho Khách Khi Đang PENDING -->
+                                            <c:if test="${order.status == 'PENDING'}">
+                                                <button type="button" onclick="openCancelModal('${order.id}', '${order.orderCode}', '${order.phone}')" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-full font-label-bold text-xs shadow-sm transition-all flex items-center gap-1 whitespace-nowrap">
+                                                    <span class="material-symbols-outlined text-[16px]">cancel</span> Hủy đơn
+                                                </button>
+                                            </c:if>
                                         </div>
                                     </div>
                                 </div>
@@ -131,6 +156,77 @@
         </c:if>
     </div>
 </main>
+
+<!-- Modal Xác nhận Hủy Đơn Hàng cho Khách Vãng Lai -->
+<div id="cancelOrderModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+    <div class="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant transform transition-transform">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+            <div class="flex items-center gap-2 text-rose-600">
+                <span class="material-symbols-outlined text-2xl">warning</span>
+                <h3 class="font-headline-md font-bold text-lg text-on-surface">Xác nhận hủy đơn hàng</h3>
+            </div>
+            <button type="button" onclick="closeCancelModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form action="${pageContext.request.contextPath}/order/cancel" method="POST" class="mt-4 space-y-4">
+            <input type="hidden" name="from" value="tracking">
+            <input type="hidden" id="modalCancelOrderId" name="orderId" value="">
+            <input type="hidden" id="modalCancelOrderCodeVal" name="orderCode" value="">
+            <input type="hidden" id="modalCancelOrderPhoneVal" name="phone" value="">
+
+            <p class="text-sm text-on-surface-variant">
+                Bạn có chắc chắn muốn hủy đơn hàng <strong id="modalCancelOrderCode" class="text-primary"></strong>?
+                Sau khi xác nhận hủy, đơn hàng sẽ chuyển sang trạng thái đã hủy và hoàn tồn kho sản phẩm.
+            </p>
+
+            <div>
+                <label class="block text-xs font-label-bold text-on-surface-variant mb-2">Vui lòng chọn lý do hủy đơn:</label>
+                <div class="space-y-2 text-sm text-on-surface">
+                    <label class="flex items-center gap-2 p-2.5 rounded-lg border border-outline-variant hover:bg-surface-container cursor-pointer">
+                        <input type="radio" name="reason" value="Muốn thay đổi địa chỉ hoặc số điện thoại" checked class="text-primary focus:ring-primary">
+                        <span>Muốn thay đổi địa chỉ hoặc số điện thoại</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2.5 rounded-lg border border-outline-variant hover:bg-surface-container cursor-pointer">
+                        <input type="radio" name="reason" value="Muốn đổi hoặc thêm sản phẩm khác" class="text-primary focus:ring-primary">
+                        <span>Muốn đổi hoặc thêm sản phẩm khác</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2.5 rounded-lg border border-outline-variant hover:bg-surface-container cursor-pointer">
+                        <input type="radio" name="reason" value="Tìm thấy giá tốt hơn ở nơi khác" class="text-primary focus:ring-primary">
+                        <span>Tìm thấy giá tốt hơn ở nơi khác</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2.5 rounded-lg border border-outline-variant hover:bg-surface-container cursor-pointer">
+                        <input type="radio" name="reason" value="Đặt nhầm hoặc không còn nhu cầu" class="text-primary focus:ring-primary">
+                        <span>Đặt nhầm hoặc không còn nhu cầu</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-surface-variant">
+                <button type="button" onclick="closeCancelModal()" class="px-4 py-2 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container text-sm font-label-bold transition-colors">
+                    Đóng
+                </button>
+                <button type="submit" class="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-sm font-label-bold shadow-md transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[18px]">check</span> Đồng ý hủy đơn
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCancelModal(orderId, orderCode, phone) {
+    document.getElementById('modalCancelOrderId').value = orderId;
+    document.getElementById('modalCancelOrderCodeVal').value = orderCode;
+    document.getElementById('modalCancelOrderPhoneVal').value = phone;
+    document.getElementById('modalCancelOrderCode').textContent = orderCode;
+    document.getElementById('cancelOrderModal').classList.remove('hidden');
+}
+function closeCancelModal() {
+    document.getElementById('cancelOrderModal').classList.add('hidden');
+}
+</script>
 
 <jsp:include page="/WEB-INF/views/components/footer.jsp" />
 </body>

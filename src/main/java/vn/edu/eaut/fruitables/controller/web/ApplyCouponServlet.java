@@ -24,10 +24,10 @@ public class ApplyCouponServlet extends HttpServlet {
         String couponCode = request.getParameter("couponCode");
         HttpSession session = request.getSession();
 
-        // 1. KIỂM TRA ĐĂNG NHẬP (Khách vãng lai không được dùng mã giảm giá)
+        // 1. Kiểm tra đăng nhập
         UserModel user = (UserModel) session.getAttribute("USERMODEL");
         if (user == null) {
-            session.setAttribute("COUPON_ERROR", "Bạn phải đăng nhập để sử dụng tính năng Mã giảm giá!");
+            session.setAttribute("COUPON_ERROR", "Bạn phải đăng nhập để sử dụng mã giảm giá!");
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
@@ -37,8 +37,7 @@ public class ApplyCouponServlet extends HttpServlet {
             return;
         }
 
-        // Truy vấn dữ liệu coupon từ CSDL
-        String sql = "SELECT * FROM coupons WHERE code = ? AND status = 1 AND start_date <= NOW() AND end_date >= NOW() AND used_count < usage_limit";
+        String sql = "SELECT * FROM coupons WHERE code = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -46,26 +45,74 @@ public class ApplyCouponServlet extends HttpServlet {
             ps.setString(1, couponCode.trim());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Lấy đối tượng áp dụng voucher từ CSDL
-                    String targetAudience = rs.getString("target_audience");
-                    // Lấy loại tài khoản (Nếu null thì mặc định là LOCAL)
-                    String userLoginType = user.getLoginType() != null ? user.getLoginType() : "LOCAL";
+                    String codeUpper = couponCode.trim().toUpperCase();
+                    boolean status = rs.getBoolean("status");
+                    java.sql.Timestamp startDate = rs.getTimestamp("start_date");
+                    java.sql.Timestamp endDate = rs.getTimestamp("end_date");
+                    int usageLimit = rs.getInt("usage_limit");
+                    int usedCount = rs.getInt("used_count");
+                    java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-                    // 2. KIỂM TRA QUYỀN TRUY CẬP VOUCHER ĐỘC QUYỀN (Phân loại tài khoản)
-                    if ("GOOGLE_ONLY".equals(targetAudience) && !"GOOGLE".equals(userLoginType)) {
-                        session.setAttribute("COUPON_ERROR", "Đặc quyền VIP: Mã này chỉ dành riêng cho tài khoản đăng ký bằng Gmail!");
+                    // 2. Kiểm tra trạng thái kích hoạt của Voucher
+                    if (!status) {
+                        session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " hiện đang tạm ngưng áp dụng!");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
                         response.sendRedirect(request.getContextPath() + "/cart");
                         return;
+                    }
+
+                    // 3. Kiểm tra ngày bắt đầu hiệu lực
+                    if (startDate != null && now.before(startDate)) {
+                        session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " chưa đến thời gian áp dụng (Bắt đầu từ " + sdf.format(startDate) + ")!");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
+                        response.sendRedirect(request.getContextPath() + "/cart");
+                        return;
+                    }
+
+                    // 4. KIỂM TRA HẾT HẠN SỬ DỤNG (HSD)
+                    if (endDate != null && now.after(endDate)) {
+                        session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " không còn hiệu lực do đã hết hạn sử dụng vào ngày " + sdf.format(endDate) + "!");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
+                        response.sendRedirect(request.getContextPath() + "/cart");
+                        return;
+                    }
+
+                    // 5. Kiểm tra giới hạn số lượt sử dụng
+                    if (usageLimit > 0 && usedCount >= usageLimit) {
+                        session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " đã hết số lượt sử dụng (" + usedCount + "/" + usageLimit + " lượt)!");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
+                        response.sendRedirect(request.getContextPath() + "/cart");
+                        return;
+                    }
+
+                    // 6. Kiểm tra đối tượng áp dụng Voucher
+                    String targetAudience = rs.getString("target_audience");
+                    String userLoginType = user.getLoginType() != null ? user.getLoginType() : "LOCAL";
+                    String userEmail = user.getEmail() != null ? user.getEmail().toLowerCase() : "";
+
+                    if ("GMAIL".equalsIgnoreCase(targetAudience) || "GOOGLE_ONLY".equalsIgnoreCase(targetAudience)) {
+                        boolean isGoogleUser = "GOOGLE".equalsIgnoreCase(userLoginType) || userEmail.endsWith("@gmail.com");
+                        if (!isGoogleUser) {
+                            session.setAttribute("COUPON_ERROR", "Mã này chỉ dành riêng cho tài khoản Google / Gmail!");
+                            session.removeAttribute("DISCOUNT_AMOUNT");
+                            session.removeAttribute("APPLIED_COUPON_CODE");
+                            response.sendRedirect(request.getContextPath() + "/cart");
+                            return;
+                        }
                     }
 
                     String discountType = rs.getString("discount_type");
                     double discountValue = rs.getDouble("discount_value");
                     double minOrderValue = rs.getDouble("min_order_value");
 
-                    // Tính tổng tiền giỏ hàng từ Session
+                    // Tính tổng tiền giỏ hàng hiện tại
                     @SuppressWarnings("unchecked")
                     Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
-
                     double cartTotal = 0;
                     if (cart != null) {
                         for (CartItemDTO item : cart.values()) {
@@ -73,28 +120,38 @@ public class ApplyCouponServlet extends HttpServlet {
                         }
                     }
 
+                    // 7. Kiểm tra điều kiện đơn hàng tối thiểu
                     if (cartTotal >= minOrderValue) {
                         double discountAmount = 0;
-                        if ("PERCENT".equals(discountType)) {
-                            discountAmount = (cartTotal * discountValue) / 100;
-                        } else if ("FIXED".equals(discountType)) {
+                        if ("PERCENT".equalsIgnoreCase(discountType)) {
+                            discountAmount = (cartTotal * discountValue) / 100.0;
+                        } else {
                             discountAmount = discountValue;
                         }
 
-                        // Lưu giá trị giảm tiền vào Session
+                        // Đảm bảo mức giảm không vượt quá tổng tiền hàng
+                        if (discountAmount > cartTotal) {
+                            discountAmount = cartTotal;
+                        }
+
                         session.setAttribute("DISCOUNT_AMOUNT", discountAmount);
-                        session.setAttribute("APPLIED_COUPON_CODE", couponCode.trim());
-                        session.setAttribute("COUPON_MESSAGE", "Áp dụng mã giảm giá thành công!");
-                        session.removeAttribute("COUPON_ERROR"); // Xóa thông báo lỗi cũ nếu có
+                        session.setAttribute("APPLIED_COUPON_CODE", codeUpper);
+                        session.setAttribute("COUPON_MESSAGE", "Áp dụng mã giảm giá " + codeUpper + " thành công!");
+                        session.removeAttribute("COUPON_ERROR");
                     } else {
-                        session.setAttribute("COUPON_ERROR", "Đơn hàng chưa đạt giá trị tối thiểu " + minOrderValue + " VNĐ!");
+                        session.setAttribute("COUPON_ERROR", "Đơn hàng phải đạt tối thiểu " + String.format("%,.0f", minOrderValue) + " ₫ để dùng mã này (Hiện tại: " + String.format("%,.0f", cartTotal) + " ₫)!");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
                     }
                 } else {
-                    session.setAttribute("COUPON_ERROR", "Mã giảm giá không hợp lệ hoặc đã hết hạn!");
+                    session.setAttribute("COUPON_ERROR", "Mã giảm giá '" + couponCode.trim().toUpperCase() + "' không tồn tại trong hệ thống. Vui lòng kiểm tra lại!");
+                    session.removeAttribute("DISCOUNT_AMOUNT");
+                    session.removeAttribute("APPLIED_COUPON_CODE");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            session.setAttribute("COUPON_ERROR", "Lỗi hệ thống khi xử lý voucher!");
         }
 
         response.sendRedirect(request.getContextPath() + "/cart");

@@ -163,25 +163,42 @@
                         </c:forEach>
                     </div>
 
+                    <!-- KHỐI TÍNH TOÁN TIỀN HÀNG, THUẾ, GIẢM GIÁ & PHÍ SHIP -->
+                    <c:set var="discount" value="${sessionScope.DISCOUNT_AMOUNT != null ? sessionScope.DISCOUNT_AMOUNT : 0}"/>
+                    <c:set var="grandTotal" value="${(totalAmount + totalTaxValue - discount) > 0 ? (totalAmount + totalTaxValue - discount) : 0}"/>
+
                     <div class="space-y-2.5 text-xs text-on-surface-variant mb-4 border-b border-surface-variant pb-4">
                         <div class="flex justify-between items-center">
                             <span>Tạm tính hàng hóa</span>
                             <span class="font-semibold text-on-surface"><fmt:formatNumber value="${totalAmount}" type="number" groupingUsed="true"/> ₫</span>
                         </div>
+
                         <div class="flex justify-between items-center text-error">
                             <span>Thuế VAT tính thêm</span>
                             <span class="font-semibold">+ <fmt:formatNumber value="${totalTaxValue}" type="number" groupingUsed="true"/> ₫</span>
                         </div>
+
+                        <!-- HIỂN THỊ TIỀN ĐÃ TRỪ TỪ MÃ GIẢM GIÁ (NẾU CÓ) -->
+                        <c:if test="${discount > 0}">
+                            <div class="flex justify-between items-center text-emerald-600 font-semibold">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">sell</span> Mã giảm giá (${sessionScope.APPLIED_COUPON_CODE})
+                                </span>
+                                <span>- <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫</span>
+                            </div>
+                        </c:if>
+
                         <div class="flex justify-between items-center">
                             <span>Phí vận chuyển</span>
                             <span class="font-semibold text-primary">Miễn phí</span>
                         </div>
                     </div>
 
+                    <!-- TỔNG TIỀN CUỐI CÙNG ĐÃ TRỪ GIẢM GIÁ -->
                     <div class="flex justify-between items-center mb-6">
                         <span class="font-label-bold text-on-surface text-sm">Tổng thanh toán</span>
                         <span class="font-price-tag text-2xl text-primary font-extrabold">
-                            <fmt:formatNumber value="${totalAmount + totalTaxValue}" type="number" groupingUsed="true"/> ₫
+                            <fmt:formatNumber value="${grandTotal}" type="number" groupingUsed="true"/> ₫
                         </span>
                     </div>
 
