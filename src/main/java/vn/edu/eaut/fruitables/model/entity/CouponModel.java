@@ -48,4 +48,12 @@ public class CouponModel {
 
     public Boolean getStatus() { return status; }
     public void setStatus(Boolean status) { this.status = status; }
+
+    private Long productId;
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+
+    private String productName;
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
 }

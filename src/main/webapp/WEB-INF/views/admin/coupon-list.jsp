@@ -84,6 +84,15 @@
           <input type="datetime-local" name="endDate" required class="w-full border rounded px-3 py-2 outline-none focus:border-primary">
         </div>
         <div>
+          <label class="block text-sm font-semibold mb-1">Sản phẩm áp dụng</label>
+          <select name="productId" class="w-full border rounded px-3 py-2 outline-none focus:border-primary">
+            <option value="">Toàn bộ đơn hàng (Tất cả SP)</option>
+            <c:forEach var="p" items="${products}">
+              <option value="${p.id}">Áp dụng riêng: <c:out value="${p.name}"/></option>
+            </c:forEach>
+          </select>
+        </div>
+        <div>
           <label class="block text-sm font-semibold mb-1">Số lượng giới hạn</label>
           <input type="number" name="usageLimit" value="100" class="w-full border rounded px-3 py-2 outline-none focus:border-primary">
         </div>
@@ -102,6 +111,7 @@
         <tr>
           <th class="py-3 px-4">Mã Voucher</th>
           <th class="py-3 px-4">Giảm giá</th>
+          <th class="py-3 px-4">Phạm vi áp dụng</th>
           <th class="py-3 px-4">Điều kiện tối thiểu</th>
           <th class="py-3 px-4">Thời gian áp dụng</th>
           <th class="py-3 px-4 text-center">Trạng thái</th>
@@ -122,6 +132,21 @@
                 </c:when>
                 <c:otherwise>
                   - <c:out value="${coupon.discountValue}"/> %
+                </c:otherwise>
+              </c:choose>
+            </td>
+
+            <td class="py-3 px-4">
+              <c:choose>
+                <c:when test="${not empty coupon.productName}">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold border border-purple-200">
+                    <span class="material-symbols-outlined text-[14px]">inventory_2</span> <c:out value="${coupon.productName}"/>
+                  </span>
+                </c:when>
+                <c:otherwise>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold border border-emerald-200">
+                    <span class="material-symbols-outlined text-[14px]">shopping_bag</span> Toàn bộ đơn
+                  </span>
                 </c:otherwise>
               </c:choose>
             </td>

@@ -37,7 +37,7 @@ public class ApplyCouponServlet extends HttpServlet {
             return;
         }
 
-        String sql = "SELECT * FROM coupons WHERE code = ?";
+        String sql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id WHERE c.code = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -51,6 +51,8 @@ public class ApplyCouponServlet extends HttpServlet {
                     java.sql.Timestamp endDate = rs.getTimestamp("end_date");
                     int usageLimit = rs.getInt("usage_limit");
                     int usedCount = rs.getInt("used_count");
+                    Long specificProductId = rs.getObject("product_id") != null ? rs.getLong("product_id") : null;
+                    String specificProductName = rs.getString("product_name");
                     java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -106,27 +108,57 @@ public class ApplyCouponServlet extends HttpServlet {
                         }
                     }
 
+                    // Lấy giỏ hàng từ Session
+                    @SuppressWarnings("unchecked")
+                    Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
+                    if (cart == null || cart.isEmpty()) {
+                        session.setAttribute("COUPON_ERROR", "Giỏ hàng của bạn đang trống!");
+                        response.sendRedirect(request.getContextPath() + "/cart");
+                        return;
+                    }
+
+                    // 7. KIỂM TRA ĐIỀU KIỆN SẢN PHẨM RIÊNG BIỆT (NẾU CÓ)
+                    if (specificProductId != null) {
+                        if (!cart.containsKey(specificProductId)) {
+                            String targetName = specificProductName != null ? specificProductName : "sản phẩm chỉ định";
+                            session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " chỉ áp dụng riêng cho sản phẩm '" + targetName + "'. Giỏ hàng của bạn chưa có sản phẩm này!");
+                            session.removeAttribute("DISCOUNT_AMOUNT");
+                            session.removeAttribute("APPLIED_COUPON_CODE");
+                            response.sendRedirect(request.getContextPath() + "/cart");
+                            return;
+                        }
+                    }
+
                     String discountType = rs.getString("discount_type");
                     double discountValue = rs.getDouble("discount_value");
                     double minOrderValue = rs.getDouble("min_order_value");
 
                     // Tính tổng tiền giỏ hàng hiện tại
-                    @SuppressWarnings("unchecked")
-                    Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
                     double cartTotal = 0;
-                    if (cart != null) {
-                        for (CartItemDTO item : cart.values()) {
-                            cartTotal += item.getSubTotal();
-                        }
+                    for (CartItemDTO item : cart.values()) {
+                        cartTotal += item.getSubTotal();
                     }
 
-                    // 7. Kiểm tra điều kiện đơn hàng tối thiểu
+                    // 8. Kiểm tra điều kiện đơn hàng tối thiểu
                     if (cartTotal >= minOrderValue) {
                         double discountAmount = 0;
-                        if ("PERCENT".equalsIgnoreCase(discountType)) {
-                            discountAmount = (cartTotal * discountValue) / 100.0;
+
+                        if (specificProductId != null) {
+                            // Áp dụng chiết khấu riêng cho sản phẩm đó
+                            CartItemDTO targetItem = cart.get(specificProductId);
+                            double itemTotal = targetItem.getSubTotal();
+                            if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                discountAmount = (itemTotal * discountValue) / 100.0;
+                            } else {
+                                discountAmount = Math.min(discountValue, itemTotal);
+                            }
                         } else {
-                            discountAmount = discountValue;
+                            // Áp dụng chiết khấu toàn đơn
+                            if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                discountAmount = (cartTotal * discountValue) / 100.0;
+                            } else {
+                                discountAmount = discountValue;
+                            }
                         }
 
                         // Đảm bảo mức giảm không vượt quá tổng tiền hàng

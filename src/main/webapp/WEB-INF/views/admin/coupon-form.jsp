@@ -74,6 +74,20 @@
                                 </select>
                             </div>
                         </div>
+
+                        <!-- PHẠM VI ÁP DỤNG (SẢN PHẨM) -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phạm vi áp dụng (Sản phẩm)</label>
+                            <div class="relative">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">inventory_2</span>
+                                <select name="productId" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all font-semibold text-gray-800">
+                                    <option value="" ${empty coupon.productId ? 'selected' : ''}>Toàn bộ đơn hàng (Tất cả sản phẩm)</option>
+                                    <c:forEach var="p" items="${products}">
+                                        <option value="${p.id}" ${coupon.productId == p.id ? 'selected' : ''}>Áp dụng riêng cho: <c:out value="${p.name}"/></option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

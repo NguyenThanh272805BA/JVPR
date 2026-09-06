@@ -113,11 +113,17 @@
     </div>
 
     <!-- DANH SÁCH VOUCHER DẠNG TICKET NGHỆ THUẬT -->
+    <jsp:useBean id="nowDate" class="java.util.Date" />
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <c:forEach var="coupon" items="${coupons}">
-        <div class="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200/90 hover:border-primary/50 hover:shadow-[0_12px_30px_rgba(129,196,8,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden">
+        <c:set var="diffMs" value="${coupon.endDate.time - nowDate.time}" />
+        <c:set var="diffHours" value="${diffMs / 3600000}" />
+        <c:set var="isExpired" value="${diffMs <= 0}" />
+        <c:set var="isExpiringSoon" value="${diffMs > 0 && diffHours <= 48}" />
+
+        <div class="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border ${isExpired ? 'border-slate-300 opacity-65 grayscale-[25%]' : (isExpiringSoon ? 'border-amber-400 shadow-[0_8px_25px_rgba(245,158,11,0.18)]' : 'border-slate-200/90 hover:border-primary/50 hover:shadow-[0_12px_30px_rgba(129,196,8,0.14)]')} hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden">
           <!-- Dải ruy băng góc trái -->
-          <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-primary to-[#6ca305]"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-2 ${isExpired ? 'bg-slate-400' : (isExpiringSoon ? 'bg-gradient-to-b from-amber-500 to-orange-500' : 'bg-gradient-to-b from-primary to-[#6ca305]')}"></div>
 
           <!-- Lỗ khuyết vé coupon -->
           <div class="ticket-cutout-left"></div>
@@ -135,27 +141,53 @@
                 </span>
 
                 <c:choose>
-                  <c:when test="${coupon.targetAudience == 'GMAIL'}">
-                    <span class="text-[11px] font-bold px-2.5 py-1 bg-rose-50 text-rose-600 rounded-md border border-rose-100">Dành riêng Gmail</span>
-                  </c:when>
-                  <c:when test="${coupon.targetAudience == 'REGULAR'}">
-                    <span class="text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">Thành viên thường</span>
+                  <c:when test="${not empty coupon.productName}">
+                    <span class="text-[11px] font-bold px-2.5 py-1 bg-purple-50 text-purple-700 rounded-md border border-purple-200 flex items-center gap-1" title="Áp dụng riêng cho ${coupon.productName}">
+                      <span class="material-symbols-outlined text-[13px]">inventory_2</span> <c:out value="${coupon.productName}"/>
+                    </span>
                   </c:when>
                   <c:otherwise>
-                    <span class="text-[11px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">Tất cả khách hàng</span>
+                    <c:choose>
+                      <c:when test="${coupon.targetAudience == 'GMAIL'}">
+                        <span class="text-[11px] font-bold px-2.5 py-1 bg-rose-50 text-rose-600 rounded-md border border-rose-100">Dành riêng Gmail</span>
+                      </c:when>
+                      <c:when test="${coupon.targetAudience == 'REGULAR'}">
+                        <span class="text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md border border-blue-100">Thành viên thường</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="text-[11px] font-bold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">Tất cả khách hàng</span>
+                      </c:otherwise>
+                    </c:choose>
                   </c:otherwise>
                 </c:choose>
               </div>
 
-              <span class="text-[11px] font-medium text-slate-400 whitespace-nowrap bg-slate-50 px-2 py-0.5 rounded">
-                HSD: <fmt:formatDate value="${coupon.endDate}" pattern="dd/MM/yyyy"/>
-              </span>
+              <!-- Cảnh báo thời gian / HSD -->
+              <div>
+                <c:choose>
+                  <c:when test="${isExpired}">
+                    <span class="text-[11px] font-bold text-red-700 bg-red-100 px-2.5 py-1 rounded-md border border-red-200 inline-flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[14px]">event_busy</span> Đã hết hạn
+                    </span>
+                  </c:when>
+                  <c:when test="${isExpiringSoon}">
+                    <span class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md border border-amber-300 inline-flex items-center gap-1 animate-pulse">
+                      <span class="material-symbols-outlined text-[14px]">alarm</span> Sắp hết hạn (<fmt:formatNumber value="${diffHours}" maxFractionDigits="0"/>h nữa)
+                    </span>
+                  </c:when>
+                  <c:otherwise>
+                    <span class="text-[11px] font-medium text-slate-500 whitespace-nowrap bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
+                      HSD: <fmt:formatDate value="${coupon.endDate}" pattern="dd/MM/yyyy"/>
+                    </span>
+                  </c:otherwise>
+                </c:choose>
+              </div>
             </div>
 
             <!-- Giá trị Voucher -->
             <div class="my-1">
               <span class="text-xs text-slate-400 font-medium block mb-0.5">Mức chiết khấu</span>
-              <h3 class="font-headline-md text-3xl text-primary font-black tracking-tight group-hover:scale-[1.02] transition-transform">
+              <h3 class="font-headline-md text-3xl ${isExpired ? 'text-slate-500' : 'text-primary'} font-black tracking-tight group-hover:scale-[1.02] transition-transform">
                 <c:choose>
                   <c:when test="${coupon.discountType == 'FIXED'}">
                     -<fmt:formatNumber value="${coupon.discountValue}" type="number" groupingUsed="true"/> ₫
@@ -167,22 +199,34 @@
               </h3>
             </div>
 
-            <p class="text-xs text-slate-500 mb-6">
-              Áp dụng đơn từ: <b class="text-slate-800 font-bold"><fmt:formatNumber value="${coupon.minOrderValue}" type="number" groupingUsed="true"/> ₫</b>
-            </p>
+            <div class="flex flex-col gap-1 mb-5 text-xs text-slate-500">
+              <p>Áp dụng đơn từ: <b class="text-slate-800 font-bold"><fmt:formatNumber value="${coupon.minOrderValue}" type="number" groupingUsed="true"/> ₫</b></p>
+              <c:if test="${not empty coupon.productName}">
+                <p class="text-purple-600 font-medium flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span> Chỉ áp dụng cho: <strong><c:out value="${coupon.productName}"/></strong>
+                </p>
+              </c:if>
+            </div>
 
             <!-- Đường cắt đứt khúc vé -->
             <div class="border-t border-dashed border-slate-200 -mx-6 mb-4"></div>
 
             <!-- Bottom: Mã Code & Thao tác -->
             <div class="mt-auto flex items-center justify-between gap-3">
-              <div class="flex items-center gap-1.5 bg-slate-50 border border-dashed border-slate-300 hover:border-primary px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-                   onclick="copyCode('${coupon.code}', this)" title="Bấm để sao chép mã">
-                <span class="font-mono font-extrabold text-slate-800 text-sm tracking-widest uppercase"><c:out value="${coupon.code}"/></span>
-                <span class="material-symbols-outlined text-slate-400 text-base group-hover:text-primary">content_copy</span>
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-dashed ${isExpired ? 'border-slate-300 opacity-60 cursor-not-allowed' : 'border-slate-300 hover:border-primary cursor-pointer'} px-3 py-1.5 rounded-xl transition-colors"
+                   <c:if test="${!isExpired}">onclick="copyCode('${coupon.code}', this)" title="Bấm để sao chép mã"</c:if>>
+                <span class="font-mono font-extrabold ${isExpired ? 'text-slate-400' : 'text-slate-800'} text-sm tracking-widest uppercase"><c:out value="${coupon.code}"/></span>
+                <c:if test="${!isExpired}">
+                  <span class="material-symbols-outlined text-slate-400 text-base group-hover:text-primary">content_copy</span>
+                </c:if>
               </div>
 
               <c:choose>
+                <c:when test="${isExpired}">
+                  <button type="button" disabled class="text-xs bg-slate-200 text-slate-400 px-4 py-2 rounded-full font-label-bold cursor-not-allowed">
+                    Đã hết hạn
+                  </button>
+                </c:when>
                 <c:when test="${not empty sessionScope.USERMODEL}">
                   <a href="${pageContext.request.contextPath}/shop" class="text-xs bg-primary hover:bg-[#6ca305] text-white px-4 py-2 rounded-full font-label-bold transition-all shadow-sm hover:shadow hover:-translate-y-0.5">
                     Dùng ngay

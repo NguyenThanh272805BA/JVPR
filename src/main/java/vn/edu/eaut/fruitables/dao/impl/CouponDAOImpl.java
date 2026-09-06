@@ -9,28 +9,35 @@ public class CouponDAOImpl extends AbstractDAO<CouponModel> implements ICouponDA
 
     @Override
     public List<CouponModel> findAll() {
-        String sql = "SELECT * FROM coupons ORDER BY id DESC";
+        String sql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id ORDER BY c.id DESC";
         return query(sql, new CouponMapper());
     }
 
     @Override
     public Long save(CouponModel coupon) {
-        String sql = "INSERT INTO coupons (code, discount_type, discount_value, min_order_value, start_date, end_date, usage_limit, used_count, status) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 1)";
-        return insert(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(), coupon.getMinOrderValue(), coupon.getStartDate(), coupon.getEndDate(), coupon.getUsageLimit());
+        String sql = "INSERT INTO coupons (code, discount_type, discount_value, min_order_value, product_id, start_date, end_date, usage_limit, used_count, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 1)";
+        return insert(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(), coupon.getMinOrderValue(), coupon.getProductId(), coupon.getStartDate(), coupon.getEndDate(), coupon.getUsageLimit());
     }
 
     @Override
     public CouponModel findById(Integer id) {
-        String sql = "SELECT * FROM coupons WHERE id = ?";
+        String sql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id WHERE c.id = ?";
         List<CouponModel> coupons = query(sql, new CouponMapper(), id);
         return coupons.isEmpty() ? null : coupons.get(0);
     }
 
     @Override
+    public CouponModel findByCode(String code) {
+        String sql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id WHERE c.code = ?";
+        List<CouponModel> coupons = query(sql, new CouponMapper(), code);
+        return coupons.isEmpty() ? null : coupons.get(0);
+    }
+
+    @Override
     public void update(CouponModel coupon) {
-        String sql = "UPDATE coupons SET code = ?, discount_type = ?, discount_value = ?, min_order_value = ?, start_date = ?, end_date = ?, usage_limit = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE coupons SET code = ?, discount_type = ?, discount_value = ?, min_order_value = ?, product_id = ?, start_date = ?, end_date = ?, usage_limit = ?, status = ? WHERE id = ?";
         update(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(),
-                coupon.getMinOrderValue(), coupon.getStartDate(), coupon.getEndDate(),
+                coupon.getMinOrderValue(), coupon.getProductId(), coupon.getStartDate(), coupon.getEndDate(),
                 coupon.getUsageLimit(), coupon.getStatus(), coupon.getId());
     }
 

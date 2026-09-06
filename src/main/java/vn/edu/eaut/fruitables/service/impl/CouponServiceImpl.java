@@ -34,6 +34,11 @@ public class CouponServiceImpl implements ICouponService {
     }
 
     @Override
+    public CouponModel findByCode(String code) {
+        return couponDAO.findByCode(code);
+    }
+
+    @Override
     public void update(CouponModel coupon) {
         couponDAO.update(coupon);
     }

@@ -2,7 +2,9 @@ package vn.edu.eaut.fruitables.controller.admin;
 
 import vn.edu.eaut.fruitables.model.entity.CouponModel;
 import vn.edu.eaut.fruitables.service.ICouponService;
+import vn.edu.eaut.fruitables.service.IProductService;
 import vn.edu.eaut.fruitables.service.impl.CouponServiceImpl;
+import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +18,7 @@ import java.sql.Timestamp;
 public class CouponEditServlet extends HttpServlet {
 
     private final ICouponService couponService = new CouponServiceImpl();
+    private final IProductService productService = new ProductServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -29,6 +32,7 @@ public class CouponEditServlet extends HttpServlet {
             }
 
             request.setAttribute("coupon", coupon);
+            request.setAttribute("products", productService.findAll());
             request.getRequestDispatcher("/WEB-INF/views/admin/coupon-form.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,6 +53,14 @@ public class CouponEditServlet extends HttpServlet {
             // Thêm trường đối tượng áp dụng
             String targetAudience = request.getParameter("targetAudience");
             coupon.setTargetAudience(targetAudience != null ? targetAudience : "ALL");
+
+            // Thêm trường sản phẩm áp dụng riêng
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr != null && !productIdStr.trim().isEmpty() && !productIdStr.equals("all")) {
+                try {
+                    coupon.setProductId(Long.parseLong(productIdStr.trim()));
+                } catch (NumberFormatException ignored) {}
+            }
 
             String startDateStr = request.getParameter("startDate").replace("T", " ");
             String endDateStr = request.getParameter("endDate").replace("T", " ");

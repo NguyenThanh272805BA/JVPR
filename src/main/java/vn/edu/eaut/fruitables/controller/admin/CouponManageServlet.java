@@ -2,7 +2,9 @@ package vn.edu.eaut.fruitables.controller.admin;
 
 import vn.edu.eaut.fruitables.model.entity.CouponModel;
 import vn.edu.eaut.fruitables.service.ICouponService;
+import vn.edu.eaut.fruitables.service.IProductService;
 import vn.edu.eaut.fruitables.service.impl.CouponServiceImpl;
+import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,9 +19,11 @@ import java.util.List;
 public class CouponManageServlet extends HttpServlet {
 
     private ICouponService couponService;
+    private IProductService productService;
 
     public CouponManageServlet() {
         this.couponService = new CouponServiceImpl();
+        this.productService = new ProductServiceImpl();
     }
 
     @Override
@@ -27,6 +31,7 @@ public class CouponManageServlet extends HttpServlet {
         // Kéo toàn bộ danh sách mã giảm giá từ DB
         List<CouponModel> coupons = couponService.findAll();
         request.setAttribute("coupons", coupons);
+        request.setAttribute("products", productService.findAll());
 
         request.getRequestDispatcher("/WEB-INF/views/admin/coupon-list.jsp").forward(request, response);
     }
@@ -44,6 +49,7 @@ public class CouponManageServlet extends HttpServlet {
             String startDateStr = request.getParameter("startDate");
             String endDateStr = request.getParameter("endDate");
             Integer usageLimit = Integer.parseInt(request.getParameter("usageLimit"));
+            String productIdStr = request.getParameter("productId");
 
             // Parse datetime-local string (YYYY-MM-DDTHH:MM) sang SQL Timestamp
             Timestamp startDate = Timestamp.valueOf(startDateStr.replace("T", " ") + ":00");
@@ -51,13 +57,19 @@ public class CouponManageServlet extends HttpServlet {
 
             // Đóng gói Model
             CouponModel coupon = new CouponModel();
-            coupon.setCode(code.toUpperCase()); // Ép mã tự động viết hoa
+            coupon.setCode(code.toUpperCase().trim()); // Ép mã tự động viết hoa
             coupon.setDiscountType(discountType);
             coupon.setDiscountValue(discountValue);
             coupon.setMinOrderValue(minOrderValue);
             coupon.setStartDate(startDate);
             coupon.setEndDate(endDate);
             coupon.setUsageLimit(usageLimit);
+
+            if (productIdStr != null && !productIdStr.trim().isEmpty() && !productIdStr.equals("all")) {
+                try {
+                    coupon.setProductId(Long.parseLong(productIdStr.trim()));
+                } catch (NumberFormatException ignored) {}
+            }
 
             // Lưu Database
             couponService.save(coupon);

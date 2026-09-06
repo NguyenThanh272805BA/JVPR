@@ -6,6 +6,7 @@ public interface ICouponService {
     List<CouponModel> findAll();
     CouponModel save(CouponModel couponModel);
     CouponModel findById(Integer id);
+    CouponModel findByCode(String code);
     void update(CouponModel coupon);
     void hardDelete(Integer id);
     void restore(Integer id);

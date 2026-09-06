@@ -6,6 +6,7 @@ public interface ICouponDAO extends GenericDAO<CouponModel> {
     List<CouponModel> findAll();
     Long save(CouponModel couponModel);
     CouponModel findById(Integer id);
+    CouponModel findByCode(String code);
     void update(CouponModel coupon);
     void hardDelete(Integer id);
     void softDelete(Integer id);
