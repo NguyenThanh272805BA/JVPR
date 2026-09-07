@@ -63,20 +63,87 @@
 <!-- NHÚNG NAVBAR ĐỒNG BỘ -->
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<!-- HERO BANNER KHUYẾN MÃI (GIỮ NGUYÊN ẢNH GỐC & CẤU TRÚC BANNER) -->
-<section class="relative w-full text-white py-16 md:py-24 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/80 backdrop-blur-[1px]"></div>
-  <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop text-center z-10">
-    <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-[#6ca305] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 shadow-lg shadow-primary/30 border border-white/20">
-      <span class="material-symbols-outlined text-[16px] animate-pulse">local_fire_department</span>
-      Săn Voucher & Flash Sale Mỗi Ngày
+<!-- HERO BANNER: 3D GOLDEN VOUCHER & FLASH SALE VAULT -->
+<section class="tilt-3d-stage relative w-full text-white py-12 md:py-18 bg-slate-950 overflow-hidden perspective-1200">
+  <!-- Nền không gian sâu với quầng hào quang màu hổ phách và cam vàng -->
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#180d04] to-slate-950 z-0"></div>
+  <div class="absolute -top-28 -left-28 w-[34rem] h-[34rem] bg-amber-500/20 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0"></div>
+  <div class="absolute -bottom-28 right-0 w-[36rem] h-[36rem] bg-primary/20 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3.5s;"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:30px_30px] opacity-15 pointer-events-none z-0"></div>
+
+  <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <!-- Cột trái: Tiêu đề & Thông điệp -->
+    <div class="lg:col-span-7 text-left space-y-4">
+      <div class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-orange-500/30 border border-white/20">
+        <span class="material-symbols-outlined text-[16px] animate-pulse">local_fire_department</span>
+        Săn Voucher & Flash Sale Độc Quyền
+      </div>
+
+      <h1 class="font-display-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white drop-shadow-lg leading-tight">
+        Kho Ưu Đãi Trái Cây &<br>
+        <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">Voucher Giảm Đến 50%</span>
+      </h1>
+
+      <p class="font-body-lg text-slate-300 text-sm md:text-base max-w-xl leading-relaxed">
+        Sưu tầm ngay các mã giảm giá vận chuyển và phiếu quà tặng thành viên để tận hưởng hoa quả sạch, tươi mát mỗi ngày với chi phí tiết kiệm nhất.
+      </p>
+
+      <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-300">
+        <div class="flex items-center gap-1.5 bg-white/10 px-3.5 py-2 rounded-xl backdrop-blur-md border border-white/10">
+          <span class="material-symbols-outlined text-amber-400 text-base">check_circle</span> Tự động trừ khi thanh toán
+        </div>
+        <div class="flex items-center gap-1.5 bg-white/10 px-3.5 py-2 rounded-xl backdrop-blur-md border border-white/10">
+          <span class="material-symbols-outlined text-primary text-base">local_shipping</span> Freeship đơn từ 300.000₫
+        </div>
+      </div>
     </div>
-    <h1 class="font-display-lg text-3xl md:text-5xl font-black mb-3.5 tracking-tight text-white drop-shadow-lg">
-      Kho Ưu Đãi Độc Quyền
-    </h1>
-    <p class="font-body-lg text-slate-200 text-sm md:text-base max-w-xl mx-auto leading-relaxed drop-shadow">
-      Khám phá các mã giảm giá và hàng loạt sản phẩm trái cây, nông sản hữu cơ đang được trợ giá với mức chiết khấu cực sốc.
-    </p>
+
+    <!-- Cột phải: Thẻ 3D Golden VIP Ticket lơ lửng -->
+    <div class="lg:col-span-5 flex justify-center relative">
+      <div data-3d-tilt data-tilt-max="14" data-tilt-scale="1.03"
+           class="preserve-3d relative w-full max-w-[380px] rounded-3xl p-6 glass-card-3d-dark border border-amber-400/30 shadow-[0_25px_60px_rgba(245,158,11,0.2)] cursor-pointer">
+        
+        <div class="shimmer-layer"></div>
+
+        <!-- Layer z-30: Header voucher -->
+        <div class="translate-z-30 flex items-center justify-between border-b border-amber-400/20 pb-3 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-slate-950 font-black text-xs shadow-md">
+              FP
+            </div>
+            <div>
+              <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wider">FRUITABLES PASS</div>
+              <div class="text-[9px] text-slate-400">Phiếu ưu đãi thành viên</div>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/40">VIP PASS</span>
+        </div>
+
+        <!-- Layer z-50: Trung tâm giảm giá nổi khối -->
+        <div class="translate-z-50 text-center py-4 bg-gradient-to-b from-amber-500/10 to-orange-500/5 rounded-2xl border border-amber-400/20 my-2">
+          <div class="text-3xl md:text-4xl font-black font-price-tag bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent drop-shadow">
+            GIẢM 50.000 ₫
+          </div>
+          <p class="text-xs text-slate-300 mt-1">Áp dụng cho mọi đơn hoa quả từ 299.000 ₫</p>
+          
+          <div class="mt-3 inline-flex items-center gap-2 bg-slate-900/80 border border-amber-400/40 px-4 py-1.5 rounded-xl">
+            <span class="font-mono text-sm font-bold text-amber-300 tracking-wider">FRUIT50K</span>
+            <span class="text-[10px] text-slate-400">(Bấm để lưu mã)</span>
+          </div>
+        </div>
+
+        <!-- Layer z-40: Footer voucher -->
+        <div class="translate-z-40 flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-amber-400/20">
+          <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-amber-400">schedule</span> HSD: 7 ngày tới</span>
+          <span class="text-amber-300 font-bold">Số lượng có hạn</span>
+        </div>
+
+        <!-- Huy hiệu 3D nổi hẳn lên trên (translate-z-60) -->
+        <div class="translate-z-60 absolute -top-3 -right-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-white/30 animate-float-3d">
+          🔥 HOT DEAL HÔM NAY
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -323,5 +390,6 @@
     });
   }
 </script>
+<script src="${pageContext.request.contextPath}/assets/web/js/banner-3d.js"></script>
 </body>
 </html>

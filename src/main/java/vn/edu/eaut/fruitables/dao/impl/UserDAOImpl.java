@@ -12,6 +12,14 @@ import java.util.List;
 public class UserDAOImpl extends AbstractDAO<UserModel> implements IUserDAO {
 
     @Override
+    public UserModel findById(Long id) {
+        if (id == null) return null;
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<UserModel> users = query(sql, new UserMapper(), id);
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
     public UserModel findByUsernameOrPhoneOrEmail(String identifier) {
         String sql = "SELECT * FROM users WHERE username = ? OR phone = ? OR email = ?";
         List<UserModel> users = query(sql, new UserMapper(), identifier, identifier, identifier);

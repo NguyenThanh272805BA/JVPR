@@ -66,14 +66,16 @@
                     </div>
 
                     <div class="mb-5">
-                        <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ Email (Để nhận biên nhận & hóa đơn)</label>
+                        <label class="block font-label-bold text-sm text-on-surface mb-1.5">
+                            Địa chỉ Email <span class="text-xs font-normal text-on-surface-variant">(Thành viên nhận thông báo giao hàng qua Gmail; Khách vãng lai có thể để trống)</span>
+                        </label>
                         <c:choose>
                             <c:when test="${not empty sessionScope.USERMODEL}">
                                 <input type="email" name="email" readonly value="${sessionScope.USERMODEL.email}"
                                        class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm">
                             </c:when>
                             <c:otherwise>
-                                <input type="email" name="email" placeholder="example@email.com"
+                                <input type="email" name="email" placeholder="example@email.com (Không bắt buộc với khách vãng lai)"
                                        class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
                             </c:otherwise>
                         </c:choose>

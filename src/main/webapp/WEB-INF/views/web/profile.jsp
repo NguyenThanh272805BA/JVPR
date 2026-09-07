@@ -45,7 +45,7 @@
           </li>
           <li>
             <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined text-[20px]">receipt_long</span> Quản lý đơn hàng
+              <span class="material-symbols-outlined text-[20px]">receipt_long</span> Lịch sử đơn hàng
             </a>
           </li>
           <li>

@@ -63,29 +63,137 @@
     </div>
 </c:if>
 
-<!-- HERO SECTION (GIỮ NGUYÊN HOÀN TOÀN) -->
-<section class="relative w-full bg-surface-container h-[480px] md:h-[560px] flex items-center overflow-hidden">
-    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop');"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
+<!-- HERO SECTION: 3D INTERACTIVE HARVEST SHOWCASE -->
+<section class="tilt-3d-stage relative w-full min-h-[580px] md:min-h-[640px] flex items-center overflow-hidden bg-slate-950 py-12 md:py-16 perspective-1200">
+    <!-- Nền đa tầng không gian sâu với Mesh Gradient & Ambient Aura -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0a180a] to-slate-950 z-0"></div>
+    <div class="absolute -top-32 -left-32 w-[38rem] h-[38rem] bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute bottom-0 right-0 w-[32rem] h-[32rem] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -4s;"></div>
+    
+    <!-- Lưới họa tiết công nghệ chấm mờ -->
+    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:32px_32px] opacity-15 pointer-events-none z-0"></div>
 
-    <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full">
-        <span class="inline-block py-1 px-3.5 rounded-full bg-primary/20 text-primary border border-primary/40 font-label-bold text-xs uppercase tracking-wider mb-4 backdrop-blur-sm">
-            100% Tự Nhiên & Hữu Cơ
-        </span>
-        <h1 class="text-white font-display-lg text-[36px] md:text-[54px] font-extrabold max-w-2xl leading-tight mb-4 drop-shadow-md">
-            Thực phẩm sạch,<br><span class="text-primary">Sức khỏe</span> vàng cho gia đình
-        </h1>
-        <p class="text-white/90 font-body-lg text-base md:text-lg mb-8 max-w-lg leading-relaxed">
-            Fruitables cam kết cung cấp trái cây tươi ngon và rau củ đạt chứng nhận VietGAP mỗi ngày. Giao siêu tốc tận cửa chỉ trong 2 giờ.
-        </p>
-        <div class="flex flex-wrap gap-4">
-            <a href="${pageContext.request.contextPath}/shop" class="inline-flex items-center justify-center bg-primary text-white px-8 py-3.5 rounded-full font-label-bold text-base hover:bg-primary-container transition-all duration-300 shadow-[0_4px_16px_rgba(129,196,8,0.35)] hover:-translate-y-0.5">
-                Mua sắm ngay
-                <span class="material-symbols-outlined ml-2 text-[20px]">arrow_forward</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/guest-tracking" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm px-6 py-3.5 rounded-full font-label-bold text-base transition-all">
-                Tra cứu đơn hàng
-            </a>
+    <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <!-- CỘT TRÁI: Typography & Lời mời gọi hành động -->
+        <div class="lg:col-span-7 text-left space-y-6">
+            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary/15 text-primary border border-primary/30 font-label-bold text-xs uppercase tracking-wider backdrop-blur-md shadow-sm">
+                <span class="material-symbols-outlined text-[16px] animate-spin" style="animation-duration: 8s;">eco</span>
+                <span>100% Tự Nhiên & Chuẩn VietGAP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+            </div>
+
+            <h1 class="text-white font-display-lg text-[34px] sm:text-[44px] md:text-[56px] font-black leading-[1.12] tracking-tight drop-shadow-md">
+                Nông sản thuần khiết,<br>
+                <span class="bg-gradient-to-r from-primary via-[#a3e635] to-emerald-400 bg-clip-text text-transparent">Trọn vẹn năng lượng</span><br>
+                sống mỗi ngày
+            </h1>
+
+            <p class="text-slate-300 font-body-lg text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
+                Fruitables kết nối trực tiếp các nhà vườn hữu cơ đến bàn ăn gia đình bạn. Trái cây thượng hạng, ướp lạnh tươi mát và giao hỏa tốc chỉ trong 2 giờ.
+            </p>
+
+            <!-- Nhóm nút bấm hành động -->
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="${pageContext.request.contextPath}/shop" class="relative group inline-flex items-center justify-center bg-gradient-to-r from-primary to-[#6ca305] text-white px-8 py-3.5 rounded-full font-label-bold text-base hover:shadow-[0_8px_25px_rgba(129,196,8,0.45)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
+                    <span class="relative z-10 flex items-center gap-2">
+                        Mua sắm ngay
+                        <span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </span>
+                    <div class="shimmer-layer"></div>
+                </a>
+
+                <a href="${pageContext.request.contextPath}/guest-tracking" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-md px-6 py-3.5 rounded-full font-label-bold text-base transition-all duration-300 hover:-translate-y-0.5 gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-primary">local_shipping</span>
+                    Tra cứu đơn hàng
+                </a>
+            </div>
+
+            <!-- Chỉ số tin cậy 3D Quick Stats -->
+            <div class="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-4 max-w-lg">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-lg">bolt</span>
+                    </div>
+                    <div>
+                        <div class="text-white font-bold text-xs">Giao 2 Giờ</div>
+                        <div class="text-[10px] text-slate-400">Nội thành hỏa tốc</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-lg">verified</span>
+                    </div>
+                    <div>
+                        <div class="text-white font-bold text-xs">Chuẩn VietGAP</div>
+                        <div class="text-[10px] text-slate-400">100% hữu cơ sạch</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-lg">hotel_class</span>
+                    </div>
+                    <div>
+                        <div class="text-white font-bold text-xs">4.9 / 5.0</div>
+                        <div class="text-[10px] text-slate-400">50k+ Khách tin yêu</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: 3D CARD SHOWCASE NỔI KHỐI -->
+        <div class="lg:col-span-5 flex justify-center relative">
+            <!-- Thẻ 3D nghiêng tương tác theo chuột -->
+            <div data-3d-tilt data-tilt-max="14" data-tilt-scale="1.03"
+                 class="preserve-3d relative w-full max-w-[420px] h-[460px] rounded-3xl glass-card-3d-dark p-6 flex flex-col justify-between cursor-pointer border border-white/20 shadow-[0_30px_70px_rgba(0,0,0,0.6)]">
+                
+                <!-- Vệt sáng kim loại phản chiếu -->
+                <div class="shimmer-layer"></div>
+
+                <!-- Lớp trên: Header thẻ nổi (translate-z-30) -->
+                <div class="translate-z-30 flex items-center justify-between z-20">
+                    <span class="px-3 py-1 rounded-full bg-primary/25 border border-primary/40 text-primary text-[11px] font-bold tracking-wider uppercase flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span> Mới thu hoạch
+                    </span>
+                    <span class="text-xs text-slate-300 font-semibold flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-amber-400 text-sm">star</span> 4.9 (5.2k)
+                    </span>
+                </div>
+
+                <!-- Lớp trung tâm: Hình ảnh Giỏ trái cây 3D siêu nét và sống động (translate-z-50) -->
+                <div class="translate-z-50 relative flex items-center justify-center my-auto py-2 z-10">
+                    <!-- Hào quang phát sáng sau quả -->
+                    <div class="absolute w-56 h-56 bg-primary/30 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?q=80&w=800&auto=format&fit=crop" 
+                         alt="Fresh Fruits Basket 3D" 
+                         class="w-72 h-56 object-cover rounded-2xl shadow-2xl border border-white/20 transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+                </div>
+
+                <!-- Lớp dưới: Thông tin tóm tắt sản phẩm & Cam kết (translate-z-40) -->
+                <div class="translate-z-40 bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 z-20 flex items-center justify-between gap-3">
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Hộp Trái Cây Gia Đình</h4>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Táo Envy, Cam Sành, Nho Đỏ, Bơ Sáp</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-primary font-bold uppercase tracking-wider block">Ưu đãi tuần</span>
+                        <span class="text-white font-bold text-base font-price-tag">289.000 ₫</span>
+                    </div>
+                </div>
+
+                <!-- Badge vệ tinh 1 lơ lửng bên ngoài (translate-z-60) -->
+                <div class="translate-z-60 absolute -top-4 -right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-2xl shadow-xl flex items-center gap-1.5 border border-white/30 animate-float-3d">
+                    <span class="material-symbols-outlined text-sm">verified</span>
+                    <span>100% Organic</span>
+                </div>
+
+                <!-- Badge vệ tinh 2 lơ lửng góc dưới trái (translate-z-60) -->
+                <div class="translate-z-60 absolute -bottom-4 -left-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-2xl shadow-xl flex items-center gap-1.5 border border-white/30 animate-float-3d-reverse">
+                    <span class="material-symbols-outlined text-sm">ac_unit</span>
+                    <span>Bảo quản lạnh 4°C</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -543,5 +651,6 @@
         }
     });
 </script>
+<script src="${pageContext.request.contextPath}/assets/web/js/banner-3d.js"></script>
 </body>
 </html>

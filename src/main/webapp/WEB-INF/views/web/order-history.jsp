@@ -18,30 +18,57 @@
 
 <main class="max-w-container-max-width mx-auto py-12 px-margin-mobile md:px-margin-desktop w-full flex-grow flex gap-8 flex-col lg:flex-row">
     <!-- Sidebar Menu Khách hàng -->
-    <aside class="w-full lg:w-1/4 bg-surface-container-lowest rounded-xl shadow-soft p-6 h-fit border border-outline-variant">
-        <div class="text-center mb-6 border-b border-surface-variant pb-6">
-            <div class="relative w-24 h-24 mx-auto mb-4 rounded-full border-4 border-surface-container-high overflow-hidden bg-surface-container flex items-center justify-center">
-                <c:choose>
-                    <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
-                        <img src="${sessionScope.USERMODEL.avatarUrl}" class="w-full h-full object-cover">
-                    </c:when>
-                    <c:otherwise>
-                        <span class="material-symbols-outlined text-[48px] text-outline">person</span>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-            <h3 class="font-headline-md text-on-surface font-bold text-lg">${sessionScope.USERMODEL.fullName}</h3>
-            <p class="text-xs text-on-surface-variant">${sessionScope.USERMODEL.phone != null ? sessionScope.USERMODEL.phone : sessionScope.USERMODEL.email}</p>
+    <aside class="w-full md:w-1/4">
+      <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm sticky top-28">
+        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-surface-variant">
+          <div class="w-16 h-16 rounded-full border-2 border-primary flex items-center justify-center bg-surface-container overflow-hidden shrink-0">
+            <c:choose>
+                <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
+                    <img src="${sessionScope.USERMODEL.avatarUrl}" alt="Avatar" class="w-full h-full object-cover">
+                </c:when>
+                <c:otherwise>
+                    <span class="material-symbols-outlined text-primary text-3xl">person</span>
+                </c:otherwise>
+            </c:choose>
+          </div>
+
+          <div class="overflow-hidden">
+            <p class="text-xs text-on-surface-variant">Tài khoản</p>
+            <p class="font-label-bold text-base text-on-surface truncate">${sessionScope.USERMODEL.fullName}</p>
+          </div>
         </div>
-        <ul class="space-y-2">
-            <li><a href="${pageContext.request.contextPath}/profile" class="block py-2.5 px-4 text-on-surface hover:bg-surface-container rounded-lg transition-colors font-label-bold text-sm">Thông tin tài khoản</a></li>
-            <li><a href="${pageContext.request.contextPath}/order-history" class="block py-2.5 px-4 bg-primary-container/20 text-primary font-label-bold rounded-lg border border-primary-container/30 text-sm">Lịch sử đơn hàng</a></li>
+
+        <ul class="space-y-2 font-label-bold text-sm">
+          <li>
+            <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-[20px]">manage_accounts</span> Thông tin tài khoản
+            </a>
+          </li>
+          <li>
+            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary">
+              <span class="material-symbols-outlined text-[20px]">receipt_long</span> Lịch sử đơn hàng
+            </a>
+          </li>
+          <li>
+            <a href="${pageContext.request.contextPath}/guest-tracking" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined text-[20px]">local_shipping</span> Tra cứu đơn hàng
+            </a>
+          </li>
+          <li>
+            <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-3 p-3 rounded-xl text-error hover:bg-error-container transition-colors mt-2 border-t border-surface-variant pt-4">
+              <span class="material-symbols-outlined text-[20px]">logout</span> Đăng xuất
+            </a>
+          </li>
         </ul>
+      </div>
     </aside>
 
     <!-- Danh sách đơn hàng -->
     <div class="w-full lg:w-3/4">
-        <h1 class="text-2xl font-headline-md font-bold mb-6 text-on-surface border-b border-surface-variant pb-4">Đơn hàng của bạn</h1>
+        <h1 class="text-2xl font-headline-md font-bold mb-6 text-on-surface border-b border-surface-variant pb-4 flex items-center justify-between">
+            <span>Lịch sử đơn hàng</span>
+            <span class="text-xs font-normal text-on-surface-variant">Tổng cộng ${orders.size()} đơn hàng</span>
+        </h1>
 
         <!-- Flash messages -->
         <c:if test="${not empty sessionScope.ORDER_MESSAGE_SUCCESS}">
@@ -141,10 +168,10 @@
                                     </div>
 
                                     <div class="flex flex-col items-center relative z-10">
-                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : 'bg-surface-container text-on-surface-variant'}">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep == 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : (uStep > 4 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant')}">
                                             <span class="material-symbols-outlined text-sm">local_shipping</span>
                                         </div>
-                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 4 ? 'text-sky-700 font-bold' : 'text-on-surface-variant'}">Đang giao</span>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep == 4 ? 'text-sky-700 font-bold' : (uStep > 4 ? 'text-primary font-bold' : 'text-on-surface-variant')}">Đang giao</span>
                                     </div>
 
                                     <div class="flex flex-col items-center relative z-10">
@@ -159,6 +186,18 @@
                                     <div class="mt-3 p-2.5 rounded-lg bg-sky-50 text-sky-800 text-xs flex items-center gap-2 border border-sky-200">
                                         <span class="material-symbols-outlined text-sky-600 text-base flex-shrink-0 animate-pulse">local_shipping</span>
                                         <span><strong>Đơn hàng đang đến!</strong> Shipper đang trên đường vận chuyển hoa quả tươi đến địa chỉ của bạn.</span>
+                                    </div>
+                                </c:if>
+                                <c:if test="${order.status == 'DELIVERED'}">
+                                    <div class="mt-3 p-2.5 rounded-lg bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2 border border-emerald-200">
+                                        <span class="material-symbols-outlined text-emerald-600 text-base flex-shrink-0">task_alt</span>
+                                        <span><strong>Đơn hàng đã được giao!</strong> Vui lòng kiểm tra kiện hàng và bấm nút <em>"Đã nhận được hàng"</em> bên dưới để hoàn tất đơn hàng.</span>
+                                    </div>
+                                </c:if>
+                                <c:if test="${order.status == 'COMPLETED'}">
+                                    <div class="mt-3 p-2.5 rounded-lg bg-green-50 text-green-800 text-xs flex items-center gap-2 border border-green-200">
+                                        <span class="material-symbols-outlined text-green-600 text-base flex-shrink-0">check_circle</span>
+                                        <span><strong>Giao dịch hoàn tất!</strong> Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm hoa quả tươi của Fruitables.</span>
                                     </div>
                                 </c:if>
                             </div>

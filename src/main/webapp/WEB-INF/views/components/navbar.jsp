@@ -3,9 +3,23 @@
 
 <nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
     <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <!-- Logo -->
-        <a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg font-extrabold text-primary" href="${pageContext.request.contextPath}/home">
-            Fruitables
+        <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
+        <a class="group flex items-center gap-3 transition-all duration-300 select-none" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
+            <div class="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-[0_4px_16px_rgba(101,163,13,0.35)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 relative overflow-hidden flex-shrink-0 border border-white/30">
+                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent"></div>
+                <svg class="w-6 h-6 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C12 2 12.5 5 10 7C7.5 9 6 12 6 15C6 18.3137 8.68629 21 12 21C15.3137 21 18 18.3137 18 15C18 12 16.5 9 14 7C11.5 5 12 2 12 2Z" fill="currentColor" fill-opacity="0.95"/>
+                    <path d="M12 2C12 2 13.2 4.2 15.5 4.2C17.5 4.2 18.5 2.8 18.5 2.8C18.5 2.8 18 5.2 16 5.8C14 6.4 12.5 5.2 12 2Z" fill="#fef08a"/>
+                    <circle cx="9.5" cy="13.5" r="1.5" fill="white" fill-opacity="0.75"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex items-center text-2xl md:text-[27px] font-black tracking-tight leading-none">
+                    <span class="text-slate-900 font-display-lg">Fruit</span><span class="bg-gradient-to-r from-primary via-[#84cc16] to-[#65a30d] bg-clip-text text-transparent font-display-lg">ables</span>
+                    <span class="w-2 h-2 rounded-full bg-primary ml-1 animate-pulse"></span>
+                </div>
+                <span class="text-[9px] font-bold text-on-surface-variant/75 tracking-[0.22em] uppercase mt-0.5 pl-0.5">Organic & Fresh</span>
+            </div>
         </a>
 
         <!-- Menu điều hướng đồng bộ icon -->
@@ -106,6 +120,50 @@
                             });
                         });
 
+                        function escapeHtml(str) {
+                            if (!str) return '';
+                            return String(str)
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;')
+                                .replace(/"/g, '&quot;')
+                                .replace(/'/g, '&#039;');
+                        }
+
+                        function formatNotifTime(dateStr) {
+                            if (!dateStr) return '';
+                            try {
+                                const d = new Date(dateStr);
+                                if (isNaN(d.getTime())) return dateStr;
+                                const now = new Date();
+                                const diffMs = now - d;
+                                const diffMins = Math.floor(diffMs / 60000);
+                                if (diffMins < 1) return 'Vừa xong';
+                                if (diffMins < 60) return diffMins + ' phút trước';
+                                const diffHours = Math.floor(diffMins / 60);
+                                if (diffHours < 24) return diffHours + ' giờ trước';
+                                const diffDays = Math.floor(diffHours / 24);
+                                if (diffDays < 7) return diffDays + ' ngày trước';
+                                return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                            } catch (e) {
+                                return dateStr;
+                            }
+                        }
+
+                        window.handleNotificationClick = function(id) {
+                            if (id) {
+                                fetch('${pageContext.request.contextPath}/api/notifications', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: 'action=mark_read&id=' + id
+                                }).finally(() => {
+                                    window.location.href = '${pageContext.request.contextPath}/order-history';
+                                });
+                            } else {
+                                window.location.href = '${pageContext.request.contextPath}/order-history';
+                            }
+                        };
+
                         function fetchNotifications() {
                             fetch('${pageContext.request.contextPath}/api/notifications')
                                 .then(res => res.json())
@@ -146,19 +204,24 @@
                                         }
 
                                         const readBg = n.isRead ? 'bg-surface-container-lowest opacity-75' : 'bg-primary/5 font-semibold';
+                                        const unreadDot = !n.isRead ? '<span class="w-2 h-2 rounded-full bg-primary flex-shrink-0"></span>' : '';
+                                        const timeStr = formatNotifTime(n.createdAt);
+                                        const safeTitle = escapeHtml(n.title || 'Thông báo đơn hàng');
+                                        const safeMsg = escapeHtml(n.message || '');
+                                        const notifId = n.id || 0;
 
                                         return `
-                                            <div class="p-3.5 hover:bg-surface-container transition-colors flex items-start gap-3 ${readBg} cursor-pointer" onclick="window.location.href='${pageContext.request.contextPath}/order-history'">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}">
-                                                    <span class="material-symbols-outlined text-base">${icon}</span>
+                                            <div class="p-3.5 hover:bg-surface-container transition-colors flex items-start gap-3 \${readBg} cursor-pointer" onclick="handleNotificationClick(\${notifId})">
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 \${iconColor}">
+                                                    <span class="material-symbols-outlined text-base">\${icon}</span>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <div class="flex items-center justify-between gap-1">
-                                                        <h5 class="text-xs font-bold text-on-surface truncate">${n.title}</h5>
-                                                        ${!n.isRead ? '<span class="w-2 h-2 rounded-full bg-primary flex-shrink-0"></span>' : ''}
+                                                        <h5 class="text-xs font-bold text-on-surface truncate">\${safeTitle}</h5>
+                                                        \${unreadDot}
                                                     </div>
-                                                    <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2 leading-tight">${n.message}</p>
-                                                    <span class="text-[9px] text-on-surface-variant/70 mt-1 inline-block">${n.createdAt || ''}</span>
+                                                    <p class="text-[11px] text-on-surface-variant mt-0.5 line-clamp-2 leading-tight font-normal">\${safeMsg}</p>
+                                                    <span class="text-[9px] text-on-surface-variant/70 mt-1 inline-block">\${timeStr}</span>
                                                 </div>
                                             </div>
                                         `;

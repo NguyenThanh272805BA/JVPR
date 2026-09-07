@@ -15,8 +15,16 @@
 <div class="flex-1 flex flex-col h-full overflow-y-auto">
     <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10 sticky top-0">
         <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-green-600 text-3xl">redeem</span>
-            <h1 class="text-2xl font-extrabold text-green-700 tracking-tight">Fruitables Workspace</h1>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center shadow-[0_4px_12px_rgba(101,163,13,0.3)] border border-white/20">
+                <span class="material-symbols-outlined text-white text-xl drop-shadow-sm">redeem</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5 leading-none">
+                    <span class="text-xl font-black text-slate-900 tracking-tight">Fruit<span class="bg-gradient-to-r from-primary via-[#84cc16] to-[#65a30d] bg-clip-text text-transparent">ables</span></span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">Workspace</span>
+                </div>
+                <p class="text-[10px] font-bold text-primary tracking-widest uppercase mt-0.5">Voucher Manager</p>
+            </div>
         </div>
         <a href="${pageContext.request.contextPath}/admin/coupons" class="flex items-center gap-2 bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-4 py-2 rounded-lg font-semibold transition-colors border border-gray-200">
             <span class="material-symbols-outlined text-sm">arrow_back_ios_new</span>

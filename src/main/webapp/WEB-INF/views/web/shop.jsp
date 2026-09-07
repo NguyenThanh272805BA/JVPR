@@ -17,13 +17,84 @@
 <!-- NAVBAR CHUNG -->
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<!-- SHOP HERO BANNER -->
-<section class="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-hidden">
-    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=2070&auto=format&fit=crop');"></div>
-    <div class="absolute inset-0 bg-black/50"></div>
-    <div class="relative z-10 text-center px-4">
-        <h1 class="text-white font-display-lg text-4xl md:text-5xl font-extrabold mb-4 tracking-wide drop-shadow-lg">Cửa Hàng Trực Tuyến</h1>
-        <p class="text-white/90 font-body-lg text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">Khám phá các sản phẩm tươi sạch, an toàn và 100% hữu cơ được thu hoạch mỗi ngày từ nông trại.</p>
+<!-- SHOP HERO BANNER: 3D ORGANIC MARKET HALL -->
+<section class="tilt-3d-stage relative w-full min-h-[380px] md:min-h-[440px] flex items-center overflow-hidden bg-slate-950 py-10 md:py-14 perspective-1200">
+    <!-- Nền không gian sâu với Mesh Gradient & Ambient Aura -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#071609] to-slate-950 z-0"></div>
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[110px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-amber-500/15 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-0"></div>
+
+    <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Cột trái: Tiêu đề & Giới thiệu -->
+        <div class="lg:col-span-7 text-left space-y-4">
+            <div class="inline-flex items-center gap-2 py-1 px-3.5 rounded-full bg-primary/20 text-primary border border-primary/30 font-label-bold text-xs uppercase tracking-wider backdrop-blur-sm">
+                <span class="material-symbols-outlined text-[15px] animate-pulse">storefront</span>
+                <span>Chợ Nông Sản Trực Tuyến 24/7</span>
+            </div>
+
+            <h1 class="text-white font-display-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-lg leading-tight">
+                Thiên Đường Trái Cây &<br>
+                <span class="bg-gradient-to-r from-primary via-[#a3e635] to-emerald-400 bg-clip-text text-transparent">Nông Sản Sạch VietGAP</span>
+            </h1>
+
+            <p class="text-slate-300 font-body-lg text-sm md:text-base max-w-xl leading-relaxed">
+                Tất cả hoa quả được thu hoạch mới mỗi sáng, bảo quản bằng công nghệ ướp lạnh tiêu chuẩn quốc tế để giữ trọn vẹn vitamin và độ ngọt tự nhiên.
+            </p>
+
+            <!-- Quick category navigation tags -->
+            <div class="flex flex-wrap gap-2 pt-2">
+                <a href="${pageContext.request.contextPath}/shop?category=1" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">flight_takeoff</span>
+                    Trái cây nhập khẩu
+                </a>
+                <a href="${pageContext.request.contextPath}/shop?category=2" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">landscape</span>
+                    Trái cây nội địa
+                </a>
+                <a href="${pageContext.request.contextPath}/shop?category=3" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">spa</span>
+                    Rau củ hữu cơ
+                </a>
+            </div>
+        </div>
+
+        <!-- Cột phải: 3D Interactive Market Showcase Badge -->
+        <div class="lg:col-span-5 flex justify-center relative">
+            <div data-3d-tilt data-tilt-max="14" data-tilt-scale="1.03"
+                 class="preserve-3d relative w-full max-w-[380px] h-[280px] md:h-[300px] rounded-3xl glass-card-3d-dark p-5 flex flex-col justify-between cursor-pointer border border-white/20 shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
+                
+                <div class="shimmer-layer"></div>
+
+                <div class="translate-z-30 flex items-center justify-between z-20">
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Tươi mới 100%
+                    </span>
+                    <span class="text-xs text-slate-300 font-semibold flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        <span class="material-symbols-outlined text-primary text-sm">energy_savings_leaf</span> VietGAP Certified
+                    </span>
+                </div>
+
+                <div class="translate-z-50 relative flex items-center justify-center my-auto z-10">
+                    <div class="absolute w-44 h-44 bg-primary/25 rounded-full blur-2xl pointer-events-none animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=600&auto=format&fit=crop" 
+                         alt="Fresh Fruit Market 3D" 
+                         class="w-64 h-36 object-cover rounded-2xl shadow-xl border border-white/20 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                </div>
+
+                <div class="translate-z-40 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 z-20 flex items-center justify-between">
+                    <span class="text-xs text-slate-200 font-medium flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base text-primary">local_shipping</span> Giao hỏa tốc 2H
+                    </span>
+                    <span class="text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">Đồng kiểm khi nhận</span>
+                </div>
+
+                <!-- Floating badges -->
+                <div class="translate-z-60 absolute -top-3 -right-3 bg-gradient-to-r from-primary to-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-white/30 animate-float-3d">
+                    🍎 Tươi ngon mỗi ngày
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -551,5 +622,6 @@
         </button>
     </div>
 </div>
+<script src="${pageContext.request.contextPath}/assets/web/js/banner-3d.js"></script>
 </body>
 </html>

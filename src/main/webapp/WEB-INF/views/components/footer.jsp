@@ -1,8 +1,25 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <footer class="bg-surface-container py-12 border-t border-outline-variant mt-auto">
     <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-            <a class="font-display-lg text-headline-md font-extrabold text-primary block mb-4" href="${pageContext.request.contextPath}/home">Fruitables</a>
+            <a class="group inline-flex items-center gap-3 mb-4 transition-transform duration-300" href="${pageContext.request.contextPath}/home" title="Fruitables">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-[0_4px_16px_rgba(101,163,13,0.35)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 relative overflow-hidden flex-shrink-0 border border-white/30">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent"></div>
+                    <svg class="w-6 h-6 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C12 2 12.5 5 10 7C7.5 9 6 12 6 15C6 18.3137 8.68629 21 12 21C15.3137 21 18 18.3137 18 15C18 12 16.5 9 14 7C11.5 5 12 2 12 2Z" fill="currentColor" fill-opacity="0.95"/>
+                        <path d="M12 2C12 2 13.2 4.2 15.5 4.2C17.5 4.2 18.5 2.8 18.5 2.8C18.5 2.8 18 5.2 16 5.8C14 6.4 12.5 5.2 12 2Z" fill="#fef08a"/>
+                        <circle cx="9.5" cy="13.5" r="1.5" fill="white" fill-opacity="0.75"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center text-2xl font-black tracking-tight leading-none">
+                        <span class="text-slate-900 font-display-lg">Fruit</span><span class="bg-gradient-to-r from-primary via-[#84cc16] to-[#65a30d] bg-clip-text text-transparent font-display-lg">ables</span>
+                        <span class="w-2 h-2 rounded-full bg-primary ml-1 animate-pulse"></span>
+                    </div>
+                    <span class="text-[9px] font-bold text-on-surface-variant/75 tracking-[0.22em] uppercase mt-0.5 pl-0.5">Organic & Fresh</span>
+                </div>
+            </a>
             <p class="text-on-surface-variant font-body-md text-sm">Hệ thống phân phối nông sản, hoa quả sạch chuẩn VietGAP số 1 Việt Nam. Đảm bảo tươi sạch mỗi ngày.</p>
         </div>
         <div>
@@ -27,7 +44,7 @@
             <p class="text-on-surface-variant font-body-md text-sm mb-4">Nhận ngay thông báo ưu đãi và voucher mua hàng hấp dẫn.</p>
             <div class="flex">
                 <input type="email" placeholder="Email của bạn..." class="w-full px-4 py-2 rounded-l-lg border border-outline-variant outline-none focus:border-primary text-sm bg-surface-container-lowest">
-                <button class="bg-primary hover:bg-primary-container text-white px-4 rounded-r-lg transition-colors font-label-bold text-sm">Gửi</button>
+                <button type="button" class="bg-primary hover:bg-primary-container text-white px-4 rounded-r-lg transition-colors font-label-bold text-sm">Gửi</button>
             </div>
         </div>
     </div>
@@ -39,7 +56,7 @@
 <!-- ============================================== -->
 <!-- LIVE CHAT WIDGET (CSKH TRỰC TUYẾN)            -->
 <!-- ============================================== -->
-<div id="fruitables-live-chat-root" class="fixed bottom-6 right-6 z-[999] flex flex-col items-end">
+<div id="fruitables-live-chat-root" class="fixed bottom-6 right-6 z-[999] flex flex-col items-end select-none">
     <!-- Cửa sổ Chat Box -->
     <div id="chat-window" class="hidden mb-4 w-[360px] sm:w-[380px] h-[500px] max-h-[80vh] bg-surface-container-lowest rounded-3xl shadow-2xl border border-outline-variant flex flex-col overflow-hidden transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
         
@@ -59,13 +76,13 @@
                     </p>
                 </div>
             </div>
-            <button id="close-chat-btn" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
-                <span class="material-symbols-outlined text-xl">close</span>
+            <button type="button" id="close-chat-btn" class="text-white/80 hover:text-white p-1.5 rounded-full hover:bg-white/15 transition-colors cursor-pointer" title="Thu nhỏ chat">
+                <span class="material-symbols-outlined text-xl pointer-events-none">close</span>
             </button>
         </div>
 
         <!-- Chat Body -->
-        <div class="flex-1 flex flex-col p-4 bg-surface-container-low/40 overflow-hidden">
+        <div class="flex-1 flex flex-col p-4 bg-surface-container-low/40 overflow-hidden select-text">
             <c:choose>
                 <c:when test="${empty sessionScope.USERMODEL}">
                     <!-- Chưa đăng nhập -> Yêu cầu đăng nhập -->
@@ -100,8 +117,8 @@
                     <form id="chat-send-form" class="mt-3 flex items-center gap-2 pt-2 border-t border-surface-variant flex-shrink-0">
                         <input type="text" id="chat-input" placeholder="Nhập tin nhắn tư vấn..." autocomplete="off"
                                class="flex-1 px-4 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
-                        <button type="submit" id="chat-submit-btn" class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50">
-                            <span class="material-symbols-outlined text-lg">send</span>
+                        <button type="submit" id="chat-submit-btn" class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer">
+                            <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
                         </button>
                     </form>
                 </c:otherwise>
@@ -110,18 +127,19 @@
     </div>
 
     <!-- Nút Nổi Kích Hoạt Live Chat -->
-    <button id="chat-toggle-btn" class="group flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-primary to-emerald-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 border-2 border-white">
-        <div class="relative flex items-center justify-center">
+    <button type="button" id="chat-toggle-btn" class="group flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-primary to-emerald-600 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 active:scale-95 border-2 border-white cursor-pointer">
+        <div class="relative flex items-center justify-center pointer-events-none">
             <span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform">chat_bubble</span>
             <span id="chat-unread-badge" class="hidden absolute -top-1.5 -right-2 bg-error text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">0</span>
         </div>
-        <span class="font-label-bold text-xs pr-1">Hỗ trợ trực tuyến</span>
+        <span class="font-label-bold text-xs pr-1 pointer-events-none">Hỗ trợ trực tuyến</span>
     </button>
 </div>
 
-<c:if test="${not empty sessionScope.USERMODEL}">
+<!-- SINGLE UNIFIED LIVE CHAT CONTROLLER -->
 <script>
     (function() {
+        const rootContainer = document.getElementById('fruitables-live-chat-root');
         const toggleBtn = document.getElementById('chat-toggle-btn');
         const closeBtn = document.getElementById('close-chat-btn');
         const chatWindow = document.getElementById('chat-window');
@@ -130,48 +148,92 @@
         const messagesBox = document.getElementById('chat-messages');
         const unreadBadge = document.getElementById('chat-unread-badge');
 
-        let chatOpen = false;
+        if (!toggleBtn || !chatWindow) return;
+
+        const isLoggedIn = ${not empty sessionScope.USERMODEL ? 'true' : 'false'};
+        let isOpen = false;
         let pollInterval = null;
         let lastMessageCount = 0;
 
         function openChat() {
-            chatOpen = true;
+            if (isOpen) return;
+            isOpen = true;
+
             chatWindow.classList.remove('hidden');
-            setTimeout(() => {
-                chatWindow.classList.remove('scale-95', 'opacity-0');
-                chatWindow.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            unreadBadge.classList.add('hidden');
-            unreadBadge.innerText = '0';
-            fetchMessages();
-            if (chatInput) chatInput.focus();
-            if (!pollInterval) {
-                pollInterval = setInterval(fetchMessages, 2500);
+            // Force browser reflow to ensure animation triggers properly
+            void chatWindow.offsetWidth;
+
+            chatWindow.classList.remove('scale-95', 'opacity-0');
+            chatWindow.classList.add('scale-100', 'opacity-100');
+
+            if (unreadBadge) {
+                unreadBadge.classList.add('hidden');
+                unreadBadge.innerText = '0';
+            }
+
+            if (isLoggedIn) {
+                fetchMessages();
+                if (chatInput) {
+                    setTimeout(() => chatInput.focus(), 150);
+                }
+                if (!pollInterval) {
+                    pollInterval = setInterval(fetchMessages, 2500);
+                }
             }
         }
 
         function closeChat() {
-            chatOpen = false;
+            if (!isOpen) return;
+            isOpen = false;
+
             chatWindow.classList.remove('scale-100', 'opacity-100');
             chatWindow.classList.add('scale-95', 'opacity-0');
+
             setTimeout(() => {
-                chatWindow.classList.add('hidden');
+                if (!isOpen) {
+                    chatWindow.classList.add('hidden');
+                }
             }, 300);
+
             if (pollInterval) {
                 clearInterval(pollInterval);
                 pollInterval = null;
             }
         }
 
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                if (chatOpen) closeChat(); else openChat();
+        function toggleChat(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (isOpen) {
+                closeChat();
+            } else {
+                openChat();
+            }
+        }
+
+        toggleBtn.addEventListener('click', toggleChat);
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeChat();
             });
         }
 
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closeChat);
-        }
+        // Ngăn chặn sự kiện click bên trong cửa sổ chat lan truyền ra ngoài
+        chatWindow.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Đóng chat khi click ra ngoài vùng chat
+        document.addEventListener('click', function(e) {
+            if (isOpen && rootContainer && !rootContainer.contains(e.target)) {
+                closeChat();
+            }
+        });
 
         function formatTime(ts) {
             if (!ts) return '';
@@ -183,7 +245,14 @@
             }
         }
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
         function fetchMessages() {
+            if (!isLoggedIn) return;
+
             fetch('${pageContext.request.contextPath}/api/chat')
                 .then(res => res.json())
                 .then(data => {
@@ -195,7 +264,7 @@
                         lastMessageCount = msgs.length;
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => console.error('Chat error:', err));
         }
 
         function renderMessages(msgs) {
@@ -207,7 +276,7 @@
                         <span class="material-symbols-outlined text-sm">eco</span>
                     </div>
                     <div class="bg-surface-container-lowest border border-outline-variant p-3 rounded-2xl rounded-tl-sm max-w-[80%] shadow-sm text-on-surface leading-relaxed">
-                        Chào <strong class="text-primary"><c:out value="${sessionScope.USERMODEL.fullName}"/></strong>! Fruitables có thể giải đáp thông tin đơn hàng hoặc hỗ trợ tư vấn trái cây cho bạn như thế nào ạ? 🍎🍇
+                        Chào <strong class="text-primary">${not empty sessionScope.USERMODEL ? sessionScope.USERMODEL.fullName : 'bạn'}</strong>! Fruitables có thể giải đáp thông tin đơn hàng hoặc hỗ trợ tư vấn trái cây cho bạn như thế nào ạ? 🍎🍇
                     </div>
                 </div>
             `;
@@ -246,14 +315,10 @@
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
         if (sendForm) {
             sendForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                if (!chatInput) return;
                 const text = chatInput.value.trim();
                 if (!text) return;
 
@@ -270,35 +335,8 @@
                         fetchMessages();
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => console.error('Send message error:', err));
             });
         }
     })();
 </script>
-</c:if>
-<c:if test="${empty sessionScope.USERMODEL}">
-<script>
-    (function() {
-        const toggleBtn = document.getElementById('chat-toggle-btn');
-        const closeBtn = document.getElementById('close-chat-btn');
-        const chatWindow = document.getElementById('chat-window');
-
-        if (toggleBtn && chatWindow) {
-            toggleBtn.addEventListener('click', function() {
-                chatWindow.classList.toggle('hidden');
-                if (!chatWindow.classList.contains('hidden')) {
-                    setTimeout(() => {
-                        chatWindow.classList.remove('scale-95', 'opacity-0');
-                        chatWindow.classList.add('scale-100', 'opacity-100');
-                    }, 10);
-                }
-            });
-        }
-        if (closeBtn && chatWindow) {
-            closeBtn.addEventListener('click', function() {
-                chatWindow.classList.add('hidden');
-            });
-        }
-    })();
-</script>
-</c:if>

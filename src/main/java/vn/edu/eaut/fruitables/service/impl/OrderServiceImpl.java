@@ -102,20 +102,9 @@ public class OrderServiceImpl implements IOrderService {
 
             // Gửi email & thông báo khi đơn đang giao (SHIPPING)
             if ("SHIPPING".equalsIgnoreCase(status)) {
-                String customerEmail = order.getCustomerEmail();
-                if (customerEmail != null && !customerEmail.trim().isEmpty()) {
-                    String recipient = order.getRecipientName() != null ? order.getRecipientName() : "Quý khách";
-                    double total = order.getTotalAmount() != null ? order.getTotalAmount() : 0.0;
-                    emailService.sendShippingNotification(
-                            customerEmail,
-                            order.getOrderCode(),
-                            recipient,
-                            total,
-                            "1 - 2 giờ tới (Hoa quả tươi giữ lạnh)"
-                    );
-                }
-
                 if (order.getUserId() != null) {
+                    // TRƯỜNG HỢP 1: Khách hàng có tài khoản
+                    // Gửi thông báo trực tiếp lên giao diện Web (Notification Center)
                     notificationDAO.createNotification(
                             order.getUserId(),
                             order.getId(),
@@ -124,6 +113,44 @@ public class OrderServiceImpl implements IOrderService {
                             "Đơn hàng trái cây tươi mát của bạn đang trên đường vận chuyển hỏa tốc. Shipper sẽ liên hệ trong 1-2 giờ tới, vui lòng để ý điện thoại nhé!",
                             "ORDER_SHIPPING"
                     );
+
+                    // Lấy email từ đơn hàng hoặc fallback từ hồ sơ tài khoản đã đăng ký
+                    String targetEmail = order.getCustomerEmail();
+                    if (targetEmail == null || targetEmail.trim().isEmpty()) {
+                        vn.edu.eaut.fruitables.dao.IUserDAO userDAO = new vn.edu.eaut.fruitables.dao.impl.UserDAOImpl();
+                        vn.edu.eaut.fruitables.model.entity.UserModel account = userDAO.findById(order.getUserId());
+                        if (account != null && account.getEmail() != null) {
+                            targetEmail = account.getEmail();
+                        }
+                    }
+
+                    if (targetEmail != null && !targetEmail.trim().isEmpty()) {
+                        String recipient = order.getRecipientName() != null ? order.getRecipientName() : "Quý khách";
+                        double total = order.getTotalAmount() != null ? order.getTotalAmount() : 0.0;
+                        emailService.sendShippingNotification(
+                                targetEmail,
+                                order.getOrderCode(),
+                                recipient,
+                                total,
+                                "1 - 2 giờ tới (Hoa quả tươi giữ lạnh)"
+                        );
+                    }
+                } else {
+                    // TRƯỜNG HỢP 2: Khách vãng lai (không có tài khoản)
+                    // Khách vãng lai theo dõi đơn hàng bằng SĐT tại trang /guest-tracking.
+                    // Chỉ gửi email nếu khách vãng lai chủ động điền email lúc đặt hàng
+                    String guestEmail = order.getCustomerEmail();
+                    if (guestEmail != null && !guestEmail.trim().isEmpty()) {
+                        String recipient = order.getRecipientName() != null ? order.getRecipientName() : "Quý khách";
+                        double total = order.getTotalAmount() != null ? order.getTotalAmount() : 0.0;
+                        emailService.sendShippingNotification(
+                                guestEmail,
+                                order.getOrderCode(),
+                                recipient,
+                                total,
+                                "1 - 2 giờ tới (Hoa quả tươi giữ lạnh)"
+                        );
+                    }
                 }
             } else if ("DELIVERED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status)) {
                 if (order.getUserId() != null) {

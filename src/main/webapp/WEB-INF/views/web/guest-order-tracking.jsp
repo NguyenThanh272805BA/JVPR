@@ -14,12 +14,95 @@
 <body class="bg-surface-container bg-pattern min-h-screen flex flex-col antialiased">
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
-<main class="flex-grow py-12">
-    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
-        <div class="max-w-2xl mx-auto text-center mb-10">
-            <h1 class="font-headline-md text-3xl font-extrabold text-on-surface mb-3">Tra cứu tiến độ đơn hàng</h1>
-            <p class="text-on-surface-variant text-sm">Dành cho khách hàng chưa có tài khoản hoặc muốn theo dõi trạng thái giao hàng nhanh chóng.</p>
+<!-- HERO BANNER: 3D LOGISTICS & REALTIME TRACKING HUB -->
+<section class="tilt-3d-stage relative w-full min-h-[360px] md:min-h-[420px] flex items-center overflow-hidden bg-slate-950 py-10 md:py-14 perspective-1200">
+    <!-- Nền không gian sâu công nghệ giao vận -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0a1518] to-slate-950 z-0"></div>
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-sky-500/15 rounded-full blur-[110px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-0"></div>
+
+    <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Cột trái: Tiêu đề & Cam kết -->
+        <div class="lg:col-span-7 text-left space-y-4">
+            <div class="inline-flex items-center gap-2 py-1 px-3.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30 font-label-bold text-xs uppercase tracking-wider backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                <span>Hệ Thống Theo Dõi Đơn Hàng Real-time</span>
+            </div>
+
+            <h1 class="text-white font-display-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-lg leading-tight">
+                Tra Cứu Tiến Độ &<br>
+                <span class="bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">Hành Trình Giao Hàng</span>
+            </h1>
+
+            <p class="text-slate-300 font-body-lg text-sm md:text-base max-w-xl leading-relaxed">
+                Kiểm tra chính xác đơn hàng hoa quả của bạn đang ở khâu nào: từ Tiếp nhận, Đóng gói ướp lạnh đến lúc Shipper hỏa tốc mang đến tận cửa nhà bạn.
+            </p>
+
+            <div class="flex flex-wrap gap-3 pt-2 text-xs text-slate-300">
+                <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md border border-white/10">
+                    <span class="material-symbols-outlined text-sky-400 text-sm">ac_unit</span> Thùng xốp giữ lạnh 4°C
+                </div>
+                <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md border border-white/10">
+                    <span class="material-symbols-outlined text-emerald-400 text-sm">verified</span> Đồng kiểm khi nhận
+                </div>
+                <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-xl backdrop-blur-md border border-white/10">
+                    <span class="material-symbols-outlined text-amber-400 text-sm">electric_bolt</span> Giao siêu tốc 1 - 2H
+                </div>
+            </div>
         </div>
+
+        <!-- Cột phải: Thẻ 3D Live Delivery Status Card -->
+        <div class="lg:col-span-5 flex justify-center relative">
+            <div data-3d-tilt data-tilt-max="14" data-tilt-scale="1.03"
+                 class="preserve-3d relative w-full max-w-[380px] rounded-3xl glass-card-3d-dark p-6 border border-sky-400/30 shadow-[0_25px_60px_rgba(14,165,233,0.2)] cursor-pointer">
+                
+                <div class="shimmer-layer"></div>
+
+                <!-- Layer z-30: Header thẻ -->
+                <div class="translate-z-30 flex items-center justify-between border-b border-white/15 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/30">
+                            <span class="material-symbols-outlined text-base">near_me</span>
+                        </span>
+                        <div>
+                            <div class="text-xs font-bold text-white">Fruitables Express Hub</div>
+                            <div class="text-[10px] text-slate-400">Điều phối giao vận thông minh</div>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40">
+                        GPS Active
+                    </span>
+                </div>
+
+                <!-- Layer z-50: Hình ảnh shipper / delivery 3D minh họa -->
+                <div class="translate-z-50 relative flex items-center justify-center my-3">
+                    <div class="absolute w-40 h-40 bg-sky-500/20 rounded-full blur-2xl pointer-events-none animate-pulse"></div>
+                    <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=600&auto=format&fit=crop" 
+                         alt="Logistics Delivery 3D" 
+                         class="w-64 h-36 object-cover rounded-2xl shadow-xl border border-white/20 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                </div>
+
+                <!-- Layer z-40: Trạng thái tóm tắt -->
+                <div class="translate-z-40 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-xs text-slate-200 font-medium">Bảo đảm nguyên kiện tươi 100%</span>
+                    </div>
+                    <span class="text-[11px] font-bold text-sky-400">Đúng giờ</span>
+                </div>
+
+                <!-- Floating badges -->
+                <div class="translate-z-60 absolute -top-3 -right-3 bg-gradient-to-r from-sky-500 to-teal-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-white/30 animate-float-3d">
+                    ⚡ Cập nhật theo thời gian thực
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<main class="flex-grow pb-12">
+    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
 
         <!-- Flash messages -->
         <c:if test="${not empty sessionScope.ORDER_MESSAGE_SUCCESS}">
@@ -153,11 +236,11 @@
 
                                                     <!-- Bước 4: Đang giao hỏa tốc -->
                                                     <div class="flex flex-col items-center relative z-10">
-                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : 'bg-surface-container text-on-surface-variant'}">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum == 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : (stepNum > 4 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant')}">
                                                             <span class="material-symbols-outlined text-base">local_shipping</span>
                                                         </div>
-                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 4 ? 'text-sky-700 font-bold' : 'text-on-surface-variant'}">Đang giao</span>
-                                                        <span class="text-[9px] text-sky-600 font-medium hidden sm:block">1 - 2 giờ tới</span>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum == 4 ? 'text-sky-700 font-bold' : (stepNum > 4 ? 'text-primary font-bold' : 'text-on-surface-variant')}">Đang giao</span>
+                                                        <span class="text-[9px] ${stepNum == 4 ? 'text-sky-600 font-medium' : 'text-on-surface-variant/70'} hidden sm:block">1 - 2 giờ tới</span>
                                                     </div>
 
                                                     <!-- Bước 5: Giao thành công -->
@@ -166,7 +249,7 @@
                                                             <span class="material-symbols-outlined text-base">verified</span>
                                                         </div>
                                                         <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 5 ? 'text-emerald-700 font-bold' : 'text-on-surface-variant'}">Giao tận nơi</span>
-                                                        <span class="text-[9px] text-on-surface-variant/70 hidden sm:block">Hoàn tất</span>
+                                                        <span class="text-[9px] ${stepNum >= 5 ? 'text-emerald-700 font-bold' : 'text-on-surface-variant/70'} hidden sm:block">Hoàn tất</span>
                                                     </div>
                                                 </div>
 
@@ -177,6 +260,15 @@
                                                         <div>
                                                             <strong class="font-bold">Đơn hàng hoa quả đang được Shipper hỏa tốc mang đến bạn!</strong>
                                                             <p class="text-[11px] text-sky-700 mt-0.5">Trái cây được bảo quản bằng thùng xốp giữ nhiệt. Shipper sẽ gọi điện trước khi đến, vui lòng giữ liên lạc.</p>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
+                                                <c:if test="${order.status == 'DELIVERED' || order.status == 'COMPLETED'}">
+                                                    <div class="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2.5">
+                                                        <span class="material-symbols-outlined text-emerald-600 text-xl flex-shrink-0">check_circle</span>
+                                                        <div>
+                                                            <strong class="font-bold">Đơn hàng đã được giao thành công!</strong>
+                                                            <p class="text-[11px] text-emerald-700 mt-0.5">Cảm ơn bạn đã lựa chọn hoa quả sạch và tươi ngon tại Fruitables. Chúc bạn ngon miệng!</p>
                                                         </div>
                                                     </div>
                                                 </c:if>
@@ -326,5 +418,6 @@ function closeCancelModal() {
 </script>
 
 <jsp:include page="/WEB-INF/views/components/footer.jsp" />
+<script src="${pageContext.request.contextPath}/assets/web/js/banner-3d.js"></script>
 </body>
 </html>
