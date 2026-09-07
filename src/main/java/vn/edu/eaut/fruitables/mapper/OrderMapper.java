@@ -19,6 +19,9 @@ public class OrderMapper implements IRowMapper<OrderModel> {
             order.setStatus(rs.getString("status"));
             order.setPaymentStatus(rs.getString("payment_status"));
             order.setCreatedAt(rs.getTimestamp("created_at"));
+            try { order.setRecipientName(rs.getString("recipient_name")); } catch (Exception ignored) {}
+            try { order.setCustomerEmail(rs.getString("customer_email")); } catch (Exception ignored) {}
+            try { order.setOrderNotes(rs.getString("order_notes")); } catch (Exception ignored) {}
             return order;
         } catch (SQLException e) {
             e.printStackTrace();

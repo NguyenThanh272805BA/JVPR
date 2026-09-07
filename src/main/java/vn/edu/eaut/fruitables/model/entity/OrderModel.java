@@ -15,12 +15,25 @@ public class OrderModel {
     private Timestamp createdAt;
     private String paymentStatus;
 
+    private String recipientName;
+    private String customerEmail;
+    private String orderNotes;
+
     // Thuộc tính bổ sung để lưu danh sách sản phẩm của đơn hàng
     private List<OrderDetailModel> details;
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getRecipientName() { return recipientName; }
+    public void setRecipientName(String recipientName) { this.recipientName = recipientName; }
+
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
+
+    public String getOrderNotes() { return orderNotes; }
+    public void setOrderNotes(String orderNotes) { this.orderNotes = orderNotes; }
 
     public String getOrderCode() { return orderCode; }
     public void setOrderCode(String orderCode) { this.orderCode = orderCode; }

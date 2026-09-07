@@ -9,6 +9,8 @@ import java.util.Map;
 public interface IOrderService {
     OrderModel createOrder(OrderModel orderModel, Map<Long, CartItemDTO> cart);
     List<OrderModel> findAll();
+    OrderModel findById(Long id);
+    List<OrderModel> findByUserId(Long userId);
     OrderModel findByOrderCode(String orderCode);
     List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode);
     void updateOrderStatus(Long orderId, String status);

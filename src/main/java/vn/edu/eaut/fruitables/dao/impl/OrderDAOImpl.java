@@ -16,8 +16,8 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
 
     @Override
     public Long saveOrder(OrderModel order) {
-        String sql = "INSERT INTO orders (order_code, user_id, total_amount, shipping_address, phone, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        return insert(sql, order.getOrderCode(), order.getUserId(), order.getTotalAmount(), order.getShippingAddress(), order.getPhone(), order.getPaymentMethod(), order.getStatus());
+        String sql = "INSERT INTO orders (order_code, user_id, recipient_name, total_amount, shipping_address, phone, customer_email, order_notes, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return insert(sql, order.getOrderCode(), order.getUserId(), order.getRecipientName(), order.getTotalAmount(), order.getShippingAddress(), order.getPhone(), order.getCustomerEmail(), order.getOrderNotes(), order.getPaymentMethod(), order.getStatus());
     }
 
     @Override
@@ -54,8 +54,20 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
 
     @Override
     public List<OrderModel> findByPhoneOrOrderCode(String phone, String orderCode) {
-        String sql = "SELECT * FROM orders WHERE phone = ? OR order_code = ? ORDER BY created_at DESC";
-        return query(sql, new OrderMapper(), phone, orderCode);
+        boolean hasPhone = (phone != null && !phone.trim().isEmpty());
+        boolean hasCode = (orderCode != null && !orderCode.trim().isEmpty());
+
+        if (hasPhone && hasCode) {
+            String sql = "SELECT * FROM orders WHERE phone = ? AND order_code = ? ORDER BY created_at DESC";
+            return query(sql, new OrderMapper(), phone.trim(), orderCode.trim());
+        } else if (hasPhone) {
+            String sql = "SELECT * FROM orders WHERE phone = ? ORDER BY created_at DESC";
+            return query(sql, new OrderMapper(), phone.trim());
+        } else if (hasCode) {
+            String sql = "SELECT * FROM orders WHERE order_code = ? ORDER BY created_at DESC";
+            return query(sql, new OrderMapper(), orderCode.trim());
+        }
+        return new ArrayList<>();
     }
 
     @Override

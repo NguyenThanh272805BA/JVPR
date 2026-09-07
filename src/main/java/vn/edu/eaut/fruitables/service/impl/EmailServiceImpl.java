@@ -112,4 +112,83 @@ public class EmailServiceImpl {
             return false;
         }
     }
+
+    public void sendShippingNotification(String toEmail, String orderCode, String customerName, double totalAmount, String estimateTime) {
+        vn.edu.eaut.fruitables.model.entity.OrderModel order = new vn.edu.eaut.fruitables.model.entity.OrderModel();
+        order.setOrderCode(orderCode);
+        order.setTotalAmount(totalAmount);
+        order.setPaymentMethod("COD / Trực tuyến");
+        sendShippingNotification(toEmail, customerName, order);
+    }
+
+    public void sendShippingNotification(String toEmail, String customerName, vn.edu.eaut.fruitables.model.entity.OrderModel order) {
+        if (toEmail == null || toEmail.trim().isEmpty() || fromEmail == null || password == null) {
+            return;
+        }
+
+        // Chạy trên luồng riêng biệt để không làm đơ giao diện Admin
+        new Thread(() -> {
+            try {
+                Properties props = new Properties();
+                props.put("mail.smtp.host", "smtp.gmail.com");
+                props.put("mail.smtp.port", "587");
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+
+                Session session = Session.getInstance(props, new Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(fromEmail, password);
+                    }
+                });
+
+                String name = (customerName != null && !customerName.trim().isEmpty()) ? customerName : "Quý khách";
+                String orderCode = order.getOrderCode() != null ? order.getOrderCode() : ("#" + order.getId());
+                String totalFormatted = String.format("%,.0f ₫", order.getTotalAmount() != null ? order.getTotalAmount() : 0.0);
+                String address = order.getShippingAddress() != null ? order.getShippingAddress() : "Địa chỉ đã đăng ký";
+
+                MimeMessage message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(fromEmail, "Fruitables Hoa Quả Sạch", "UTF-8"));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail.trim()));
+                message.setSubject("🚚 [Fruitables] Đơn hàng " + orderCode + " đang trên đường giao tới bạn!", "UTF-8");
+
+                StringBuilder html = new StringBuilder();
+                html.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 25px; border: 1px solid #e0e0e0; border-radius: 16px; background-color: #ffffff;'>");
+                html.append("<div style='text-align: center; margin-bottom: 20px;'>");
+                html.append("  <h1 style='color: #81c408; margin: 0; font-size: 28px; font-weight: 800;'>Fruitables</h1>");
+                html.append("  <p style='color: #666; font-size: 13px; margin-top: 4px;'>Nông sản & Hoa quả sạch chuẩn VietGAP</p>");
+                html.append("</div>");
+
+                html.append("<div style='background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; border: 1px solid #bbf7d0; text-align: center; margin-bottom: 24px;'>");
+                html.append("  <div style='font-size: 38px; margin-bottom: 8px;'>🚚💨</div>");
+                html.append("  <h2 style='color: #15803d; margin: 0 0 8px 0; font-size: 20px;'>Đơn hàng của bạn đang được giao tới!</h2>");
+                html.append("  <p style='color: #166534; font-size: 14px; margin: 0;'>Shipper Fruitables đã nhận hoa quả tươi và đang trên đường giao đến bạn trong khoảng <b>30 - 45 phút</b> tới.</p>");
+                html.append("</div>");
+
+                html.append("<p style='font-size: 15px; color: #333;'>Xin chào <b>").append(name).append("</b>,</p>");
+                html.append("<p style='font-size: 14px; color: #555; line-height: 1.6;'>Các sản phẩm trái cây trong đơn hàng của bạn đã được nhân viên tuyển chọn kỹ càng và bọc lưới xốp chống dập bảo quản cẩn thận.</p>");
+
+                html.append("<div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 20px 0;'>");
+                html.append("  <h3 style='margin: 0 0 12px 0; color: #1e293b; font-size: 15px; border-bottom: 1px dashed #cbd5e1; pb: 8px;'>Thông tin đơn hàng:</h3>");
+                html.append("  <p style='margin: 6px 0; font-size: 13px; color: #475569;'>• Mã đơn: <b style='color: #81c408;'>").append(orderCode).append("</b></p>");
+                html.append("  <p style='margin: 6px 0; font-size: 13px; color: #475569;'>• Tổng thanh toán: <b style='color: #dc2626;'>").append(totalFormatted).append("</b> (").append(order.getPaymentMethod()).append(")</p>");
+                html.append("  <p style='margin: 6px 0; font-size: 13px; color: #475569;'>• Địa chỉ nhận: <b>").append(address).append("</b></p>");
+                html.append("  <p style='margin: 6px 0; font-size: 13px; color: #475569;'>• Số điện thoại: <b>").append(order.getPhone() != null ? order.getPhone() : "").append("</b></p>");
+                html.append("</div>");
+
+                html.append("<div style='background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px;'>");
+                html.append("  <p style='margin: 0; color: #92400e; font-size: 13px; line-height: 1.5;'><b>Lưu ý nhận hàng:</b> Quý khách vui lòng để ý điện thoại và được quyền <b>mở thùng đồng kiểm độ tươi</b> của trái cây trước khi thanh toán. Nếu có bất kỳ quả dập nát, quý khách sẽ được đổi trả miễn phí trong 24h!</p>");
+                html.append("</div>");
+
+                html.append("<p style='color: #64748b; font-size: 13px; text-align: center; margin-top: 25px;'>Cảm ơn bạn đã tin chọn thực phẩm sạch của Fruitables!</p>");
+                html.append("<hr style='border: none; border-top: 1px solid #f1f5f9; margin: 20px 0;'/>");
+                html.append("<p style='text-align: center; color: #94a3b8; font-size: 12px;'>Hotline hỗ trợ CSKH: 0375162932 | Email: ").append(fromEmail).append("</p>");
+                html.append("</div>");
+
+                message.setContent(html.toString(), "text/html; charset=utf-8");
+                Transport.send(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 }

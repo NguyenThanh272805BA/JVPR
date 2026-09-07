@@ -53,9 +53,19 @@ public class CheckoutServlet extends HttpServlet {
         Long userId = (user != null) ? user.getId() : null;
 
         // 2. Lấy thông tin từ form checkout
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
+        String notes = request.getParameter("notes");
         String paymentMethod = request.getParameter("paymentMethod"); // COD, VNPAY, MOMO
+
+        if ((fullName == null || fullName.trim().isEmpty()) && user != null) {
+            fullName = user.getFullName();
+        }
+        if ((email == null || email.trim().isEmpty()) && user != null) {
+            email = user.getEmail();
+        }
 
         // 3. Lấy giỏ hàng từ Session
         @SuppressWarnings("unchecked")
@@ -88,6 +98,9 @@ public class CheckoutServlet extends HttpServlet {
             OrderModel newOrder = new OrderModel();
             newOrder.setOrderCode(orderCode);
             newOrder.setUserId(userId);
+            newOrder.setRecipientName(fullName);
+            newOrder.setCustomerEmail(email);
+            newOrder.setOrderNotes(notes);
             newOrder.setTotalAmount(totalAmount);
             newOrder.setShippingAddress(address);
             newOrder.setPhone(phone);
@@ -98,6 +111,19 @@ public class CheckoutServlet extends HttpServlet {
             OrderModel savedOrder = orderService.createOrder(newOrder, cart);
 
             if (savedOrder != null) {
+                if (userId != null) {
+                    try {
+                        vn.edu.eaut.fruitables.dao.INotificationDAO notificationDAO = new vn.edu.eaut.fruitables.dao.impl.NotificationDAOImpl();
+                        notificationDAO.createNotification(
+                                userId,
+                                savedOrder.getId(),
+                                orderCode,
+                                "Đặt hàng thành công: " + orderCode,
+                                "Đơn hàng của bạn đã được tiếp nhận và đang chờ xác nhận từ Fruitables. Cảm ơn bạn!",
+                                "ORDER_PENDING"
+                        );
+                    } catch (Exception ignored) {}
+                }
                 // RẼ NHÁNH LOGIC THANH TOÁN SAU KHI LƯU DB THÀNH CÔNG
                 if ("COD".equals(paymentMethod)) {
 

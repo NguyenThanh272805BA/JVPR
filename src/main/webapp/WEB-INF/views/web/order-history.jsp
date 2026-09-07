@@ -71,33 +71,98 @@
 
                         <!-- Badge Trạng thái hiển thị theo cập nhật từ Admin -->
                         <div>
-                            <c:choose>
-                                <c:when test="${order.status == 'COMPLETED'}">
-                                    <span class="px-3.5 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Hoàn thành</span>
-                                </c:when>
-                                <c:when test="${order.status == 'DELIVERED'}">
-                                    <span class="px-3.5 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold border border-emerald-300 animate-pulse">
-                                        Đã giao hàng (Chờ bạn xác nhận)
-                                    </span>
-                                </c:when>
-                                <c:when test="${order.status == 'SHIPPING'}">
-                                    <span class="px-3.5 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold border border-blue-200">Đang giao hàng</span>
-                                </c:when>
-                                <c:when test="${order.status == 'RETURNED'}">
-                                    <span class="px-3.5 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold border border-purple-200">Đã hoàn hàng</span>
-                                </c:when>
-                                <c:when test="${order.status == 'FAILED'}">
-                                    <span class="px-3.5 py-1.5 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Giao thất bại</span>
-                                </c:when>
-                                <c:when test="${order.status == 'CANCELLED'}">
-                                    <span class="px-3.5 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">Đã hủy</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="px-3.5 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Đang xử lý</span>
-                                </c:otherwise>
-                            </c:choose>
+                                <c:choose>
+                                    <c:when test="${order.status == 'COMPLETED'}">
+                                        <span class="px-3.5 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Hoàn thành</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'DELIVERED'}">
+                                        <span class="px-3.5 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold border border-emerald-300">
+                                            Đã giao hàng (Chờ bạn xác nhận)
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'SHIPPING'}">
+                                        <span class="px-3.5 py-1.5 bg-sky-100 text-sky-700 rounded-full text-xs font-bold border border-sky-300 animate-pulse">Đang giao hàng hỏa tốc</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'PACKING'}">
+                                        <span class="px-3.5 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold border border-indigo-200">Đóng gói & Ướp lạnh</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'CONFIRMED'}">
+                                        <span class="px-3.5 py-1.5 bg-cyan-100 text-cyan-700 rounded-full text-xs font-bold border border-cyan-200">Đã xác nhận đơn</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'RETURNED'}">
+                                        <span class="px-3.5 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-bold border border-purple-200">Đã hoàn hàng</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'FAILED'}">
+                                        <span class="px-3.5 py-1.5 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Giao thất bại</span>
+                                    </c:when>
+                                    <c:when test="${order.status == 'CANCELLED'}">
+                                        <span class="px-3.5 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">Đã hủy</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="px-3.5 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Đang xử lý</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- Stepper tiến độ đơn hàng -->
+                        <c:if test="${order.status != 'CANCELLED' && order.status != 'RETURNED' && order.status != 'FAILED'}">
+                            <c:set var="uStep" value="1"/>
+                            <c:if test="${order.status == 'CONFIRMED'}"><c:set var="uStep" value="2"/></c:if>
+                            <c:if test="${order.status == 'PACKING'}"><c:set var="uStep" value="3"/></c:if>
+                            <c:if test="${order.status == 'SHIPPING'}"><c:set var="uStep" value="4"/></c:if>
+                            <c:if test="${order.status == 'DELIVERED' || order.status == 'COMPLETED'}"><c:set var="uStep" value="5"/></c:if>
+
+                            <div class="py-3 px-2 bg-surface-container-low/40 rounded-xl border border-surface-variant">
+                                <div class="flex items-center justify-between relative">
+                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-variant z-0 rounded-full"></div>
+                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary z-0 rounded-full transition-all duration-500"
+                                         style="width: ${(uStep - 1) * 25}%;"></div>
+
+                                    <div class="flex flex-col items-center relative z-10">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 1 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                            <span class="material-symbols-outlined text-sm">receipt</span>
+                                        </div>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 1 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Đặt hàng</span>
+                                    </div>
+
+                                    <div class="flex flex-col items-center relative z-10">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 2 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                            <span class="material-symbols-outlined text-sm">task_alt</span>
+                                        </div>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 2 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Xác nhận</span>
+                                    </div>
+
+                                    <div class="flex flex-col items-center relative z-10">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 3 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                            <span class="material-symbols-outlined text-sm">inventory_2</span>
+                                        </div>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 3 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Đóng gói</span>
+                                    </div>
+
+                                    <div class="flex flex-col items-center relative z-10">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : 'bg-surface-container text-on-surface-variant'}">
+                                            <span class="material-symbols-outlined text-sm">local_shipping</span>
+                                        </div>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 4 ? 'text-sky-700 font-bold' : 'text-on-surface-variant'}">Đang giao</span>
+                                    </div>
+
+                                    <div class="flex flex-col items-center relative z-10">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-sm ${uStep >= 5 ? 'bg-emerald-600 text-white ring-4 ring-emerald-200' : 'bg-surface-container text-on-surface-variant'}">
+                                            <span class="material-symbols-outlined text-sm">verified</span>
+                                        </div>
+                                        <span class="text-[10px] font-label-bold mt-1.5 ${uStep >= 5 ? 'text-emerald-700 font-bold' : 'text-on-surface-variant'}">Giao xong</span>
+                                    </div>
+                                </div>
+
+                                <c:if test="${order.status == 'SHIPPING'}">
+                                    <div class="mt-3 p-2.5 rounded-lg bg-sky-50 text-sky-800 text-xs flex items-center gap-2 border border-sky-200">
+                                        <span class="material-symbols-outlined text-sky-600 text-base flex-shrink-0 animate-pulse">local_shipping</span>
+                                        <span><strong>Đơn hàng đang đến!</strong> Shipper đang trên đường vận chuyển hoa quả tươi đến địa chỉ của bạn.</span>
+                                    </div>
+                                </c:if>
+                            </div>
+                        </c:if>
 
                     <!-- Danh sách món hàng -->
                     <div class="space-y-4 border-b border-surface-variant pb-4">

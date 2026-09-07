@@ -103,6 +103,12 @@
                             </p>
                         </c:if>
                     </div>
+
+                    <div class="mt-4">
+                        <label class="block font-label-bold text-sm text-on-surface mb-1.5">Ghi chú đơn hàng (Tùy chọn)</label>
+                        <textarea name="notes" rows="2" placeholder="Ví dụ: Giao giờ hành chính, chọn quả ngọt mọng nước, đóng gói hộp quà..."
+                                  class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm"></textarea>
+                    </div>
                 </div>
 
                 <!-- PHƯƠNG THỨC THANH TOÁN -->

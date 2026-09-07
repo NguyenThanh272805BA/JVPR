@@ -51,6 +51,10 @@
             <span class="material-symbols-outlined">redeem</span>
             <span class="font-label-bold">Mã khuyến mãi</span>
         </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/chat') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/chat">
+            <span class="material-symbols-outlined">support_agent</span>
+            <span class="font-label-bold">Live Chat CSKH</span>
+        </a>
     </nav>
 </aside>
 

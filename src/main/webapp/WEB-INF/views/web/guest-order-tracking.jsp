@@ -78,7 +78,9 @@
                                             <c:choose>
                                                 <c:when test="${order.status == 'COMPLETED'}"><span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">Hoàn tất</span></c:when>
                                                 <c:when test="${order.status == 'DELIVERED'}"><span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">Giao thành công</span></c:when>
-                                                <c:when test="${order.status == 'SHIPPING'}"><span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Đang giao hàng</span></c:when>
+                                                <c:when test="${order.status == 'SHIPPING'}"><span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold animate-pulse">Đang giao hàng</span></c:when>
+                                                <c:when test="${order.status == 'PACKING'}"><span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold">Đang đóng gói & ướp lạnh</span></c:when>
+                                                <c:when test="${order.status == 'CONFIRMED'}"><span class="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-bold">Đã xác nhận</span></c:when>
                                                 <c:when test="${order.status == 'RETURNED'}"><span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">Đơn hoàn hàng</span></c:when>
                                                 <c:when test="${order.status == 'FAILED'}"><span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold">Giao thất bại</span></c:when>
                                                 <c:when test="${order.status == 'CANCELLED'}"><span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">Đã hủy</span></c:when>
@@ -86,6 +88,101 @@
                                             </c:choose>
                                         </div>
                                     </div>
+
+                                    <!-- ORDER TRACKING STEPPER 5 BƯỚC HOA QUẢ TƯƠI -->
+                                    <c:choose>
+                                        <c:when test="${order.status == 'CANCELLED'}">
+                                            <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-2xl text-red-600">cancel</span>
+                                                <div>
+                                                    <div class="font-bold">Đơn hàng này đã được hủy</div>
+                                                    <p class="mt-0.5 text-red-600/80">Nếu bạn vẫn có nhu cầu mua trái cây, xin vui lòng đặt lại đơn mới hoặc liên hệ CSKH qua ô chat trực tuyến bên dưới.</p>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${order.status == 'RETURNED' || order.status == 'FAILED'}">
+                                            <div class="p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 text-xs flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-2xl text-purple-600">assignment_return</span>
+                                                <div>
+                                                    <div class="font-bold">Đơn hàng giao không thành công / Hoàn kho</div>
+                                                    <p class="mt-0.5 text-purple-600/80">Nhân viên CSKH Fruitables sẽ liên hệ lại với bạn qua số điện thoại để hỗ trợ giải quyết.</p>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <!-- Tính bước hiện tại: 1 = PENDING, 2 = CONFIRMED, 3 = PACKING, 4 = SHIPPING, 5 = DELIVERED/COMPLETED -->
+                                            <c:set var="stepNum" value="1"/>
+                                            <c:if test="${order.status == 'CONFIRMED'}"><c:set var="stepNum" value="2"/></c:if>
+                                            <c:if test="${order.status == 'PACKING'}"><c:set var="stepNum" value="3"/></c:if>
+                                            <c:if test="${order.status == 'SHIPPING'}"><c:set var="stepNum" value="4"/></c:if>
+                                            <c:if test="${order.status == 'DELIVERED' || order.status == 'COMPLETED'}"><c:set var="stepNum" value="5"/></c:if>
+
+                                            <div class="py-4 px-2">
+                                                <div class="flex items-center justify-between relative">
+                                                    <!-- Đường nối giữa các bước -->
+                                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-surface-variant z-0 rounded-full"></div>
+                                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary z-0 rounded-full transition-all duration-500"
+                                                         style="width: ${(stepNum - 1) * 25}%;"></div>
+
+                                                    <!-- Bước 1: Đã đặt hàng -->
+                                                    <div class="flex flex-col items-center relative z-10">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 1 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                                            <span class="material-symbols-outlined text-base">receipt</span>
+                                                        </div>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 1 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Đặt hàng</span>
+                                                        <span class="text-[9px] text-on-surface-variant/70 hidden sm:block">Đã tiếp nhận</span>
+                                                    </div>
+
+                                                    <!-- Bước 2: Đã xác nhận -->
+                                                    <div class="flex flex-col items-center relative z-10">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 2 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                                            <span class="material-symbols-outlined text-base">task_alt</span>
+                                                        </div>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 2 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Xác nhận</span>
+                                                        <span class="text-[9px] text-on-surface-variant/70 hidden sm:block">Duyệt đơn</span>
+                                                    </div>
+
+                                                    <!-- Bước 3: Đóng gói & Ướp lạnh -->
+                                                    <div class="flex flex-col items-center relative z-10">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 3 ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-surface-container text-on-surface-variant'}">
+                                                            <span class="material-symbols-outlined text-base">inventory_2</span>
+                                                        </div>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 3 ? 'text-primary font-bold' : 'text-on-surface-variant'}">Đóng gói</span>
+                                                        <span class="text-[9px] text-on-surface-variant/70 hidden sm:block">Ướp lạnh tươi</span>
+                                                    </div>
+
+                                                    <!-- Bước 4: Đang giao hỏa tốc -->
+                                                    <div class="flex flex-col items-center relative z-10">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 4 ? 'bg-sky-600 text-white ring-4 ring-sky-200 animate-bounce' : 'bg-surface-container text-on-surface-variant'}">
+                                                            <span class="material-symbols-outlined text-base">local_shipping</span>
+                                                        </div>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 4 ? 'text-sky-700 font-bold' : 'text-on-surface-variant'}">Đang giao</span>
+                                                        <span class="text-[9px] text-sky-600 font-medium hidden sm:block">1 - 2 giờ tới</span>
+                                                    </div>
+
+                                                    <!-- Bước 5: Giao thành công -->
+                                                    <div class="flex flex-col items-center relative z-10">
+                                                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-sm transition-all ${stepNum >= 5 ? 'bg-emerald-600 text-white ring-4 ring-emerald-200' : 'bg-surface-container text-on-surface-variant'}">
+                                                            <span class="material-symbols-outlined text-base">verified</span>
+                                                        </div>
+                                                        <span class="text-[11px] font-label-bold mt-2 text-center ${stepNum >= 5 ? 'text-emerald-700 font-bold' : 'text-on-surface-variant'}">Giao tận nơi</span>
+                                                        <span class="text-[9px] text-on-surface-variant/70 hidden sm:block">Hoàn tất</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Banner thông tin bảo quản hoa quả khi đang giao -->
+                                                <c:if test="${order.status == 'SHIPPING'}">
+                                                    <div class="mt-4 p-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-xs flex items-center gap-2.5">
+                                                        <span class="material-symbols-outlined text-sky-600 text-xl flex-shrink-0 animate-spin">cyclone</span>
+                                                        <div>
+                                                            <strong class="font-bold">Đơn hàng hoa quả đang được Shipper hỏa tốc mang đến bạn!</strong>
+                                                            <p class="text-[11px] text-sky-700 mt-0.5">Trái cây được bảo quản bằng thùng xốp giữ nhiệt. Shipper sẽ gọi điện trước khi đến, vui lòng giữ liên lạc.</p>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
 
                                     <!-- DANH SÁCH SẢN PHẨM ĐÃ MUA KÈM HÌNH ẢNH -->
                                     <c:if test="${not empty order.details}">
