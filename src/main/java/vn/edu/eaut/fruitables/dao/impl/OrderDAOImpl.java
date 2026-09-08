@@ -175,4 +175,36 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
             } catch (Exception e) {}
         }
     }
+
+    @Override
+    public List<OrderModel> searchAndFilterOrders(String keyword, String status, String startDate, String endDate) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM orders WHERE 1=1 ");
+        List<Object> params = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (order_code LIKE ? OR recipient_name LIKE ? OR phone LIKE ?) ");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        if (status != null && !status.trim().isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            sql.append("AND status = ? ");
+            params.add(status.trim());
+        }
+
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            sql.append("AND created_at >= ? ");
+            params.add(startDate.trim() + " 00:00:00");
+        }
+
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            sql.append("AND created_at <= ? ");
+            params.add(endDate.trim() + " 23:59:59");
+        }
+
+        sql.append("ORDER BY id DESC");
+        return query(sql.toString(), new OrderMapper(), params.toArray());
+    }
 }

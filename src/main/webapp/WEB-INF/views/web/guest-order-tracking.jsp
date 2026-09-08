@@ -15,12 +15,12 @@
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <!-- HERO BANNER: 3D LOGISTICS & REALTIME TRACKING HUB -->
-<section class="tilt-3d-stage relative w-full min-h-[360px] md:min-h-[420px] flex items-center overflow-hidden bg-slate-950 py-10 md:py-14 perspective-1200">
-    <!-- Nền không gian sâu công nghệ giao vận -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0a1518] to-slate-950 z-0"></div>
-    <div class="absolute -top-24 -left-24 w-96 h-96 bg-sky-500/15 rounded-full blur-[110px] pointer-events-none animate-ambient-aura z-0"></div>
-    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-0"></div>
+<section class="tilt-3d-stage relative w-full min-h-[360px] md:min-h-[420px] flex items-center overflow-hidden bg-gradient-to-br from-[#062410] via-[#0b3324] to-[#031910] py-10 md:py-14 perspective-1200 shadow-xl">
+    <!-- Nền không gian sâu công nghệ giao vận tươi sáng hữu cơ -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-800/35 via-[#083020]/70 to-[#02150c] z-0"></div>
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/25 rounded-full blur-[110px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-teal-400/20 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-0"></div>
 
     <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <!-- Cột trái: Tiêu đề & Cam kết -->

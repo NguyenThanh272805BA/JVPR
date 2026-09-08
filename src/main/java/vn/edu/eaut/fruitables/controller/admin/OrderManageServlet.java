@@ -23,29 +23,72 @@ public class OrderManageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<OrderModel> orders = orderService.findAll();
+        String keyword = request.getParameter("keyword");
+        String status = request.getParameter("status");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+
+        List<OrderModel> orders = orderService.searchAndFilterOrders(keyword, status, startDate, endDate);
         request.setAttribute("orders", orders);
+        request.setAttribute("keyword", keyword != null ? keyword : "");
+        request.setAttribute("selectedStatus", status != null ? status : "ALL");
+        request.setAttribute("startDate", startDate != null ? startDate : "");
+        request.setAttribute("endDate", endDate != null ? endDate : "");
+
         request.getRequestDispatcher("/WEB-INF/views/admin/order-list.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+
+        boolean isAjax = "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))
+                || "true".equalsIgnoreCase(request.getParameter("ajax"))
+                || (request.getHeader("Accept") != null && request.getHeader("Accept").contains("application/json"));
 
         // Cập nhật trạng thái đơn hàng từ Admin/Shipper
         if ("updateStatus".equals(action)) {
             try {
                 Long orderId = Long.parseLong(request.getParameter("orderId"));
-                String newStatus = request.getParameter("status"); // DELIVERED, RETURNED, FAILED
+                String newStatus = request.getParameter("status"); // CONFIRMED, PACKING, SHIPPING, DELIVERED, COMPLETED, FAILED
 
                 if (newStatus != null && !newStatus.trim().isEmpty()) {
                     orderService.updateOrderStatus(orderId, newStatus);
+                    if (isAjax) {
+                        response.setContentType("application/json; charset=UTF-8");
+                        response.getWriter().write("{\"success\":true,\"orderId\":" + orderId + ",\"status\":\"" + newStatus + "\"}");
+                        return;
+                    }
                 }
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                if (isAjax) {
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("{\"success\":false,\"message\":\"" + e.getMessage() + "\"}");
+                    return;
+                }
             }
         }
-        // Sau khi xử lý xong, tải lại trang danh sách
-        response.sendRedirect(request.getContextPath() + "/admin/orders");
+
+        // Nếu submit form thông thường, chuyển hướng bảo toàn bộ lọc và vị trí đơn hàng
+        String keyword = request.getParameter("keyword");
+        String status = request.getParameter("filterStatus");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String orderId = request.getParameter("orderId");
+
+        StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/admin/orders?");
+        if (keyword != null && !keyword.trim().isEmpty()) redirectUrl.append("keyword=").append(java.net.URLEncoder.encode(keyword, "UTF-8")).append("&");
+        if (status != null && !status.trim().isEmpty()) redirectUrl.append("status=").append(java.net.URLEncoder.encode(status, "UTF-8")).append("&");
+        if (startDate != null && !startDate.trim().isEmpty()) redirectUrl.append("startDate=").append(startDate).append("&");
+        if (endDate != null && !endDate.trim().isEmpty()) redirectUrl.append("endDate=").append(endDate).append("&");
+
+        if (orderId != null) {
+            redirectUrl.append("#order-row-").append(orderId);
+        }
+
+        response.sendRedirect(redirectUrl.toString());
     }
 }

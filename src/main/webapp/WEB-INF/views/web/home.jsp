@@ -64,31 +64,32 @@
 </c:if>
 
 <!-- HERO SECTION: 3D INTERACTIVE HARVEST SHOWCASE -->
-<section class="tilt-3d-stage relative w-full min-h-[580px] md:min-h-[640px] flex items-center overflow-hidden bg-slate-950 py-12 md:py-16 perspective-1200">
-    <!-- Nền đa tầng không gian sâu với Mesh Gradient & Ambient Aura -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0a180a] to-slate-950 z-0"></div>
-    <div class="absolute -top-32 -left-32 w-[38rem] h-[38rem] bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0"></div>
-    <div class="absolute bottom-0 right-0 w-[32rem] h-[32rem] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -4s;"></div>
+<section class="tilt-3d-stage relative w-full min-h-[580px] md:min-h-[640px] flex items-center overflow-hidden bg-gradient-to-br from-[#062410] via-[#0f3d1b] to-[#041a0b] py-12 md:py-16 perspective-1200 shadow-xl">
+    <!-- Nền đa tầng không gian sâu với Mesh Gradient & Ambient Aura tươi sáng hữu cơ -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-800/40 via-[#0a3818]/70 to-[#031c0a] z-0"></div>
+    <div class="absolute -top-32 -left-32 w-[42rem] h-[42rem] bg-primary/30 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute bottom-0 right-0 w-[36rem] h-[36rem] bg-lime-400/25 rounded-full blur-[140px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -4s;"></div>
+    <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-emerald-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
     
-    <!-- Lưới họa tiết công nghệ chấm mờ -->
-    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:32px_32px] opacity-15 pointer-events-none z-0"></div>
+    <!-- Lưới họa tiết công nghệ chấm mờ hữu cơ -->
+    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:32px_32px] opacity-20 pointer-events-none z-0"></div>
 
     <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
         <!-- CỘT TRÁI: Typography & Lời mời gọi hành động -->
         <div class="lg:col-span-7 text-left space-y-6">
-            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary/15 text-primary border border-primary/30 font-label-bold text-xs uppercase tracking-wider backdrop-blur-md shadow-sm">
+            <div class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary/25 text-lime-300 border border-primary/40 font-label-bold text-xs uppercase tracking-wider backdrop-blur-md shadow-sm">
                 <span class="material-symbols-outlined text-[16px] animate-spin" style="animation-duration: 8s;">eco</span>
                 <span>100% Tự Nhiên & Chuẩn VietGAP</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-lime-400 animate-ping"></span>
             </div>
 
             <h1 class="text-white font-display-lg text-[34px] sm:text-[44px] md:text-[56px] font-black leading-[1.12] tracking-tight drop-shadow-md">
                 Nông sản thuần khiết,<br>
-                <span class="bg-gradient-to-r from-primary via-[#a3e635] to-emerald-400 bg-clip-text text-transparent">Trọn vẹn năng lượng</span><br>
+                <span class="bg-gradient-to-r from-lime-300 via-[#a3e635] to-emerald-300 bg-clip-text text-transparent">Trọn vẹn năng lượng</span><br>
                 sống mỗi ngày
             </h1>
 
-            <p class="text-slate-300 font-body-lg text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
+            <p class="text-emerald-100/90 font-body-lg text-sm sm:text-base md:text-lg max-w-xl leading-relaxed">
                 Fruitables kết nối trực tiếp các nhà vườn hữu cơ đến bàn ăn gia đình bạn. Trái cây thượng hạng, ướp lạnh tươi mát và giao hỏa tốc chỉ trong 2 giờ.
             </p>
 
@@ -103,40 +104,40 @@
                 </a>
 
                 <a href="${pageContext.request.contextPath}/guest-tracking" class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-white/40 backdrop-blur-md px-6 py-3.5 rounded-full font-label-bold text-base transition-all duration-300 hover:-translate-y-0.5 gap-2">
-                    <span class="material-symbols-outlined text-[20px] text-primary">local_shipping</span>
+                    <span class="material-symbols-outlined text-[20px] text-lime-300">local_shipping</span>
                     Tra cứu đơn hàng
                 </a>
             </div>
 
             <!-- Chỉ số tin cậy 3D Quick Stats -->
-            <div class="pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-4 max-w-lg">
+            <div class="pt-4 border-t border-emerald-700/40 grid grid-cols-3 gap-4 max-w-lg">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-primary/25 text-lime-300 flex items-center justify-center flex-shrink-0">
                         <span class="material-symbols-outlined text-lg">bolt</span>
                     </div>
                     <div>
                         <div class="text-white font-bold text-xs">Giao 2 Giờ</div>
-                        <div class="text-[10px] text-slate-400">Nội thành hỏa tốc</div>
+                        <div class="text-[10px] text-emerald-200/75">Nội thành hỏa tốc</div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/25 text-emerald-300 flex items-center justify-center flex-shrink-0">
                         <span class="material-symbols-outlined text-lg">verified</span>
                     </div>
                     <div>
                         <div class="text-white font-bold text-xs">Chuẩn VietGAP</div>
-                        <div class="text-[10px] text-slate-400">100% hữu cơ sạch</div>
+                        <div class="text-[10px] text-emerald-200/75">100% hữu cơ sạch</div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center flex-shrink-0">
                         <span class="material-symbols-outlined text-lg">hotel_class</span>
                     </div>
                     <div>
                         <div class="text-white font-bold text-xs">4.9 / 5.0</div>
-                        <div class="text-[10px] text-slate-400">50k+ Khách tin yêu</div>
+                        <div class="text-[10px] text-emerald-200/75">50k+ Khách tin yêu</div>
                     </div>
                 </div>
             </div>

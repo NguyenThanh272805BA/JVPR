@@ -1,20 +1,81 @@
 package vn.edu.eaut.fruitables.controller.admin;
 
+import com.google.gson.Gson;
 import vn.edu.eaut.fruitables.dao.impl.UserDAOImpl;
+import vn.edu.eaut.fruitables.model.entity.UserModel;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-@WebServlet(urlPatterns = {"/admin/users"})
+@WebServlet(urlPatterns = {"/admin/users", "/admin/users/stats", "/admin/users/detail"})
 public class UserManageServlet extends HttpServlet {
     private UserDAOImpl userDAO = new UserDAOImpl();
+    private Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("users", userDAO.findAllUsers());
+        String servletPath = request.getServletPath();
+
+        // 1. API AJAX trả số liệu tăng trưởng người dùng theo thời gian cho Chart.js
+        if ("/admin/users/stats".equals(servletPath)) {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            String filter = request.getParameter("filter");
+            if (filter == null || filter.isEmpty()) filter = "day";
+            Map<String, Object> chartData = userDAO.getUserGrowthChartData(filter);
+            response.getWriter().write(gson.toJson(chartData));
+            return;
+        }
+
+        // 2. API AJAX trả tóm tắt chi tiêu / đơn hàng của người dùng
+        if ("/admin/users/detail".equals(servletPath)) {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            String userIdStr = request.getParameter("userId");
+            if (userIdStr == null || userIdStr.trim().isEmpty()) {
+                userIdStr = request.getParameter("id");
+            }
+            if (userIdStr != null && !userIdStr.trim().isEmpty()) {
+                try {
+                    Long userId = Long.parseLong(userIdStr);
+                    Map<String, Object> summary = userDAO.getUserPurchaseSummary(userId);
+                    response.getWriter().write(gson.toJson(summary));
+                    return;
+                } catch (Exception ignored) {}
+            }
+            response.getWriter().write("{}");
+            return;
+        }
+
+        // 3. Trang giao diện quản lý người dùng với Tìm kiếm & Lọc
+        String keyword = request.getParameter("keyword");
+        String roleIdStr = request.getParameter("roleId");
+        String status = request.getParameter("status");
+        String loginType = request.getParameter("loginType");
+
+        Integer roleId = null;
+        if (roleIdStr != null && !roleIdStr.trim().isEmpty() && !"ALL".equalsIgnoreCase(roleIdStr)) {
+            try {
+                roleId = Integer.parseInt(roleIdStr);
+            } catch (Exception ignored) {}
+        }
+
+        List<UserModel> users = userDAO.searchAndFilterUsers(keyword, roleId, status, loginType);
+        Map<String, Object> userStats = userDAO.getUserStats();
+
+        request.setAttribute("users", users);
+        request.setAttribute("userStats", userStats);
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("selectedRoleId", roleIdStr);
+        request.setAttribute("selectedStatus", status);
+        request.setAttribute("selectedLoginType", loginType);
+
         request.getRequestDispatcher("/WEB-INF/views/admin/user-list.jsp").forward(request, response);
     }
 

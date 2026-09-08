@@ -69,12 +69,92 @@
     </div>
   </header>
 
-  <div class="flex-1 overflow-y-auto p-6 bg-[#f8fafc]">
-    <div class="flex justify-between items-center mb-8">
+  <div id="orderScrollContainer" class="flex-1 overflow-y-auto p-6 bg-[#f8fafc]">
+    <div class="flex justify-between items-center mb-6">
       <div>
         <h1 class="font-headline-md text-2xl font-bold text-on-surface">Quản lý Đơn hàng</h1>
         <p class="text-xs text-on-surface-variant mt-1">Quy trình xử lý hoa quả tươi: Tiếp nhận &rarr; Xác nhận &rarr; Đóng gói &rarr; Giao hàng hỏa tốc (Báo email) &rarr; Hoàn tất</p>
       </div>
+      <div class="text-xs text-on-surface-variant bg-surface-container-lowest px-4 py-2 rounded-xl border border-outline-variant shadow-sm flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        <span>Tổng số đơn: <strong class="text-primary text-sm font-bold"><c:out value="${orders.size()}"/></strong></span>
+      </div>
+    </div>
+
+    <!-- THANH TÌM KIẾM VÀ BỘ LỌC ĐƠN HÀNG NÂNG CAO (THEO NGÀY THÁNG, TRẠNG THÁI, TỪ KHÓA) -->
+    <div class="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant shadow-sm mb-6">
+      <form id="orderFilterForm" action="${pageContext.request.contextPath}/admin/orders" method="GET" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+          <!-- Tìm kiếm từ khóa -->
+          <div class="lg:col-span-3">
+            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">search</span> Tìm kiếm đơn hàng</span>
+            </label>
+            <div class="relative">
+              <input type="text" name="keyword" value="<c:out value='${keyword}'/>" placeholder="Mã ĐH, tên khách, SĐT..."
+                     class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-outline-variant bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all">
+              <span class="material-symbols-outlined text-[16px] text-on-surface-variant absolute left-2.5 top-1/2 -translate-y-1/2">receipt</span>
+            </div>
+          </div>
+
+          <!-- Trạng thái đơn -->
+          <div class="lg:col-span-2">
+            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">tune</span> Trạng thái</span>
+            </label>
+            <select name="status" class="w-full px-3 py-2 text-xs rounded-xl border border-outline-variant bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all">
+              <option value="ALL" ${selectedStatus == 'ALL' || empty selectedStatus ? 'selected' : ''}>Tất cả trạng thái</option>
+              <option value="PENDING" ${selectedStatus == 'PENDING' ? 'selected' : ''}>1. Đã đặt hàng</option>
+              <option value="CONFIRMED" ${selectedStatus == 'CONFIRMED' ? 'selected' : ''}>2. Đã xác nhận</option>
+              <option value="PACKING" ${selectedStatus == 'PACKING' ? 'selected' : ''}>3. Đóng gói & Lạnh</option>
+              <option value="SHIPPING" ${selectedStatus == 'SHIPPING' ? 'selected' : ''}>4. Đang giao hàng</option>
+              <option value="DELIVERED" ${selectedStatus == 'DELIVERED' ? 'selected' : ''}>5. Đã giao</option>
+              <option value="COMPLETED" ${selectedStatus == 'COMPLETED' ? 'selected' : ''}>Hoàn tất</option>
+              <option value="FAILED" ${selectedStatus == 'FAILED' ? 'selected' : ''}>Giao thất bại</option>
+              <option value="RETURNED" ${selectedStatus == 'RETURNED' ? 'selected' : ''}>Đã hoàn hàng</option>
+              <option value="CANCELLED" ${selectedStatus == 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
+            </select>
+          </div>
+
+          <!-- Từ ngày -->
+          <div class="lg:col-span-2">
+            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> Từ ngày</span>
+            </label>
+            <input type="date" id="filterStartDate" name="startDate" value="${startDate}"
+                   class="w-full px-3 py-2 text-xs rounded-xl border border-outline-variant bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all">
+          </div>
+
+          <!-- Đến ngày -->
+          <div class="lg:col-span-2">
+            <label class="block text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">event</span> Đến ngày</span>
+            </label>
+            <input type="date" id="filterEndDate" name="endDate" value="${endDate}"
+                   class="w-full px-3 py-2 text-xs rounded-xl border border-outline-variant bg-surface-container-low focus:bg-surface focus:border-primary outline-none transition-all">
+          </div>
+
+          <!-- Nút Thao tác Lọc -->
+          <div class="lg:col-span-3 flex items-center gap-2">
+            <button type="submit" class="flex-1 py-2 px-3 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">filter_alt</span> Lọc đơn
+            </button>
+            <a href="${pageContext.request.contextPath}/admin/orders" class="py-2 px-3 bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-bold rounded-xl transition-all border border-outline-variant flex items-center justify-center gap-1" title="Đặt lại bộ lọc">
+              <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Date Presets -->
+        <div class="flex items-center gap-2 pt-2 border-t border-surface-variant text-xs flex-wrap">
+          <span class="text-on-surface-variant text-[11px] font-medium">Chọn nhanh mốc:</span>
+          <button type="button" onclick="setQuickDate('today')" class="px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant font-medium text-[11px] border border-outline-variant transition-colors">Hôm nay</button>
+          <button type="button" onclick="setQuickDate('yesterday')" class="px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant font-medium text-[11px] border border-outline-variant transition-colors">Hôm qua</button>
+          <button type="button" onclick="setQuickDate('7days')" class="px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant font-medium text-[11px] border border-outline-variant transition-colors">7 ngày qua</button>
+          <button type="button" onclick="setQuickDate('thisMonth')" class="px-2.5 py-1 rounded-lg bg-surface-container-low hover:bg-primary/10 hover:text-primary text-on-surface-variant font-medium text-[11px] border border-outline-variant transition-colors">Tháng này</button>
+          <button type="button" onclick="setQuickDate('clear')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-[11px] transition-colors ml-auto">Xóa ngày</button>
+        </div>
+      </form>
     </div>
 
     <div class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden border border-outline-variant">
@@ -82,7 +162,7 @@
         <table class="w-full text-left border-collapse">
           <thead>
           <tr class="border-b border-surface-variant bg-surface-container-low text-on-surface-variant font-label-bold text-xs uppercase tracking-wider">
-            <th class="py-4 px-6">Mã ĐH</th>
+            <th class="py-4 px-6">Mã ĐH & Thời gian</th>
             <th class="py-4 px-6">Khách nhận & SĐT</th>
             <th class="py-4 px-6">Tổng tiền</th>
             <th class="py-4 px-6">PTTT</th>
@@ -94,9 +174,12 @@
           </thead>
           <tbody class="divide-y divide-surface-variant text-xs">
           <c:forEach var="order" items="${orders}">
-            <tr class="hover:bg-surface-bright transition-colors">
+            <tr id="order-row-${order.id}" class="hover:bg-surface-bright transition-colors" data-order-id="${order.id}" data-has-email="${not empty order.userId || not empty order.customerEmail}">
               <td class="py-4 px-6 font-bold text-primary whitespace-nowrap">
-                <c:out value="${order.orderCode}"/>
+                <div><c:out value="${order.orderCode}"/></div>
+                <div class="text-[10px] text-on-surface-variant font-normal mt-0.5">
+                  <fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                </div>
               </td>
               <td class="py-4 px-6">
                 <div class="flex items-center gap-1.5">
@@ -135,49 +218,71 @@
                   </c:otherwise>
                 </c:choose>
               </td>
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td id="order-status-badge-${order.id}" class="py-4 px-6 whitespace-nowrap">
                 <c:choose>
                   <c:when test="${order.status == 'PENDING'}">
-                    <span class="px-2.5 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-full text-[11px] font-bold">1. Đã đặt hàng</span>
+                    <span class="px-2.5 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 1. Đã đặt hàng
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'CONFIRMED'}">
-                    <span class="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-[11px] font-bold">2. Đã xác nhận</span>
+                    <span class="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 2. Đã xác nhận
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'PACKING'}">
-                    <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[11px] font-bold">3. Đóng gói & Lạnh</span>
+                    <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> 3. Đóng gói & Lạnh
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'SHIPPING'}">
-                    <span class="px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-300 rounded-full text-[11px] font-bold animate-pulse">4. Đang giao hàng</span>
+                    <span class="px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-300 rounded-full text-[11px] font-bold animate-pulse inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> 4. Đang giao hàng
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'DELIVERED'}">
-                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-full text-[11px] font-bold">5. Đã giao</span>
+                    <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 5. Đã giao
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'COMPLETED'}">
-                    <span class="px-2.5 py-1 bg-green-100 text-green-800 border border-green-300 rounded-full text-[11px] font-bold">Hoàn tất</span>
+                    <span class="px-2.5 py-1 bg-green-100 text-green-800 border border-green-300 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Hoàn tất
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'RETURNED'}">
-                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-[11px] font-bold">Đã hoàn hàng</span>
+                    <span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span> Đã hoàn hàng
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'FAILED'}">
-                    <span class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-full text-[11px] font-bold">Giao thất bại</span>
+                    <span class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Giao thất bại
+                    </span>
                   </c:when>
                   <c:when test="${order.status == 'CANCELLED'}">
-                    <span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold">Đã hủy</span>
+                    <span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Đã hủy
+                    </span>
                   </c:when>
                   <c:otherwise>
                     <span class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-bold"><c:out value="${order.status}"/></span>
                   </c:otherwise>
                 </c:choose>
               </td>
-              <td class="py-4 px-6 text-center">
+              <td id="order-actions-${order.id}" class="py-4 px-6 text-center">
                 <div class="flex items-center justify-center gap-1.5 flex-wrap">
                   <!-- Bước 1: PENDING -> CONFIRMED -->
                   <c:if test="${order.status == 'PENDING'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="CONFIRMED">
-                      <button type="submit" class="px-2.5 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Xác nhận đơn">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
+                      <button type="submit" class="px-2.5 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Xác nhận đơn">
                         <span class="material-symbols-outlined text-[14px]">check</span> Xác nhận
                       </button>
                     </form>
@@ -185,11 +290,15 @@
 
                   <!-- Bước 2: CONFIRMED -> PACKING -->
                   <c:if test="${order.status == 'CONFIRMED'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="PACKING">
-                      <button type="submit" class="px-2.5 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Đóng gói & Giữ nhiệt lạnh">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
+                      <button type="submit" class="px-2.5 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Đóng gói & Giữ nhiệt lạnh">
                         <span class="material-symbols-outlined text-[14px]">inventory_2</span> Đóng gói
                       </button>
                     </form>
@@ -197,18 +306,22 @@
 
                   <!-- Bước 3: PACKING -> SHIPPING (Kích hoạt Email & Web Notification nếu có) -->
                   <c:if test="${order.status == 'PACKING'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="SHIPPING">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
                       <c:choose>
                         <c:when test="${not empty order.userId || not empty order.customerEmail}">
-                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Khách có tài khoản: Đi giao + Báo Gmail & Web Notification">
+                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách có tài khoản: Đi giao + Báo Gmail & Web Notification">
                             <span class="material-symbols-outlined text-[14px]">forward_to_inbox</span> Đi giao (Báo Gmail)
                           </button>
                         </c:when>
                         <c:otherwise>
-                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Khách vãng lai: Giao hàng (Khách tra cứu tiến độ qua SĐT)">
+                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách vãng lai: Giao hàng (Khách tra cứu tiến độ qua SĐT)">
                             <span class="material-symbols-outlined text-[14px]">local_shipping</span> Đi giao (Khách SĐT)
                           </button>
                         </c:otherwise>
@@ -218,18 +331,26 @@
 
                   <!-- Bước 4: SHIPPING -> DELIVERED / FAILED / RETURNED -->
                   <c:if test="${order.status == 'SHIPPING'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="DELIVERED">
-                      <button type="submit" class="px-2.5 py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Xác nhận đã giao hoa quả">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
+                      <button type="submit" class="px-2.5 py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Xác nhận đã giao hoa quả">
                         <span class="material-symbols-outlined text-[14px]">done_all</span> Đã giao
                       </button>
                     </form>
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="FAILED">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
                       <button type="submit" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-colors" title="Giao thất bại">
                         <span class="material-symbols-outlined text-[14px]">cancel</span>
                       </button>
@@ -238,11 +359,15 @@
 
                   <!-- Bước 5: DELIVERED -> COMPLETED -->
                   <c:if test="${order.status == 'DELIVERED'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="COMPLETED">
-                      <button type="submit" class="px-2.5 py-1.5 bg-green-700 text-white hover:bg-green-800 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm" title="Đơn hoàn tất thành công">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
+                      <button type="submit" class="px-2.5 py-1.5 bg-green-700 text-white hover:bg-green-800 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Đơn hoàn tất thành công">
                         <span class="material-symbols-outlined text-[14px]">verified</span> Hoàn tất
                       </button>
                     </form>
@@ -250,10 +375,14 @@
 
                   <!-- Nút Hủy Đơn (Chỉ cho phép khi chưa giao) -->
                   <c:if test="${order.status == 'PENDING' || order.status == 'CONFIRMED' || order.status == 'PACKING'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn hủy đơn này? Tồn kho hoa quả sẽ được hoàn lại tự động.');">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="return confirmCancelOrder(event, this);">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="CANCELLED">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
                       <button type="submit" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-colors" title="Hủy đơn & hoàn kho">
                         <span class="material-symbols-outlined text-[14px]">close</span>
                       </button>
@@ -262,10 +391,14 @@
 
                   <!-- Nút Hoàn hàng cho đơn lỗi -->
                   <c:if test="${order.status == 'FAILED'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline">
+                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
                       <input type="hidden" name="action" value="updateStatus">
                       <input type="hidden" name="orderId" value="${order.id}">
                       <input type="hidden" name="status" value="RETURNED">
+                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                      <input type="hidden" name="startDate" value="${startDate}">
+                      <input type="hidden" name="endDate" value="${endDate}">
+                      <input type="hidden" name="keyword" value="${keyword}">
                       <button type="submit" class="p-1.5 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white rounded-lg transition-colors" title="Báo hoàn kho">
                         <span class="material-symbols-outlined text-[14px]">assignment_return</span>
                       </button>
@@ -280,11 +413,322 @@
               </td>
             </tr>
           </c:forEach>
+          <c:if test="${empty orders}">
+            <tr>
+              <td colspan="8" class="text-center py-12 text-on-surface-variant">
+                <span class="material-symbols-outlined text-4xl text-outline mb-2">inventory_2</span>
+                <p class="font-medium">Không tìm thấy đơn hàng nào phù hợp với bộ lọc.</p>
+                <p class="text-xs text-on-surface-variant/70 mt-1">Vui lòng thử điều chỉnh lại từ khóa hoặc khoảng ngày tìm kiếm.</p>
+              </td>
+            </tr>
+          </c:if>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 </main>
+
+<!-- TOAST THÔNG BÁO NỔI -->
+<div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+  // 1. CHỌN NHANH MỐC THỜI GIAN LỌC
+  function setQuickDate(type) {
+    const startInput = document.getElementById('filterStartDate');
+    const endInput = document.getElementById('filterEndDate');
+    const form = document.getElementById('orderFilterForm');
+    const today = new Date();
+
+    function formatDate(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    if (type === 'today') {
+      const str = formatDate(today);
+      startInput.value = str;
+      endInput.value = str;
+    } else if (type === 'yesterday') {
+      const y = new Date(today);
+      y.setDate(y.getDate() - 1);
+      const str = formatDate(y);
+      startInput.value = str;
+      endInput.value = str;
+    } else if (type === '7days') {
+      const past = new Date(today);
+      past.setDate(past.getDate() - 7);
+      startInput.value = formatDate(past);
+      endInput.value = formatDate(today);
+    } else if (type === 'thisMonth') {
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+      startInput.value = formatDate(firstDay);
+      endInput.value = formatDate(today);
+    } else if (type === 'clear') {
+      startInput.value = '';
+      endInput.value = '';
+    }
+    form.submit();
+  }
+
+  // 2. KHÔI PHỤC VỊ TRÍ CUỘN SAU KHI LOAD TRANG
+  window.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('orderScrollContainer');
+    const savedScroll = sessionStorage.getItem('adminOrdersScrollTop');
+    if (container && savedScroll !== null) {
+      container.scrollTop = parseInt(savedScroll, 10);
+      sessionStorage.removeItem('adminOrdersScrollTop');
+    } else if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('bg-primary/10');
+        setTimeout(() => target.classList.remove('bg-primary/10'), 2500);
+      }
+    }
+  });
+
+  function saveCurrentScroll() {
+    const container = document.getElementById('orderScrollContainer');
+    if (container) {
+      sessionStorage.setItem('adminOrdersScrollTop', container.scrollTop);
+    }
+  }
+
+  // 3. XÁC NHẬN HỦY ĐƠN
+  function confirmCancelOrder(event, form) {
+    if (confirm('Bạn có chắc muốn hủy đơn này? Tồn kho hoa quả sẽ được hoàn lại tự động.')) {
+      handleOrderStatusSubmit(event, form);
+      return false;
+    }
+    event.preventDefault();
+    return false;
+  }
+
+  // 4. XỬ LÝ AJAX CẬP NHẬT TRẠNG THÁI KHÔNG LÀM NHẢY VỊ TRÍ CUỘN
+  async function handleOrderStatusSubmit(event, form) {
+    event.preventDefault();
+    saveCurrentScroll();
+
+    const btn = form.querySelector('button[type="submit"]');
+    if (!btn) return;
+
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>';
+
+    const formData = new FormData(form);
+    const orderId = formData.get('orderId');
+    const newStatus = formData.get('status');
+    const contextPath = '${pageContext.request.contextPath}';
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: new URLSearchParams(formData).toString()
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const row = document.getElementById('order-row-' + orderId);
+          const hasEmail = row ? (row.getAttribute('data-has-email') === 'true') : false;
+
+          updateRowStatusInPlace(orderId, newStatus, contextPath, hasEmail);
+          showToast('Cập nhật trạng thái đơn #' + orderId + ' thành công!', 'success');
+        } else {
+          showToast('Lỗi: ' + (data.message || 'Không thể cập nhật'), 'error');
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      } else {
+        // Fallback: Nếu backend phản hồi không phải 200, submit bình thường
+        form.submit();
+      }
+    } catch (err) {
+      console.error('AJAX error, falling back to form submit:', err);
+      form.submit();
+    }
+  }
+
+  // 5. CẬP NHẬT GIAO DIỆN DÒNG ĐƠN HÀNG NGAY TẠI CHỖ (IN-PLACE DOM UPDATE)
+  function updateRowStatusInPlace(orderId, status, contextPath, hasEmail) {
+    const badgeCell = document.getElementById('order-status-badge-' + orderId);
+    const actionsCell = document.getElementById('order-actions-' + orderId);
+    if (!badgeCell || !actionsCell) return;
+
+    // A. Cập nhật Badge
+    let badgeHtml = '';
+    switch (status) {
+      case 'PENDING':
+        badgeHtml = '<span class="px-2.5 py-1 bg-amber-50 text-amber-600 border border-amber-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 1. Đã đặt hàng</span>';
+        break;
+      case 'CONFIRMED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 2. Đã xác nhận</span>';
+        break;
+      case 'PACKING':
+        badgeHtml = '<span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> 3. Đóng gói & Lạnh</span>';
+        break;
+      case 'SHIPPING':
+        badgeHtml = '<span class="px-2.5 py-1 bg-sky-100 text-sky-700 border border-sky-300 rounded-full text-[11px] font-bold animate-pulse inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> 4. Đang giao hàng</span>';
+        break;
+      case 'DELIVERED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 5. Đã giao</span>';
+        break;
+      case 'COMPLETED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-green-100 text-green-800 border border-green-300 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Hoàn tất</span>';
+        break;
+      case 'FAILED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-rose-100 text-rose-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Giao thất bại</span>';
+        break;
+      case 'RETURNED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span> Đã hoàn hàng</span>';
+        break;
+      case 'CANCELLED':
+        badgeHtml = '<span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Đã hủy</span>';
+        break;
+      default:
+        badgeHtml = '<span class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-bold">' + status + '</span>';
+    }
+    badgeCell.innerHTML = badgeHtml;
+
+    // B. Cập nhật Action Buttons tương ứng
+    let actionsHtml = '<div class="flex items-center justify-center gap-1.5 flex-wrap">';
+    
+    if (status === 'CONFIRMED') {
+      // Tiếp theo: PACKING + CANCELLED
+      actionsHtml += `
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="PACKING">
+          <button type="submit" class="px-2.5 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Đóng gói & Giữ nhiệt lạnh">
+            <span class="material-symbols-outlined text-[14px]">inventory_2</span> Đóng gói
+          </button>
+        </form>
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="return confirmCancelOrder(event, this);">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="CANCELLED">
+          <button type="submit" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-colors" title="Hủy đơn & hoàn kho">
+            <span class="material-symbols-outlined text-[14px]">close</span>
+          </button>
+        </form>
+      `;
+    } else if (status === 'PACKING') {
+      // Tiếp theo: SHIPPING + CANCELLED
+      const shipBtnText = hasEmail ? 'Đi giao (Báo Gmail)' : 'Đi giao (Khách SĐT)';
+      const shipIcon = hasEmail ? 'forward_to_inbox' : 'local_shipping';
+      actionsHtml += `
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="SHIPPING">
+          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Giao hàng">
+            <span class="material-symbols-outlined text-[14px]">${shipIcon}</span> ${shipBtnText}
+          </button>
+        </form>
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="return confirmCancelOrder(event, this);">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="CANCELLED">
+          <button type="submit" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-colors" title="Hủy đơn & hoàn kho">
+            <span class="material-symbols-outlined text-[14px]">close</span>
+          </button>
+        </form>
+      `;
+    } else if (status === 'SHIPPING') {
+      // Tiếp theo: DELIVERED + FAILED
+      actionsHtml += `
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="DELIVERED">
+          <button type="submit" class="px-2.5 py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Xác nhận đã giao hoa quả">
+            <span class="material-symbols-outlined text-[14px]">done_all</span> Đã giao
+          </button>
+        </form>
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="FAILED">
+          <button type="submit" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-colors" title="Giao thất bại">
+            <span class="material-symbols-outlined text-[14px]">cancel</span>
+          </button>
+        </form>
+      `;
+    } else if (status === 'DELIVERED') {
+      // Tiếp theo: COMPLETED
+      actionsHtml += `
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="COMPLETED">
+          <button type="submit" class="px-2.5 py-1.5 bg-green-700 text-white hover:bg-green-800 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Đơn hoàn tất thành công">
+            <span class="material-symbols-outlined text-[14px]">verified</span> Hoàn tất
+          </button>
+        </form>
+      `;
+    } else if (status === 'FAILED') {
+      // Tiếp theo: RETURNED
+      actionsHtml += `
+        <form action="${contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+          <input type="hidden" name="action" value="updateStatus">
+          <input type="hidden" name="orderId" value="${orderId}">
+          <input type="hidden" name="status" value="RETURNED">
+          <button type="submit" class="p-1.5 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white rounded-lg transition-colors" title="Báo hoàn kho">
+            <span class="material-symbols-outlined text-[14px]">assignment_return</span>
+          </button>
+        </form>
+      `;
+    } else {
+      // COMPLETED, CANCELLED, RETURNED -> Không còn nút hành động tiếp
+      actionsHtml += '<span class="text-[11px] text-on-surface-variant italic">Đã kết thúc</span>';
+    }
+
+    actionsHtml += '</div>';
+    actionsCell.innerHTML = actionsHtml;
+
+    // Hiệu ứng highlight dòng vừa được cập nhật
+    const row = document.getElementById('order-row-' + orderId);
+    if (row) {
+      row.classList.add('bg-primary/10');
+      setTimeout(() => row.classList.remove('bg-primary/10'), 1500);
+    }
+  }
+
+  // 6. THÔNG BÁO TOAST NỔI HIỆN ĐẠI
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    const isSuccess = (type === 'success');
+    const bgClass = isSuccess ? 'bg-emerald-600' : 'bg-red-600';
+    const icon = isSuccess ? 'check_circle' : 'error';
+
+    toast.className = bgClass + ' text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-semibold pointer-events-auto transform translate-y-4 opacity-0 transition-all duration-300';
+    toast.innerHTML = '<span class="material-symbols-outlined text-base">' + icon + '</span><span>' + message + '</span>';
+
+    container.appendChild(toast);
+
+    // Kích hoạt transition
+    requestAnimationFrame(() => {
+      toast.classList.remove('translate-y-4', 'opacity-0');
+    });
+
+    setTimeout(() => {
+      toast.classList.add('translate-y-4', 'opacity-0');
+      setTimeout(() => toast.remove(), 300);
+    }, 3200);
+  }
+</script>
 </body>
 </html>

@@ -11,4 +11,11 @@ public interface IDashboardDAO {
     int getOutOfStockProducts();
     Map<String, Double> getRevenueChartData(String filterType);
     List<ProductModel> getLowStockProducts(int threshold);
+
+    // Mở rộng các phương thức nâng cao
+    Map<String, Object> getComparativeRevenueChartData(String filterType);
+    Map<String, Object> getOrderStatusDistribution(String filterType);
+    Map<String, Object> getCategoryProductDistribution();
+    List<ProductModel> getProductsByCategory(int categoryId);
+    Map<String, Object> getKpiComparativeMetrics();
 }

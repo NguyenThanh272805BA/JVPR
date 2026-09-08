@@ -186,7 +186,7 @@
               <h3 class="font-headline-md text-xl mb-6 text-on-surface">Viết đánh giá</h3>
               <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                  <form action="${pageContext.request.contextPath}/submit-review" method="POST">
+                  <form action="${pageContext.request.contextPath}/submit-review" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="productId" value="${product.id}">
                     <div class="mb-5">
                       <label class="block font-label-bold mb-2 text-on-surface">Chất lượng</label>
@@ -198,9 +198,30 @@
                         <option value="1">1 Sao - Rất tệ</option>
                       </select>
                     </div>
-                    <div class="mb-6">
+                    <div class="mb-5">
                       <label class="block font-label-bold mb-2 text-on-surface">Nhận xét của bạn</label>
                       <textarea name="comment" rows="4" required placeholder="Sản phẩm tươi ngon, đóng gói cẩn thận..." class="w-full px-4 py-3 border border-outline-variant rounded-lg focus:border-primary outline-none bg-surface-container-lowest"></textarea>
+                    </div>
+                    <!-- Upload ảnh thực tế đơn hàng -->
+                    <div class="mb-6">
+                      <label class="block font-label-bold mb-2 text-on-surface flex items-center justify-between">
+                        <span>Hình ảnh thực tế đơn hàng</span>
+                        <span class="text-xs text-on-surface-variant font-normal">(Không bắt buộc)</span>
+                      </label>
+                      <div class="border-2 border-dashed border-outline-variant hover:border-primary rounded-xl p-4 text-center cursor-pointer transition-colors bg-surface-container-lowest relative group" onclick="document.getElementById('reviewImageInput').click()">
+                        <input type="file" id="reviewImageInput" name="reviewImage" accept="image/*" class="hidden" onchange="previewReviewImage(this)">
+                        <div id="uploadPrompt" class="flex flex-col items-center justify-center py-2">
+                          <span class="material-symbols-outlined text-3xl text-primary mb-1">add_photo_alternate</span>
+                          <span class="text-xs font-semibold text-on-surface">Đính kèm ảnh sản phẩm thực tế</span>
+                          <span class="text-[11px] text-on-surface-variant mt-0.5">Hỗ trợ JPG, PNG, WEBP (tối đa 10MB)</span>
+                        </div>
+                        <div id="previewContainer" class="hidden relative inline-block">
+                          <img id="reviewImagePreview" src="" alt="Ảnh xem trước" class="w-24 h-24 object-cover rounded-lg border shadow-sm mx-auto">
+                          <button type="button" onclick="event.stopPropagation(); removeReviewImage();" class="absolute -top-2 -right-2 bg-error text-white rounded-full w-5 h-5 flex items-center justify-center shadow hover:bg-error/80 text-xs">
+                            <span class="material-symbols-outlined text-xs">close</span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-full font-label-bold hover:bg-primary-container transition-colors shadow-md flex items-center justify-center gap-2">
                       <span class="material-symbols-outlined">send</span> Gửi đánh giá
@@ -218,7 +239,7 @@
             </div>
           </div>
 
-          <!-- Danh sách Comment (Bên Phải) - ĐÃ BỔ SUNG AVATAR THỰC TẾ -->
+          <!-- Danh sách Comment (Bên Phải) - ĐÃ BỔ SUNG AVATAR & ẢNH ĐƠN HÀNG THỰC TẾ -->
           <div class="lg:col-span-2">
             <h3 class="font-headline-md text-xl mb-6 text-on-surface">Khách hàng đánh giá</h3>
 
@@ -263,6 +284,19 @@
                         </div>
                       </div>
                       <p class="font-body-md text-on-surface pl-13"><c:out value="${rv.comment}"/></p>
+                      
+                      <!-- Hiển thị ảnh đơn hàng đính kèm nếu có -->
+                      <c:if test="${not empty rv.imageUrl}">
+                        <div class="mt-3 pl-13 flex items-center gap-2">
+                          <div class="relative group cursor-pointer" onclick="openLightbox('${rv.imageUrl}')">
+                            <img src="${rv.imageUrl}" alt="Ảnh thực tế từ khách hàng" class="w-24 h-24 object-cover rounded-lg border border-outline-variant group-hover:opacity-90 group-hover:scale-105 transition-all shadow-sm">
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center text-white transition-opacity">
+                              <span class="material-symbols-outlined text-lg">zoom_in</span>
+                            </div>
+                          </div>
+                          <span class="text-xs text-on-surface-variant italic">(Ảnh chụp thực tế)</span>
+                        </div>
+                      </c:if>
                     </div>
                   </c:forEach>
                 </div>
@@ -283,10 +317,20 @@
   </div>
 </main>
 
+<!-- LIGHTBOX MODAL PHÓNG TO ẢNH ĐÁNH GIÁ -->
+<div id="lightboxModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-all" onclick="closeLightbox()">
+  <div class="relative max-w-3xl max-h-[90vh]" onclick="event.stopPropagation()">
+    <img id="lightboxImg" src="" alt="Ảnh phóng to" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl object-contain">
+    <button type="button" onclick="closeLightbox()" class="absolute -top-3 -right-3 bg-white text-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:bg-gray-100 font-bold">
+      <span class="material-symbols-outlined text-sm">close</span>
+    </button>
+  </div>
+</div>
+
 <!-- FOOTER CHUNG -->
 <jsp:include page="/WEB-INF/views/components/footer.jsp" />
 
-<!-- KỊCH BẢN CHUYỂN TABS (GIỮ NGUYÊN GỐC 100%) -->
+<!-- KỊCH BẢN CHUYỂN TABS & XỬ LÝ ẢNH REVIEW -->
 <script>
   function switchTab(tabName) {
     const tabDesc = document.getElementById('tab-desc');
@@ -315,6 +359,45 @@
       btnDesc.classList.remove('border-primary', 'text-primary');
       btnDesc.classList.add('border-transparent', 'text-on-surface-variant');
     }
+  }
+
+  function previewReviewImage(input) {
+    const prompt = document.getElementById('uploadPrompt');
+    const container = document.getElementById('previewContainer');
+    const preview = document.getElementById('reviewImagePreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        prompt.classList.add('hidden');
+        container.classList.remove('hidden');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function removeReviewImage() {
+    const input = document.getElementById('reviewImageInput');
+    const prompt = document.getElementById('uploadPrompt');
+    const container = document.getElementById('previewContainer');
+    const preview = document.getElementById('reviewImagePreview');
+    input.value = '';
+    preview.src = '';
+    container.classList.add('hidden');
+    prompt.classList.remove('hidden');
+  }
+
+  function openLightbox(imageUrl) {
+    const modal = document.getElementById('lightboxModal');
+    const img = document.getElementById('lightboxImg');
+    img.src = imageUrl;
+    modal.classList.remove('hidden');
+  }
+
+  function closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    modal.classList.add('hidden');
+    document.getElementById('lightboxImg').src = '';
   }
 </script>
 </body>

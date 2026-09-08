@@ -27,4 +27,14 @@ public class CategoryServiceImpl implements ICategoryService {
         }
         return null;
     }
+
+    @Override
+    public CategoryModel findById(Integer id) {
+        return categoryDAO.findById(id);
+    }
+
+    @Override
+    public boolean update(CategoryModel category) {
+        return categoryDAO.update(category);
+    }
 }

@@ -17,4 +17,23 @@ public class CategoryDAOImpl extends AbstractDAO<CategoryModel> implements ICate
         String sql = "INSERT INTO categories (name, tax_rate, status) VALUES (?, ?, ?)";
         return insert(sql, category.getName(), category.getTaxRate(), category.getStatus());
     }
+
+    @Override
+    public CategoryModel findById(Integer id) {
+        String sql = "SELECT * FROM categories WHERE id = ?";
+        List<CategoryModel> list = query(sql, new CategoryMapper(), id);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    @Override
+    public boolean update(CategoryModel category) {
+        String sql = "UPDATE categories SET name = ?, tax_rate = ?, status = ? WHERE id = ?";
+        try {
+            update(sql, category.getName(), category.getTaxRate(), category.getStatus(), category.getId());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

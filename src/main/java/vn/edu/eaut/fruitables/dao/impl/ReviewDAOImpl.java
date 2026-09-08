@@ -29,6 +29,7 @@ public class ReviewDAOImpl {
                     rv.setCreatedAt(rs.getTimestamp("created_at"));
                     rv.setUserName(rs.getString("full_name"));
                     rv.setAvatarUrl(rs.getString("avatar_url")); // Map avatar
+                    rv.setImageUrl(rs.getString("image_url")); // Map review image
                     list.add(rv);
                 }
             }
@@ -51,7 +52,7 @@ public class ReviewDAOImpl {
     }
 
     public boolean insertReview(ReviewModel review) {
-        String sql = "INSERT INTO reviews (user_id, product_id, order_id, rating, comment) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reviews (user_id, product_id, order_id, rating, comment, image_url) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, review.getUserId());
@@ -59,6 +60,7 @@ public class ReviewDAOImpl {
             ps.setLong(3, review.getOrderId());
             ps.setInt(4, review.getRating());
             ps.setString(5, review.getComment());
+            ps.setString(6, review.getImageUrl());
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); }
         return false;

@@ -18,42 +18,43 @@
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <!-- SHOP HERO BANNER: 3D ORGANIC MARKET HALL -->
-<section class="tilt-3d-stage relative w-full min-h-[380px] md:min-h-[440px] flex items-center overflow-hidden bg-slate-950 py-10 md:py-14 perspective-1200">
-    <!-- Nền không gian sâu với Mesh Gradient & Ambient Aura -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#071609] to-slate-950 z-0"></div>
-    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[110px] pointer-events-none animate-ambient-aura z-0"></div>
-    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-amber-500/15 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-0"></div>
+<section class="tilt-3d-stage relative w-full min-h-[380px] md:min-h-[440px] flex items-center overflow-hidden bg-gradient-to-br from-[#062410] via-[#0f3d1b] to-[#041a0b] py-10 md:py-14 perspective-1200 shadow-lg">
+    <!-- Nền không gian sâu với Mesh Gradient & Ambient Aura tươi sáng hữu cơ -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-700/30 via-[#0a3818]/60 to-[#031c0a] z-0"></div>
+    <div class="absolute -top-20 -left-20 w-96 h-96 bg-primary/30 rounded-full blur-[100px] pointer-events-none animate-ambient-aura z-0"></div>
+    <div class="absolute -bottom-24 right-10 w-[30rem] h-[30rem] bg-lime-400/25 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3s;"></div>
+    <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none z-0"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:28px_28px] opacity-20 pointer-events-none z-0"></div>
 
     <div class="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <!-- Cột trái: Tiêu đề & Giới thiệu -->
         <div class="lg:col-span-7 text-left space-y-4">
-            <div class="inline-flex items-center gap-2 py-1 px-3.5 rounded-full bg-primary/20 text-primary border border-primary/30 font-label-bold text-xs uppercase tracking-wider backdrop-blur-sm">
+            <div class="inline-flex items-center gap-2 py-1 px-3.5 rounded-full bg-primary/25 text-lime-300 border border-primary/40 font-label-bold text-xs uppercase tracking-wider backdrop-blur-sm shadow-sm">
                 <span class="material-symbols-outlined text-[15px] animate-pulse">storefront</span>
                 <span>Chợ Nông Sản Trực Tuyến 24/7</span>
             </div>
 
             <h1 class="text-white font-display-lg text-3xl sm:text-4xl md:text-5xl font-black tracking-tight drop-shadow-lg leading-tight">
                 Thiên Đường Trái Cây &<br>
-                <span class="bg-gradient-to-r from-primary via-[#a3e635] to-emerald-400 bg-clip-text text-transparent">Nông Sản Sạch VietGAP</span>
+                <span class="bg-gradient-to-r from-lime-300 via-[#a3e635] to-emerald-300 bg-clip-text text-transparent">Nông Sản Sạch VietGAP</span>
             </h1>
 
-            <p class="text-slate-300 font-body-lg text-sm md:text-base max-w-xl leading-relaxed">
+            <p class="text-emerald-100/90 font-body-lg text-sm md:text-base max-w-xl leading-relaxed">
                 Tất cả hoa quả được thu hoạch mới mỗi sáng, bảo quản bằng công nghệ ướp lạnh tiêu chuẩn quốc tế để giữ trọn vẹn vitamin và độ ngọt tự nhiên.
             </p>
 
             <!-- Quick category navigation tags -->
             <div class="flex flex-wrap gap-2 pt-2">
-                <a href="${pageContext.request.contextPath}/shop?category=1" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
-                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">flight_takeoff</span>
+                <a href="${pageContext.request.contextPath}/shop?category=1" class="px-4 py-2 rounded-full bg-white/15 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/20 flex items-center gap-1.5 hover:-translate-y-0.5 shadow-sm">
+                    <span class="material-symbols-outlined text-sm text-lime-300 group-hover:text-white">flight_takeoff</span>
                     Trái cây nhập khẩu
                 </a>
-                <a href="${pageContext.request.contextPath}/shop?category=2" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
-                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">landscape</span>
+                <a href="${pageContext.request.contextPath}/shop?category=2" class="px-4 py-2 rounded-full bg-white/15 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/20 flex items-center gap-1.5 hover:-translate-y-0.5 shadow-sm">
+                    <span class="material-symbols-outlined text-sm text-lime-300 group-hover:text-white">landscape</span>
                     Trái cây nội địa
                 </a>
-                <a href="${pageContext.request.contextPath}/shop?category=3" class="px-4 py-2 rounded-full bg-white/10 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/15 flex items-center gap-1.5 hover:-translate-y-0.5">
-                    <span class="material-symbols-outlined text-sm text-primary group-hover:text-white">spa</span>
+                <a href="${pageContext.request.contextPath}/shop?category=3" class="px-4 py-2 rounded-full bg-white/15 hover:bg-primary text-white text-xs font-bold transition-all backdrop-blur-md border border-white/20 flex items-center gap-1.5 hover:-translate-y-0.5 shadow-sm">
+                    <span class="material-symbols-outlined text-sm text-lime-300 group-hover:text-white">spa</span>
                     Rau củ hữu cơ
                 </a>
             </div>
@@ -223,18 +224,42 @@
 
         <!-- PRODUCT GRID -->
         <div class="w-full md:w-3/4">
-            <div class="flex justify-between items-center mb-6">
-                <p class="font-body-md text-on-surface-variant">Hiển thị <span class="font-label-bold text-on-surface"><c:out value="${products.size()}"/></span> kết quả</p>
-                <form action="${pageContext.request.contextPath}/shop" method="GET">
-                    <input type="hidden" name="keyword" value="${keyword}">
-                    <input type="hidden" name="category" value="${selectedCategory}">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-surface-variant">
+                <p class="font-body-md text-on-surface-variant text-sm">
+                    Hiển thị <span class="font-label-bold text-on-surface"><c:out value="${startItem}"/> - <c:out value="${endItem}"/></span> trên tổng số <span class="font-label-bold text-primary"><c:out value="${totalProducts}"/></span> sản phẩm
+                </p>
+                <form action="${pageContext.request.contextPath}/shop" method="GET" class="flex items-center gap-2.5 flex-wrap">
+                    <input type="hidden" name="keyword" value="<c:out value='${keyword}'/>">
+                    <c:if test="${not empty selectedCategory}"><input type="hidden" name="category" value="${selectedCategory}"></c:if>
                     <c:if test="${not empty selectedMinPrice}"><input type="hidden" name="minPrice" value="${selectedMinPrice}"></c:if>
                     <c:if test="${not empty selectedMaxPrice}"><input type="hidden" name="maxPrice" value="${selectedMaxPrice}"></c:if>
-                    <select name="sort" onchange="this.form.submit()" class="border border-outline-variant rounded-md px-3 py-2 font-body-md text-on-surface bg-surface-container-lowest outline-none focus:border-primary">
-                        <option value="newest" ${selectedSort == 'newest' ? 'selected' : ''}>Mới nhất</option>
-                        <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Giá: Thấp đến Cao</option>
-                        <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Giá: Cao xuống Thấp</option>
-                    </select>
+                    <input type="hidden" name="page" value="1">
+
+                    <!-- Lựa chọn số lượng hiển thị trên 1 trang -->
+                    <div class="flex items-center gap-1.5 bg-surface-container-lowest px-3 py-1.5 rounded-xl border border-outline-variant shadow-sm">
+                        <label class="text-xs font-medium text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm text-primary">view_module</span> Hiển thị:
+                        </label>
+                        <select name="pageSize" onchange="this.form.submit()" class="border-0 bg-transparent text-xs font-bold text-on-surface outline-none cursor-pointer focus:ring-0">
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10 / trang</option>
+                            <option value="12" ${pageSize == 12 || empty pageSize ? 'selected' : ''}>12 / trang</option>
+                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20 / trang</option>
+                            <option value="24" ${pageSize == 24 ? 'selected' : ''}>24 / trang</option>
+                            <option value="50" ${pageSize == 50 ? 'selected' : ''}>50 / trang</option>
+                        </select>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="flex items-center gap-1.5 bg-surface-container-lowest px-3 py-1.5 rounded-xl border border-outline-variant shadow-sm">
+                        <label class="text-xs font-medium text-on-surface-variant flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm text-primary">sort</span> Sắp xếp:
+                        </label>
+                        <select name="sort" onchange="this.form.submit()" class="border-0 bg-transparent text-xs font-bold text-on-surface outline-none cursor-pointer focus:ring-0">
+                            <option value="newest" ${selectedSort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                            <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Giá: Thấp đến Cao</option>
+                            <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Giá: Cao xuống Thấp</option>
+                        </select>
+                    </div>
                 </form>
             </div>
 
@@ -348,18 +373,75 @@
                 </c:forEach>
             </div>
 
-            <!-- Phân trang (Giữ nguyên gốc 100%) -->
-            <div class="mt-12 flex justify-center space-x-2">
-                <button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface-variant transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">chevron_left</span>
-                </button>
-                <button class="w-10 h-10 rounded-full bg-primary text-white font-label-bold shadow-md">1</button>
-                <button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors font-label-bold">2</button>
-                <button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface transition-colors font-label-bold">3</button>
-                <button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface-variant transition-colors">
-                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-                </button>
-            </div>
+            <!-- Empty state nếu không có sản phẩm -->
+            <c:if test="${empty products}">
+                <div class="text-center py-16 bg-surface-container-lowest rounded-2xl border border-dashed border-outline-variant my-6">
+                    <span class="material-symbols-outlined text-5xl text-outline mb-3">search_off</span>
+                    <h3 class="font-headline-md text-lg text-on-surface font-bold">Không tìm thấy sản phẩm phù hợp</h3>
+                    <p class="text-sm text-on-surface-variant mt-1">Vui lòng thử điều chỉnh lại từ khóa tìm kiếm hoặc mở rộng khoảng giá.</p>
+                    <a href="${pageContext.request.contextPath}/shop" class="inline-block mt-4 px-5 py-2 bg-primary text-white rounded-full text-xs font-bold hover:bg-primary-container transition-colors shadow-sm">
+                        Xem tất cả sản phẩm
+                    </a>
+                </div>
+            </c:if>
+
+            <!-- PHÂN TRANG ĐỘNG BẢO TOÀN BỘ LỌC & SỐ LƯỢNG HIỂN THỊ -->
+            <c:if test="${totalPages > 1}">
+                <c:url var="pageBaseUrl" value="/shop">
+                    <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}"/></c:if>
+                    <c:if test="${not empty selectedCategory}"><c:param name="category" value="${selectedCategory}"/></c:if>
+                    <c:if test="${not empty selectedSort}"><c:param name="sort" value="${selectedSort}"/></c:if>
+                    <c:if test="${not empty selectedMinPrice}"><c:param name="minPrice" value="${selectedMinPrice}"/></c:if>
+                    <c:if test="${not empty selectedMaxPrice}"><c:param name="maxPrice" value="${selectedMaxPrice}"/></c:if>
+                    <c:param name="pageSize" value="${pageSize}"/>
+                </c:url>
+
+                <div class="mt-12 flex justify-center items-center gap-2 select-none">
+                    <!-- Nút Trang trước -->
+                    <c:choose>
+                        <c:when test="${currentPage > 1}">
+                            <a href="${pageBaseUrl}&page=${currentPage - 1}" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary text-on-surface-variant transition-all shadow-sm" title="Trang trước">
+                                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="w-10 h-10 rounded-full border border-outline-variant/40 flex items-center justify-center text-outline-variant/40 cursor-not-allowed">
+                                <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                            </span>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <!-- Các trang số -->
+                    <c:forEach begin="1" end="${totalPages}" var="p">
+                        <c:choose>
+                            <c:when test="${p == currentPage}">
+                                <span class="w-10 h-10 rounded-full bg-primary text-white font-label-bold flex items-center justify-center shadow-md scale-105">
+                                    ${p}
+                                </span>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${pageBaseUrl}&page=${p}" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container text-on-surface transition-all font-label-bold">
+                                    ${p}
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:forEach>
+
+                    <!-- Nút Trang sau -->
+                    <c:choose>
+                        <c:when test="${currentPage < totalPages}">
+                            <a href="${pageBaseUrl}&page=${currentPage + 1}" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary text-on-surface-variant transition-all shadow-sm" title="Trang sau">
+                                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="w-10 h-10 rounded-full border border-outline-variant/40 flex items-center justify-center text-outline-variant/40 cursor-not-allowed">
+                                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                            </span>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:if>
         </div>
     </div>
 </main>

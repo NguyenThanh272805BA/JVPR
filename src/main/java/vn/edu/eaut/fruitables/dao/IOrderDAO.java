@@ -15,4 +15,5 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     void updateOrderStatus(Long orderId, String status);
     List<OrderDetailModel> findOrderDetailsByOrderId(Long orderId);
     boolean cancelOrderAndRestoreStock(Long orderId);
+    List<OrderModel> searchAndFilterOrders(String keyword, String status, String startDate, String endDate);
 }

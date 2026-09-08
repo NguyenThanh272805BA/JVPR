@@ -5,4 +5,6 @@ import java.util.List;
 public interface ICategoryDAO extends GenericDAO<CategoryModel> {
     List<CategoryModel> findAll();
     Long save(CategoryModel categoryModel);
+    CategoryModel findById(Integer id);
+    boolean update(CategoryModel categoryModel);
 }

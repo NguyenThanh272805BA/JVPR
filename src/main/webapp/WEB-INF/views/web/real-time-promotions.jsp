@@ -64,12 +64,12 @@
 <jsp:include page="/WEB-INF/views/components/navbar.jsp" />
 
 <!-- HERO BANNER: 3D GOLDEN VOUCHER & FLASH SALE VAULT -->
-<section class="tilt-3d-stage relative w-full text-white py-12 md:py-18 bg-slate-950 overflow-hidden perspective-1200">
-  <!-- Nền không gian sâu với quầng hào quang màu hổ phách và cam vàng -->
-  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#180d04] to-slate-950 z-0"></div>
-  <div class="absolute -top-28 -left-28 w-[34rem] h-[34rem] bg-amber-500/20 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0"></div>
-  <div class="absolute -bottom-28 right-0 w-[36rem] h-[36rem] bg-primary/20 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3.5s;"></div>
-  <div class="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:30px_30px] opacity-15 pointer-events-none z-0"></div>
+<section class="tilt-3d-stage relative w-full text-white py-12 md:py-18 bg-gradient-to-br from-[#062410] via-[#113819] to-[#041a0b] overflow-hidden perspective-1200 shadow-xl">
+  <!-- Nền không gian sâu với quầng hào quang màu hổ phách và xanh ngọc hữu cơ -->
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-800/35 via-[#0d3618]/70 to-[#031c0a] z-0"></div>
+  <div class="absolute -top-28 -left-28 w-[34rem] h-[34rem] bg-amber-500/25 rounded-full blur-[120px] pointer-events-none animate-ambient-aura z-0"></div>
+  <div class="absolute -bottom-28 right-0 w-[36rem] h-[36rem] bg-primary/30 rounded-full blur-[130px] pointer-events-none animate-ambient-aura z-0" style="animation-delay: -3.5s;"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(#84cc16_1px,transparent_1px)] [background-size:30px_30px] opacity-15 pointer-events-none z-0"></div>
 
   <div class="relative max-w-container-max-width mx-auto px-margin-mobile md:px-margin-desktop z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
     <!-- Cột trái: Tiêu đề & Thông điệp -->

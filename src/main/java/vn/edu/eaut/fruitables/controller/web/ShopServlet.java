@@ -91,8 +91,51 @@ public class ShopServlet extends HttpServlet {
             products.add(p4);
         }
 
-        // 4. Đẩy dữ liệu ra view để hiển thị và giữ lại trạng thái bộ lọc trên UI
-        request.setAttribute("products", products);
+        // Nhận pageSize (Số lượng sản phẩm hiển thị trên màn hình: 10, 12, 20, 24, 50)
+        String pageSizeParam = request.getParameter("pageSize");
+        int pageSize = 12; // Mặc định 12 sản phẩm (vừa vặn lưới 3 cột)
+        if (pageSizeParam != null && !pageSizeParam.trim().isEmpty()) {
+            try {
+                int ps = Integer.parseInt(pageSizeParam.trim());
+                if (ps > 0 && ps <= 100) {
+                    pageSize = ps;
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        // Nhận trang hiện tại (page)
+        String pageParam = request.getParameter("page");
+        int currentPage = 1;
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                int p = Integer.parseInt(pageParam.trim());
+                if (p > 0) {
+                    currentPage = p;
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        // 4. Xử lý phân trang trên danh sách sản phẩm sau lọc
+        int totalProducts = products != null ? products.size() : 0;
+        int totalPages = totalProducts > 0 ? (int) Math.ceil((double) totalProducts / pageSize) : 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        int fromIndex = (currentPage - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalProducts);
+        List<ProductModel> pageProducts = (products != null && fromIndex < totalProducts)
+                ? new ArrayList<>(products.subList(fromIndex, toIndex))
+                : new ArrayList<>();
+
+        // 5. Đẩy dữ liệu ra view để hiển thị và giữ lại trạng thái bộ lọc & phân trang trên UI
+        request.setAttribute("products", pageProducts);
+        request.setAttribute("totalProducts", totalProducts);
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("startItem", totalProducts > 0 ? fromIndex + 1 : 0);
+        request.setAttribute("endItem", toIndex);
+
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("selectedCategory", categoryId);
         request.setAttribute("selectedSort", sortOption);

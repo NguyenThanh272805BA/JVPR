@@ -182,4 +182,9 @@ public class OrderServiceImpl implements IOrderService {
     public boolean cancelOrderAndRestoreStock(Long orderId) {
         return orderDAO.cancelOrderAndRestoreStock(orderId);
     }
+
+    @Override
+    public List<OrderModel> searchAndFilterOrders(String keyword, String status, String startDate, String endDate) {
+        return orderDAO.searchAndFilterOrders(keyword, status, startDate, endDate);
+    }
 }

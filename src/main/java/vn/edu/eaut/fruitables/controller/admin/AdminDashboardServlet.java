@@ -27,6 +27,8 @@ public class AdminDashboardServlet extends HttpServlet {
         int totalProducts = dashboardDAO.getTotalProducts();
         int outOfStock = dashboardDAO.getOutOfStockProducts();
         java.util.List<vn.edu.eaut.fruitables.model.entity.ProductModel> lowStockProducts = dashboardDAO.getLowStockProducts(5);
+        java.util.Map<String, Object> kpiMetrics = dashboardDAO.getKpiComparativeMetrics();
+        java.util.Map<String, Object> categoryDistribution = dashboardDAO.getCategoryProductDistribution();
 
         // Truyền dữ liệu sang JSP
         request.setAttribute("totalRevenue", totalRevenue);
@@ -34,6 +36,8 @@ public class AdminDashboardServlet extends HttpServlet {
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("outOfStock", outOfStock);
         request.setAttribute("lowStockProducts", lowStockProducts);
+        request.setAttribute("kpiMetrics", kpiMetrics);
+        request.setAttribute("categoryDistribution", categoryDistribution);
 
         // Chuyển hướng tới giao diện JSP
         request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);

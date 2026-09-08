@@ -5,4 +5,6 @@ import java.util.List;
 public interface ICategoryService {
     List<CategoryModel> findAll();
     CategoryModel save(CategoryModel categoryModel);
+    CategoryModel findById(Integer id);
+    boolean update(CategoryModel categoryModel);
 }
