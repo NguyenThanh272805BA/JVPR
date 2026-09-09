@@ -150,6 +150,14 @@ public class CheckoutServlet extends HttpServlet {
 
                     response.sendRedirect(request.getContextPath() + "/home");
 
+                } else if ("MOMO".equals(paymentMethod)) {
+                    // Nếu là MOMO -> Chuyển sang trang quét mã QR MoMo
+                    session.setAttribute("PENDING_ORDER_CODE", orderCode);
+                    session.setAttribute("PENDING_TOTAL_AMOUNT", totalAmount);
+                    session.setAttribute("PENDING_METHOD", "MOMO");
+
+                    response.sendRedirect(request.getContextPath() + "/momo-payment");
+
                 } else {
                     // Nếu là VNPAY -> Chuyển sang Servlet tạo Link thanh toán thật
                     session.setAttribute("PENDING_ORDER_CODE", orderCode);
