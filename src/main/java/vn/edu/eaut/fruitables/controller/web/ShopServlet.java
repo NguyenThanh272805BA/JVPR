@@ -1,7 +1,10 @@
 package vn.edu.eaut.fruitables.controller.web;
 
+import vn.edu.eaut.fruitables.model.entity.CategoryModel;
 import vn.edu.eaut.fruitables.model.entity.ProductModel;
+import vn.edu.eaut.fruitables.service.ICategoryService;
 import vn.edu.eaut.fruitables.service.IProductService;
+import vn.edu.eaut.fruitables.service.impl.CategoryServiceImpl;
 import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
 import javax.servlet.ServletException;
@@ -16,10 +19,12 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/shop"})
 public class ShopServlet extends HttpServlet {
 
-    private IProductService productService;
+    private final IProductService productService;
+    private final ICategoryService categoryService;
 
     public ShopServlet() {
         this.productService = new ProductServiceImpl();
+        this.categoryService = new CategoryServiceImpl();
     }
 
     @Override
@@ -128,6 +133,9 @@ public class ShopServlet extends HttpServlet {
                 : new ArrayList<>();
 
         // 5. Đẩy dữ liệu ra view để hiển thị và giữ lại trạng thái bộ lọc & phân trang trên UI
+        List<CategoryModel> categories = categoryService.findAll();
+        request.setAttribute("categories", categories);
+
         request.setAttribute("products", pageProducts);
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("currentPage", currentPage);

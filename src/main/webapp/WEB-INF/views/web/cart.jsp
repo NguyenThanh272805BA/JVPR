@@ -57,7 +57,7 @@
                                     <c:set var="cartTotal" value="${cartTotal + item.subTotal}"/>
                                     <tr class="hover:bg-surface-bright transition-colors">
                                         <td class="py-4 px-6 flex items-center gap-3">
-                                            <img src="${item.imageUrl}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl border border-outline-variant flex-shrink-0">
+                                            <img src="${not empty item.imageUrl ? item.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl border border-outline-variant flex-shrink-0">
                                             <span class="font-label-bold text-on-surface line-clamp-2"><c:out value="${item.name}"/></span>
                                         </td>
                                         <td class="py-4 px-6 text-on-surface whitespace-nowrap">

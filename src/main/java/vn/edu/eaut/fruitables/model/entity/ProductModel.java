@@ -6,6 +6,7 @@ public class ProductModel {
     private String name;
     private String description;
     private Double price;
+    private Double costPrice; // Giá vốn hàng bán (Bình quân gia quyền)
     private Integer stock;
     private String imageUrl;
     private Boolean status;
@@ -46,6 +47,9 @@ public class ProductModel {
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
+
+    public Double getCostPrice() { return costPrice != null ? costPrice : 0.0; }
+    public void setCostPrice(Double costPrice) { this.costPrice = costPrice; }
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }

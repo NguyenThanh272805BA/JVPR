@@ -50,6 +50,10 @@
             <span class="material-symbols-outlined">inventory_2</span>
             <span class="font-label-bold">Sản phẩm</span>
         </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/inventory') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/inventory">
+            <span class="material-symbols-outlined">local_shipping</span>
+            <span class="font-label-bold">Kho nhập hàng</span>
+        </a>
         <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
             <span class="material-symbols-outlined">category</span>
             <span class="font-label-bold">Danh mục</span>
@@ -80,13 +84,13 @@
                 <input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-md border-transparent focus:border-primary-container focus:ring-1 focus:ring-primary-container font-body-md text-body-md transition-shadow" placeholder="Tìm kiếm nhanh..." type="text"/>
             </div>
         </div>
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
-                <div class="flex flex-col text-right">
-                    <span class="font-label-bold text-label-bold text-on-surface">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
-                    <span class="text-sm text-on-surface-variant">Quản trị viên</span>
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="flex flex-col text-right min-w-0">
+                    <span class="font-label-bold text-label-bold text-on-surface truncate max-w-[160px] whitespace-nowrap" title="${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
+                    <span class="text-xs text-on-surface-variant">Quản trị viên</span>
                 </div>
-                <span class="material-symbols-outlined text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+                <span class="material-symbols-outlined text-4xl text-primary flex-shrink-0" style="font-variation-settings: 'FILL' 1;">account_circle</span>
             </div>
             <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-2 text-error hover:text-on-error-container transition-colors">
                 <span class="material-symbols-outlined">logout</span>
@@ -98,18 +102,31 @@
     <!-- Main Scrollable Area -->
     <main class="flex-1 overflow-y-auto p-margin-desktop bg-background">
         <div class="max-w-container-max-width mx-auto space-y-8">
-            <div>
-                <h1 class="font-headline-md text-headline-md text-on-surface">Tổng quan hệ thống</h1>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="font-headline-md text-headline-md text-on-surface">Tổng quan hệ thống</h1>
+                    <p class="text-xs text-on-surface-variant mt-1">Giám sát doanh thu thuần, chi phí giá vốn (COGS), biên lợi nhuận và đơn hàng</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard/export-excel" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-label-bold text-xs shadow-sm transition-all hover:shadow-md">
+                        <span class="material-symbols-outlined text-base">download</span>
+                        <span>Xuất báo cáo Excel (.xlsx)</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/admin/inventory/create" class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-container text-white rounded-xl font-label-bold text-xs shadow-sm transition-all hover:shadow-md">
+                        <span class="material-symbols-outlined text-base">add_box</span>
+                        <span>Nhập kho mới</span>
+                    </a>
+                </div>
             </div>
 
-            <!-- Stats Row: 4 Thẻ KPI kèm Hiệu ứng Hover Nảy Khung So Sánh Thông Số -->
+            <!-- Stats Row: 4 Thẻ KPI Tài Chính & Vận Hành -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-                <!-- Thẻ 1: Tổng doanh thu -->
+                <!-- Thẻ 1: Tổng doanh thu thuần -->
                 <div class="relative group">
                     <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-primary/40 cursor-pointer">
                         <div class="flex items-center justify-between mb-4">
                             <span class="text-on-surface-variant font-label-bold text-label-bold flex items-center gap-1">
-                                Tổng doanh thu
+                                Doanh thu thuần
                                 <span class="material-symbols-outlined text-[16px] text-primary">info</span>
                             </span>
                             <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container">
@@ -128,12 +145,12 @@
                         </div>
                     </div>
 
-                    <!-- Khung nảy so sánh thông số khi Hover (Popover) -->
+                    <!-- Khung nảy so sánh thông số khi Hover -->
                     <div class="absolute left-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
                         <div class="absolute -top-2 left-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
                         <div class="flex items-center justify-between border-b pb-2 mb-3">
                             <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-primary text-base">query_stats</span> Phân tích đối sánh doanh thu
+                                <span class="material-symbols-outlined text-primary text-base">query_stats</span> Phân tích doanh số
                             </span>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${kpiMetrics.revGrowthToday >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">
                                 ${kpiMetrics.revGrowthToday >= 0 ? '+' : ''}${kpiMetrics.revGrowthToday}%
@@ -152,21 +169,112 @@
                                 <span>Giá trị TB/Đơn (AOV):</span>
                                 <span class="font-bold text-primary"><fmt:formatNumber value="${kpiMetrics.aov}" type="number" groupingUsed="true"/> ₫</span>
                             </div>
-                            <div class="pt-1">
-                                <div class="flex justify-between text-[11px] mb-1">
-                                    <span>Online (VNPAY/MOMO): <strong>${kpiMetrics.onlinePct}%</strong></span>
-                                    <span>COD: <strong>${kpiMetrics.codPct}%</strong></span>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden flex">
-                                    <div class="bg-primary h-2" style="width: ${kpiMetrics.onlinePct}%;"></div>
-                                    <div class="bg-amber-400 h-2" style="width: ${kpiMetrics.codPct}%;"></div>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 2: Tổng giá vốn hàng bán (COGS) -->
+                <div class="relative group">
+                    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-amber-500/40 cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-on-surface-variant font-label-bold text-label-bold flex items-center gap-1">
+                                Giá vốn (COGS)
+                                <span class="material-symbols-outlined text-[16px] text-amber-500">info</span>
+                            </span>
+                            <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                                <span class="material-symbols-outlined">inventory</span>
+                            </div>
+                        </div>
+                        <div class="font-price-tag text-price-tag text-amber-700">
+                            <fmt:formatNumber value="${totalCost}" type="number" groupingUsed="true"/> ₫
+                        </div>
+                        <div class="mt-2 text-xs text-on-surface-variant flex items-center gap-1.5">
+                            <span class="inline-flex items-center text-xs font-bold text-amber-600">
+                                <span class="material-symbols-outlined text-xs">local_shipping</span>
+                                Giá vốn bình quân
+                            </span>
+                            <span>cho hàng xuất bán</span>
+                        </div>
+                    </div>
+
+                    <!-- Khung nảy so sánh thông số khi Hover -->
+                    <div class="absolute left-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                        <div class="absolute -top-2 left-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
+                        <div class="flex items-center justify-between border-b pb-2 mb-3">
+                            <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-amber-600 text-base">receipt</span> Chi tiết giá vốn
+                            </span>
+                        </div>
+                        <div class="space-y-2.5 text-xs text-slate-600">
+                            <div class="flex justify-between items-center">
+                                <span>Giá vốn hôm nay:</span>
+                                <span class="font-bold text-slate-900"><fmt:formatNumber value="${kpiMetrics.costToday}" type="number" groupingUsed="true"/> ₫</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Giá vốn hôm qua:</span>
+                                <span class="font-semibold text-slate-500"><fmt:formatNumber value="${kpiMetrics.costYesterday}" type="number" groupingUsed="true"/> ₫</span>
+                            </div>
+                            <div class="pt-1 border-t border-dashed">
+                                <a href="${pageContext.request.contextPath}/admin/inventory" class="text-primary hover:underline font-bold flex items-center gap-1">
+                                    Xem lịch sử các phiếu nhập kho &rarr;
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Thẻ 2: Tổng đơn hàng -->
+                <!-- Thẻ 3: Lợi nhuận gộp (Lãi / Lỗ) -->
+                <div class="relative group">
+                    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-emerald-500/40 cursor-pointer">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-on-surface-variant font-label-bold text-label-bold flex items-center gap-1">
+                                Lợi nhuận gộp
+                                <span class="material-symbols-outlined text-[16px] text-emerald-600">info</span>
+                            </span>
+                            <div class="w-10 h-10 rounded-full ${grossProfit >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'} flex items-center justify-center">
+                                <span class="material-symbols-outlined">trending_up</span>
+                            </div>
+                        </div>
+                        <div class="font-price-tag text-price-tag ${grossProfit >= 0 ? 'text-emerald-700' : 'text-red-600'}">
+                            <fmt:formatNumber value="${grossProfit}" type="number" groupingUsed="true"/> ₫
+                        </div>
+                        <div class="mt-2 text-xs text-on-surface-variant flex items-center gap-1.5">
+                            <span class="inline-flex items-center text-xs font-bold ${grossProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}">
+                                ${kpiMetrics.profitMargin}%
+                            </span>
+                            <span>biên lợi nhuận (Margin)</span>
+                        </div>
+                    </div>
+
+                    <!-- Khung nảy so sánh thông số khi Hover -->
+                    <div class="absolute left-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                        <div class="absolute -top-2 left-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
+                        <div class="flex items-center justify-between border-b pb-2 mb-3">
+                            <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-emerald-600 text-base">savings</span> Phân tích Lãi / Lỗ
+                            </span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${grossProfit >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">
+                                ${grossProfit >= 0 ? 'Có Lãi' : 'Lỗ Vốn'}
+                            </span>
+                        </div>
+                        <div class="space-y-2.5 text-xs text-slate-600">
+                            <div class="flex justify-between items-center">
+                                <span>Lợi nhuận hôm nay:</span>
+                                <span class="font-bold text-slate-900"><fmt:formatNumber value="${kpiMetrics.profitToday}" type="number" groupingUsed="true"/> ₫</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Lợi nhuận hôm qua:</span>
+                                <span class="font-semibold text-slate-500"><fmt:formatNumber value="${kpiMetrics.profitYesterday}" type="number" groupingUsed="true"/> ₫</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1 border-t border-dashed">
+                                <span>Công thức tính:</span>
+                                <span class="font-medium text-slate-700">Doanh thu - Giá vốn COGS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thẻ 4: Tổng đơn hàng -->
                 <div class="relative group">
                     <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-blue-500/40 cursor-pointer">
                         <div class="flex items-center justify-between mb-4">
@@ -188,12 +296,12 @@
                         </div>
                     </div>
 
-                    <!-- Khung nảy so sánh thông số khi Hover (Popover) -->
-                    <div class="absolute left-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
-                        <div class="absolute -top-2 left-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
+                    <!-- Khung nảy so sánh thông số khi Hover -->
+                    <div class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                        <div class="absolute -top-2 right-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
                         <div class="flex items-center justify-between border-b pb-2 mb-3">
                             <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-blue-600 text-base">bar_chart</span> Đối sánh hiệu suất đơn hàng
+                                <span class="material-symbols-outlined text-blue-600 text-base">bar_chart</span> Hiệu suất đơn hàng
                             </span>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
                                 ${kpiMetrics.ordersGrowthToday >= 0 ? '+' : ''}${kpiMetrics.ordersGrowthToday}%
@@ -201,127 +309,16 @@
                         </div>
                         <div class="space-y-2.5 text-xs text-slate-600">
                             <div class="flex justify-between items-center">
-                                <span>Đơn phát sinh hôm nay:</span>
+                                <span>Đơn hôm nay:</span>
                                 <span class="font-bold text-slate-900">${kpiMetrics.ordersToday} đơn</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span>Đơn phát sinh hôm qua:</span>
+                                <span>Đơn hôm qua:</span>
                                 <span class="font-semibold text-slate-500">${kpiMetrics.ordersYesterday} đơn</span>
                             </div>
                             <div class="flex justify-between items-center pt-1 border-t border-dashed">
-                                <span>Tỷ lệ hoàn thành:</span>
-                                <span class="font-bold text-green-600">${kpiMetrics.completionRate}%</span>
-                            </div>
-                            <div class="flex justify-between items-center bg-amber-50 p-2 rounded-lg text-amber-800 font-medium">
-                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> Đơn chờ duyệt gấp:</span>
-                                <span class="font-bold text-amber-900">${kpiMetrics.pendingOrders} đơn</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Thẻ 3: Tổng sản phẩm -->
-                <div class="relative group">
-                    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-indigo-500/40 cursor-pointer">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-on-surface-variant font-label-bold text-label-bold flex items-center gap-1">
-                                Tổng sản phẩm
-                                <span class="material-symbols-outlined text-[16px] text-indigo-500">info</span>
-                            </span>
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-                                <span class="material-symbols-outlined">inventory_2</span>
-                            </div>
-                        </div>
-                        <div class="font-price-tag text-price-tag text-on-surface">${totalProducts}</div>
-                        <div class="mt-2 text-xs text-on-surface-variant flex items-center gap-1.5">
-                            <span class="inline-flex items-center text-xs font-bold text-green-600">
-                                ${kpiMetrics.inStockPct}%
-                            </span>
-                            <span>đang sẵn sàng bán</span>
-                        </div>
-                    </div>
-
-                    <!-- Khung nảy so sánh thông số khi Hover (Popover) -->
-                    <div class="absolute left-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
-                        <div class="absolute -top-2 left-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
-                        <div class="flex items-center justify-between border-b pb-2 mb-3">
-                            <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-indigo-600 text-base">category</span> Cơ cấu hàng hóa trong kho
-                            </span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">
-                                ${totalProducts} SKU
-                            </span>
-                        </div>
-                        <div class="space-y-2.5 text-xs text-slate-600">
-                            <div class="flex justify-between items-center">
-                                <span>Tỷ lệ còn hàng:</span>
-                                <span class="font-bold text-green-600">${kpiMetrics.inStockPct}%</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Tỷ lệ hết hàng:</span>
-                                <span class="font-bold text-red-500">${kpiMetrics.outStockPct}%</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-1 border-t border-dashed">
-                                <span>Danh mục dẫn đầu:</span>
-                                <span class="font-bold text-slate-800">${kpiMetrics.topCategoryName} (${kpiMetrics.topCategoryCount} SP)</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Sản phẩm mới thêm (30 ngày):</span>
-                                <span class="font-bold text-primary">+${kpiMetrics.new30d} mặt hàng</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Thẻ 4: Cảnh báo tồn kho -->
-                <div class="relative group">
-                    <div class="bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-red-500/40 cursor-pointer">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-on-surface-variant font-label-bold text-label-bold flex items-center gap-1">
-                                Cảnh báo tồn kho
-                                <span class="material-symbols-outlined text-[16px] text-error">info</span>
-                            </span>
-                            <div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center">
-                                <span class="material-symbols-outlined">warning</span>
-                            </div>
-                        </div>
-                        <div class="font-price-tag text-price-tag text-error">${outOfStock}</div>
-                        <div class="mt-2 text-xs text-on-surface-variant flex items-center gap-1.5">
-                            <span class="inline-flex items-center text-xs font-bold text-amber-600">
-                                +${kpiMetrics.lowStockCount} SP
-                            </span>
-                            <span>sắp hết hàng (&le; 5)</span>
-                        </div>
-                    </div>
-
-                    <!-- Khung nảy so sánh thông số khi Hover (Popover) -->
-                    <div class="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-5 border border-slate-200 z-50 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
-                        <div class="absolute -top-2 right-8 w-4 h-4 bg-white border-t border-l border-slate-200 transform rotate-45"></div>
-                        <div class="flex items-center justify-between border-b pb-2 mb-3">
-                            <span class="font-bold text-slate-800 text-sm flex items-center gap-1.5 text-error">
-                                <span class="material-symbols-outlined text-error text-base">emergency</span> Rủi ro cạn kiệt hàng hóa
-                            </span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-error/10 text-error">
-                                Cần nhập gấp
-                            </span>
-                        </div>
-                        <div class="space-y-2.5 text-xs text-slate-600">
-                            <div class="flex justify-between items-center">
-                                <span>Hết hàng hoàn toàn (Tồn = 0):</span>
-                                <span class="font-bold text-error">${kpiMetrics.outStockCount} sản phẩm</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Sắp hết báo động (Tồn 1 - 5):</span>
-                                <span class="font-bold text-amber-600">${kpiMetrics.lowStockCount} sản phẩm</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-1 border-t border-dashed">
-                                <span>Ước tính vốn cần tái nhập:</span>
-                                <span class="font-bold text-slate-900"><fmt:formatNumber value="${kpiMetrics.restockCost}" type="number" groupingUsed="true"/> ₫</span>
-                            </div>
-                            <div class="pt-1">
-                                <a href="${pageContext.request.contextPath}/admin/products" class="w-full py-1.5 bg-error/10 hover:bg-error/20 text-error font-bold rounded-lg text-center block transition-colors text-xs">
-                                    Xem kho & Nhập thêm hàng &rarr;
-                                </a>
+                                <span>Đơn chờ xử lý:</span>
+                                <span class="font-bold text-amber-600">${kpiMetrics.pendingOrders} đơn</span>
                             </div>
                         </div>
                     </div>
@@ -405,140 +402,6 @@
                     <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                         <span>Nhấp vào danh mục hoặc nút "Chi tiết" để xem toàn bộ danh sách sản phẩm.</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Cảnh báo tồn kho: Sản phẩm sắp hết hàng (Mới bổ sung) -->
-            <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden mb-8 border border-amber-200/70">
-                <div class="p-6 border-b border-surface-variant flex justify-between items-center bg-amber-50/50">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-700 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-xl">warning</span>
-                        </span>
-                        <div>
-                            <h2 class="font-label-bold text-base text-on-surface font-bold">Cảnh báo: Sản phẩm sắp hết hàng (Tồn kho &le; 5)</h2>
-                            <p class="text-xs text-on-surface-variant">Danh sách các sản phẩm cần nhập thêm hàng gấp để không gián đoạn kinh doanh</p>
-                        </div>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/admin/products" class="text-primary hover:text-primary-container text-xs font-label-bold flex items-center gap-1 transition-colors">
-                        Quản lý toàn bộ kho <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                    </a>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                        <tr class="bg-surface-container text-on-surface-variant font-label-bold text-xs uppercase tracking-wider">
-                            <th class="py-3.5 px-6">Mã SP</th>
-                            <th class="py-3.5 px-6">Sản phẩm</th>
-                            <th class="py-3.5 px-6">Danh mục</th>
-                            <th class="py-3.5 px-6">Giá bán</th>
-                            <th class="py-3.5 px-6">Tồn kho hiện tại</th>
-                            <th class="py-3.5 px-6 text-right">Thao tác</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-surface-variant text-sm text-on-surface">
-                        <c:choose>
-                            <c:when test="${not empty lowStockProducts}">
-                                <c:forEach var="p" items="${lowStockProducts}">
-                                    <tr class="hover:bg-amber-50/40 transition-colors">
-                                        <td class="py-3.5 px-6 font-mono text-xs text-on-surface-variant">#PRD-${p.id}</td>
-                                        <td class="py-3.5 px-6">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant overflow-hidden flex-shrink-0">
-                                                    <c:choose>
-                                                        <c:when test="${not empty p.imageUrl}">
-                                                            <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover">
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="w-full h-full flex items-center justify-center text-outline">
-                                                                <span class="material-symbols-outlined text-sm">image</span>
-                                                            </div>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                                <span class="font-medium text-on-surface line-clamp-1">${p.name}</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3.5 px-6 text-on-surface-variant text-xs">${not empty p.categoryName ? p.categoryName : 'Chưa phân loại'}</td>
-                                        <td class="py-3.5 px-6 font-semibold">
-                                            <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> ₫
-                                        </td>
-                                        <td class="py-3.5 px-6">
-                                            <c:choose>
-                                                <c:when test="${p.stock <= 0}">
-                                                    <span class="px-2.5 py-1 bg-red-100 text-red-700 font-bold rounded-full text-xs border border-red-200 inline-flex items-center gap-1 animate-pulse">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span> Hết hàng (0)
-                                                    </span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="px-2.5 py-1 bg-amber-100 text-amber-800 font-bold rounded-full text-xs border border-amber-200 inline-flex items-center gap-1">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Còn ${p.stock} sản phẩm
-                                                    </span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td class="py-3.5 px-6 text-right">
-                                            <a href="${pageContext.request.contextPath}/admin/products" class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-lg text-xs font-bold transition-all shadow-sm">
-                                                <span class="material-symbols-outlined text-[16px]">edit_square</span> Nhập thêm
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <tr>
-                                    <td colspan="6" class="py-8 text-center text-on-surface-variant text-sm">
-                                        <div class="flex flex-col items-center justify-center gap-1">
-                                            <span class="material-symbols-outlined text-emerald-500 text-3xl">check_circle</span>
-                                            <span class="font-medium text-emerald-700">Tuyệt vời! Hiện tại không có sản phẩm nào có lượng tồn kho dưới mức cảnh báo.</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </c:otherwise>
-                        </c:choose>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Recent Products (Khối đã được giữ lại trọn vẹn) -->
-            <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
-                <div class="p-6 border-b border-surface-variant flex justify-between items-center">
-                    <h2 class="font-label-bold text-label-bold text-on-surface">Sản phẩm mới thêm</h2>
-                    <a href="${pageContext.request.contextPath}/admin/products" class="text-primary-container hover:text-primary font-label-bold text-label-bold transition-colors">Xem tất cả</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                        <tr class="bg-surface-container text-on-surface-variant font-label-bold text-label-bold text-sm">
-                            <th class="py-4 px-6 font-medium">Mã SP</th>
-                            <th class="py-4 px-6 font-medium">Hình ảnh</th>
-                            <th class="py-4 px-6 font-medium">Tên sản phẩm</th>
-                            <th class="py-4 px-6 font-medium">Danh mục</th>
-                            <th class="py-4 px-6 font-medium">Giá bán</th>
-                            <th class="py-4 px-6 font-medium">Tồn kho</th>
-                            <th class="py-4 px-6 font-medium">Trạng thái</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-surface-variant text-body-md text-on-surface">
-                        <tr class="hover:bg-surface-bright transition-colors">
-                            <td class="py-4 px-6">#PRD-001</td>
-                            <td class="py-4 px-6">
-                                <div class="w-12 h-12 bg-surface-variant rounded-md flex items-center justify-center text-outline">
-                                    <span class="material-symbols-outlined text-sm">image</span>
-                                </div>
-                            </td>
-                            <td class="py-4 px-6 font-medium">Chuối hữu cơ nhập khẩu</td>
-                            <td class="py-4 px-6 text-on-surface-variant">Trái cây</td>
-                            <td class="py-4 px-6">45,000 ₫</td>
-                            <td class="py-4 px-6">120</td>
-                            <td class="py-4 px-6">
-                                <span class="px-3 py-1 bg-primary-container/20 text-primary-container rounded-full text-xs font-semibold">Đang bán</span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
@@ -636,7 +499,7 @@
                         labels: data.labels,
                         datasets: [
                             {
-                                label: 'Kỳ hiện tại (VNĐ)',
+                                label: 'Doanh thu (VNĐ)',
                                 data: data.currentData || data.data,
                                 borderColor: '#81c408',
                                 backgroundColor: gradientCurrent,
@@ -649,16 +512,43 @@
                                 tension: 0.35
                             },
                             {
-                                label: 'Kỳ trước đó (Đối sánh)',
+                                label: 'Giá vốn COGS (VNĐ)',
+                                data: data.costData || [],
+                                borderColor: '#f97316',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#f97316',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                fill: false,
+                                tension: 0.35
+                            },
+                            {
+                                label: 'Lợi nhuận gộp Lãi/Lỗ (VNĐ)',
+                                data: data.profitData || [],
+                                borderColor: '#059669',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2.5,
+                                borderDash: [4, 4],
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#059669',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                fill: false,
+                                tension: 0.35
+                            },
+                            {
+                                label: 'Doanh thu kỳ trước (Đối sánh)',
                                 data: data.previousData,
                                 borderColor: '#94a3b8',
                                 backgroundColor: 'transparent',
-                                borderWidth: 2,
+                                borderWidth: 1.5,
                                 borderDash: [6, 6],
                                 pointBackgroundColor: '#ffffff',
                                 pointBorderColor: '#94a3b8',
                                 pointBorderWidth: 1.5,
-                                pointRadius: 4,
+                                pointRadius: 3,
                                 fill: false,
                                 tension: 0.35
                             }

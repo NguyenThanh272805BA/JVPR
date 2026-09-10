@@ -112,6 +112,10 @@
             <span class="material-symbols-outlined">inventory_2</span>
             <span class="font-label-bold">Sản phẩm</span>
         </a>
+        <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/inventory') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/inventory">
+            <span class="material-symbols-outlined">warehouse</span>
+            <span class="font-label-bold">Kho nhập hàng</span>
+        </a>
         <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
             <span class="material-symbols-outlined">category</span>
             <span class="font-label-bold">Danh mục</span>
@@ -142,9 +146,9 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <span class="font-label-bold text-label-bold mr-2 text-sm">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
-            <a href="${pageContext.request.contextPath}/logout" class="p-2 text-error hover:bg-error-container rounded-full transition-colors flex items-center" title="Đăng xuất">
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <span class="font-label-bold text-label-bold mr-2 text-sm max-w-[160px] truncate whitespace-nowrap" title="${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
+            <a href="${pageContext.request.contextPath}/logout" class="p-2 text-error hover:bg-error-container rounded-full transition-colors flex items-center flex-shrink-0" title="Đăng xuất">
                 <span class="material-symbols-outlined">logout</span>
             </a>
         </div>
@@ -436,7 +440,7 @@
                             <td class="py-3.5 px-5">
                                 <div class="flex items-center gap-3">
                                     <div class="w-12 h-12 rounded-xl bg-surface-container overflow-hidden border border-outline-variant flex-shrink-0 relative">
-                                        <img class="w-full h-full object-cover" src="${item.imageUrl}" alt="${item.name}"/>
+                                        <img class="w-full h-full object-cover" src="${not empty item.imageUrl ? item.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" alt="${item.name}"/>
                                         <c:if test="${item.isFreeShipping}">
                                             <span class="absolute top-0 right-0 bg-primary text-white text-[8px] px-1 rounded-bl font-bold">Free</span>
                                         </c:if>

@@ -25,8 +25,10 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
     @Override
     public Long save(ProductModel product) {
         String sql = "INSERT INTO products (category_id, name, slug, description, detailed_description, price, tax_rate, discount_price, stock, image_url, status, weight_gram, storage_type, is_free_shipping) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String baseSlug = (product.getName() != null ? product.getName().toLowerCase().trim().replaceAll("[^a-zA-Z0-9\\u00C0-\\u1EF9]+", "-") : "product");
+        String slug = baseSlug + "-" + (System.currentTimeMillis() % 1000000);
         return insert(sql,
-                product.getCategoryId(), product.getName(), product.getName().toLowerCase().replaceAll("\\s+", "-"),
+                product.getCategoryId(), product.getName(), slug,
                 product.getDescription(), product.getDetailedDescription(), product.getPrice(), product.getTaxRate(), product.getDiscountPrice(), product.getStock(),
                 product.getImageUrl(), product.getStatus(),
                 product.getWeightGram() != null ? product.getWeightGram() : 500,

@@ -36,8 +36,13 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
 
     @Override
     public void saveOrderDetail(Long orderId, Long productId, Double price, Integer quantity, Double subTotal) {
-        String sql = "INSERT INTO order_details (order_id, product_id, price, quantity, sub_total) VALUES (?, ?, ?, ?, ?)";
-        insert(sql, orderId, productId, price, quantity, subTotal);
+        saveOrderDetail(orderId, productId, price, 0.0, quantity, subTotal);
+    }
+
+    @Override
+    public void saveOrderDetail(Long orderId, Long productId, Double price, Double costPrice, Integer quantity, Double subTotal) {
+        String sql = "INSERT INTO order_details (order_id, product_id, price, cost_price, quantity, sub_total) VALUES (?, ?, ?, ?, ?, ?)";
+        insert(sql, orderId, productId, price, costPrice != null ? costPrice : 0.0, quantity, subTotal);
     }
 
     @Override
@@ -107,6 +112,7 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                     detail.setOrderId(rs.getLong("order_id"));
                     detail.setProductId(rs.getLong("product_id"));
                     detail.setPrice(rs.getDouble("price"));
+                    detail.setCostPrice(rs.getDouble("cost_price"));
                     detail.setQuantity(rs.getInt("quantity"));
                     detail.setSubTotal(rs.getDouble("sub_total"));
                     detail.setProductName(rs.getString("product_name"));

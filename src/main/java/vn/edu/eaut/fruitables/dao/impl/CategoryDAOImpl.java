@@ -8,7 +8,8 @@ import java.util.List;
 public class CategoryDAOImpl extends AbstractDAO<CategoryModel> implements ICategoryDAO {
     @Override
     public List<CategoryModel> findAll() {
-        String sql = "SELECT * FROM categories ORDER BY id DESC";
+        String sql = "SELECT c.*, (SELECT COUNT(*) FROM products WHERE category_id = c.id AND status = 1) AS product_count " +
+                     "FROM categories c WHERE c.status = 1 ORDER BY c.id ASC";
         return query(sql, new CategoryMapper());
     }
 

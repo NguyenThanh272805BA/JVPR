@@ -39,6 +39,10 @@
       <span class="material-symbols-outlined">inventory_2</span>
       <span class="font-label-bold">Sản phẩm</span>
     </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/inventory') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/inventory">
+      <span class="material-symbols-outlined">warehouse</span>
+      <span class="font-label-bold">Kho nhập hàng</span>
+    </a>
     <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
       <span class="material-symbols-outlined">category</span>
       <span class="font-label-bold">Danh mục</span>

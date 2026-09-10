@@ -23,19 +23,21 @@ public class AdminDashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Truy xuất các chỉ số thực tế từ DB
         double totalRevenue = dashboardDAO.getTotalRevenue();
+        double totalCost = dashboardDAO.getTotalCost();
+        double grossProfit = dashboardDAO.getGrossProfit();
         int totalOrders = dashboardDAO.getTotalOrders();
         int totalProducts = dashboardDAO.getTotalProducts();
         int outOfStock = dashboardDAO.getOutOfStockProducts();
-        java.util.List<vn.edu.eaut.fruitables.model.entity.ProductModel> lowStockProducts = dashboardDAO.getLowStockProducts(5);
         java.util.Map<String, Object> kpiMetrics = dashboardDAO.getKpiComparativeMetrics();
         java.util.Map<String, Object> categoryDistribution = dashboardDAO.getCategoryProductDistribution();
 
         // Truyền dữ liệu sang JSP
         request.setAttribute("totalRevenue", totalRevenue);
+        request.setAttribute("totalCost", totalCost);
+        request.setAttribute("grossProfit", grossProfit);
         request.setAttribute("totalOrders", totalOrders);
         request.setAttribute("totalProducts", totalProducts);
         request.setAttribute("outOfStock", outOfStock);
-        request.setAttribute("lowStockProducts", lowStockProducts);
         request.setAttribute("kpiMetrics", kpiMetrics);
         request.setAttribute("categoryDistribution", categoryDistribution);
 

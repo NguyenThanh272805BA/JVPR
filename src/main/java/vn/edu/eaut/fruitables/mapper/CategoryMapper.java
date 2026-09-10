@@ -14,6 +14,9 @@ public class CategoryMapper implements IRowMapper<CategoryModel> {
             category.setTaxRate(rs.getDouble("tax_rate"));
             category.setStatus(rs.getBoolean("status"));
             category.setCreatedAt(rs.getTimestamp("created_at"));
+            try {
+                category.setProductCount(rs.getInt("product_count"));
+            } catch (SQLException ignored) {}
             return category;
         } catch (SQLException e) {
             e.printStackTrace();

@@ -38,6 +38,10 @@
       <span class="material-symbols-outlined">inventory_2</span>
       <span class="font-label-bold">Sản phẩm</span>
     </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/inventory') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/inventory">
+      <span class="material-symbols-outlined">local_shipping</span>
+      <span class="font-label-bold">Kho nhập hàng</span>
+    </a>
     <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
       <span class="material-symbols-outlined">category</span>
       <span class="font-label-bold">Danh mục</span>
@@ -60,9 +64,9 @@
 <main class="flex-1 flex flex-col h-screen overflow-hidden">
   <header class="h-20 bg-surface flex items-center justify-between px-6 shadow-sm z-10 flex-shrink-0 border-b border-surface-variant">
     <div class="flex items-center flex-1 justify-end">
-      <div class="flex items-center gap-4">
-        <span class="font-label-bold mr-2">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
-        <a href="${pageContext.request.contextPath}/logout" class="p-2 text-error hover:bg-error-container rounded-full transition-colors" title="Đăng xuất">
+      <div class="flex items-center gap-4 flex-shrink-0">
+        <span class="font-label-bold mr-2 truncate max-w-[160px] whitespace-nowrap text-sm" title="${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
+        <a href="${pageContext.request.contextPath}/logout" class="p-2 text-error hover:bg-error-container rounded-full transition-colors flex-shrink-0" title="Đăng xuất">
           <span class="material-symbols-outlined">logout</span>
         </a>
       </div>

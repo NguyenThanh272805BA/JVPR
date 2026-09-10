@@ -100,8 +100,123 @@
 </section>
 
 <!-- MAIN SHOP CONTENT -->
-<main class="flex-grow py-12">
-    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex flex-col md:flex-row gap-8">
+<main class="flex-grow py-8 md:py-10">
+    <div class="px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+
+        <!-- XÁC ĐỊNH TÊN DANH MỤC HIỆN TẠI -->
+        <c:set var="currentCatName" value="Tất cả sản phẩm" />
+        <c:forEach var="c" items="${categories}">
+            <c:if test="${selectedCategory == c.id}">
+                <c:set var="currentCatName" value="${c.name}" />
+            </c:if>
+        </c:forEach>
+
+        <!-- THANH LỰA CHỌN DANH MỤC HÀNG NGANG & MENU TRƯỢT XUỐNG -->
+        <div class="mb-8 bg-surface-container-lowest p-4 md:p-5 rounded-2xl border border-outline-variant shadow-sm transition-all hover:shadow-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-surface-variant/70">
+                <!-- Tiêu đề & Trạng thái lọc -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-xl">category</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-on-surface-variant font-medium block">Danh mục đang chọn:</span>
+                        <div class="text-sm md:text-base font-black text-on-surface flex items-center gap-2">
+                            <span class="text-primary truncate max-w-[260px] md:max-w-none">${currentCatName}</span>
+                            <c:if test="${not empty selectedCategory}">
+                                <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>"
+                                   class="text-[11px] font-bold text-rose-500 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded-full flex items-center gap-0.5 transition-colors" title="Bỏ lọc danh mục">
+                                    <span class="material-symbols-outlined text-xs">close</span> Bỏ chọn
+                                </a>
+                            </c:if>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BỘ CHỌN TRƯỢT XUỐNG (DROPDOWN MENU / SELECT) -->
+                <div class="relative flex items-center gap-2" id="categoryDropdownWrapper">
+                    <span class="text-xs text-on-surface-variant hidden md:inline">Chọn nhanh:</span>
+                    <div class="relative">
+                        <button type="button" onclick="toggleCategoryDropdown()" id="btnCategoryDropdown"
+                                class="inline-flex items-center justify-between gap-2.5 px-4 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl border border-outline-variant text-xs md:text-sm font-bold shadow-xs transition-all hover:border-primary">
+                            <span class="flex items-center gap-1.5 truncate max-w-[180px] sm:max-w-[220px]">
+                                <span class="material-symbols-outlined text-primary text-base">filter_list</span>
+                                <span class="truncate">${currentCatName}</span>
+                            </span>
+                            <span class="material-symbols-outlined text-base transition-transform duration-200" id="catDropdownArrow">expand_more</span>
+                        </button>
+
+                        <!-- Menu trượt xuống với thanh cuộn (Scrollable Dropdown) -->
+                        <div id="categoryDropdownMenu" 
+                             class="hidden absolute right-0 mt-2 w-72 max-h-80 overflow-y-auto bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-2xl z-50 p-2 divide-y divide-surface-variant/80 transition-all">
+                            <div class="py-1">
+                                <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>" 
+                                   class="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold hover:bg-primary/10 hover:text-primary transition-colors ${empty selectedCategory ? 'bg-primary text-white font-bold' : 'text-on-surface'}">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-base">apps</span>
+                                        <span>Tất cả sản phẩm</span>
+                                    </span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full ${empty selectedCategory ? 'bg-white/20 text-white' : 'bg-surface-container text-on-surface-variant'}">${totalProducts}</span>
+                                </a>
+                            </div>
+                            <div class="py-1 space-y-1">
+                                <c:forEach var="cat" items="${categories}">
+                                    <c:set var="isSel" value="${selectedCategory == cat.id}" />
+                                    <a href="${pageContext.request.contextPath}/shop?category=${cat.id}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>"
+                                       class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold hover:bg-primary/10 hover:text-primary transition-colors ${isSel ? 'bg-primary text-white font-bold' : 'text-on-surface'}">
+                                        <span class="flex items-center gap-2 truncate">
+                                            <span class="material-symbols-outlined text-base ${isSel ? 'text-white' : 'text-primary'}">${isSel ? 'check_circle' : 'subdirectory_arrow_right'}</span>
+                                            <span class="truncate">${cat.name}</span>
+                                        </span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 ${isSel ? 'bg-white/20 text-white' : 'bg-surface-container text-on-surface-variant'}">${cat.productCount}</span>
+                                    </a>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH TRƯỢT HÀNG NGANG CÁC DANH MỤC (HORIZONTAL PILLS TRACK) -->
+            <div class="relative mt-3 flex items-center">
+                <!-- Nút cuộn trái -->
+                <button type="button" onclick="scrollCategoryPills('left')" 
+                        class="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full bg-surface-container hover:bg-primary hover:text-white items-center justify-center text-on-surface shadow-xs transition-all mr-2"
+                        title="Cuộn sang trái">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+                
+                <!-- Dải nút cuộn hàng ngang -->
+                <div id="categoryPillsTrack" class="flex items-center gap-2 overflow-x-auto py-1 scroll-smooth w-full [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                    <!-- Nút Tất cả -->
+                    <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>"
+                       class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${empty selectedCategory ? 'bg-primary text-white shadow-md scale-105 active-pill' : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary border border-outline-variant/60'}">
+                        <span class="material-symbols-outlined text-sm">apps</span>
+                        <span>Tất cả</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${empty selectedCategory ? 'bg-white/20 text-white' : 'bg-surface-container-lowest text-on-surface-variant'}">${totalProducts}</span>
+                    </a>
+
+                    <!-- Danh mục động từ DB -->
+                    <c:forEach var="cat" items="${categories}">
+                        <c:set var="isCatActive" value="${selectedCategory == cat.id}" />
+                        <a href="${pageContext.request.contextPath}/shop?category=${cat.id}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>"
+                           class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${isCatActive ? 'bg-primary text-white shadow-md scale-105 active-pill' : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary border border-outline-variant/60'}">
+                            <span>${cat.name}</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isCatActive ? 'bg-white/20 text-white' : 'bg-surface-container-lowest text-on-surface-variant'}">${cat.productCount}</span>
+                        </a>
+                    </c:forEach>
+                </div>
+
+                <!-- Nút cuộn phải -->
+                <button type="button" onclick="scrollCategoryPills('right')" 
+                        class="hidden md:flex flex-shrink-0 w-8 h-8 rounded-full bg-surface-container hover:bg-primary hover:text-white items-center justify-center text-on-surface shadow-xs transition-all ml-2"
+                        title="Cuộn sang phải">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8">
 
         <!-- SIDEBAR -->
         <aside class="w-full md:w-1/4 flex flex-col gap-6 relative z-10">
@@ -114,7 +229,7 @@
                         <c:if test="${not empty selectedMinPrice}"><input type="hidden" name="minPrice" value="${selectedMinPrice}"></c:if>
                         <c:if test="${not empty selectedMaxPrice}"><input type="hidden" name="maxPrice" value="${selectedMaxPrice}"></c:if>
                         <input type="text" id="liveSearchInput" name="keyword" value="${keyword}" placeholder="Nhập tên sản phẩm..."
-                               class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface transition-colors" autocomplete="off">
+                                class="w-full pl-4 pr-10 py-3 rounded-lg border border-outline-variant focus:border-primary outline-none font-body-md text-on-surface transition-colors" autocomplete="off">
                         <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-primary">
                             <span class="material-symbols-outlined">search</span>
                         </button>
@@ -126,30 +241,35 @@
                 </div>
             </div>
 
-            <!-- Danh mục -->
+            <!-- Danh mục trong Sidebar -->
             <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-sm">
-                <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2">Danh mục</h3>
-                <ul class="space-y-3 font-body-md text-on-surface-variant">
+                <h3 class="font-headline-md text-lg text-on-surface mb-4 border-b border-surface-variant pb-2 flex items-center justify-between">
+                    <span>Danh mục</span>
+                    <span class="text-xs text-primary font-bold font-mono">${categories.size()} mục</span>
+                </h3>
+                <ul class="space-y-1.5 font-body-md text-on-surface-variant text-xs md:text-sm max-h-96 overflow-y-auto pr-1">
                     <li>
-                        <a href="${pageContext.request.contextPath}/shop" class="flex justify-between items-center hover:text-primary transition-colors ${empty selectedCategory ? 'text-primary font-bold' : ''}">
-                            <span>Tất cả sản phẩm</span>
+                        <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>" 
+                           class="flex justify-between items-center px-3 py-2 rounded-xl hover:bg-surface-container transition-colors ${empty selectedCategory ? 'bg-primary/10 text-primary font-bold' : ''}">
+                            <span class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">apps</span>
+                                <span>Tất cả sản phẩm</span>
+                            </span>
+                            <span class="text-[11px] px-2 py-0.5 rounded-full ${empty selectedCategory ? 'bg-primary text-white font-bold' : 'bg-surface-container text-on-surface-variant'}">${totalProducts}</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/shop?category=1" class="flex justify-between items-center hover:text-primary transition-colors ${selectedCategory == 1 ? 'text-primary font-bold' : ''}">
-                            <span>Trái cây nhập khẩu</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/shop?category=2" class="flex justify-between items-center hover:text-primary transition-colors ${selectedCategory == 2 ? 'text-primary font-bold' : ''}">
-                            <span>Trái cây nội địa</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/shop?category=3" class="flex justify-between items-center hover:text-primary transition-colors ${selectedCategory == 3 ? 'text-primary font-bold' : ''}">
-                            <span>Rau xanh</span>
-                        </a>
-                    </li>
+                    <c:forEach var="cat" items="${categories}">
+                        <li>
+                            <a href="${pageContext.request.contextPath}/shop?category=${cat.id}<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>" 
+                               class="flex justify-between items-center px-3 py-2 rounded-xl hover:bg-surface-container transition-colors ${selectedCategory == cat.id ? 'bg-primary/10 text-primary font-bold' : ''}">
+                                <span class="flex items-center gap-2 truncate">
+                                    <span class="material-symbols-outlined text-sm ${selectedCategory == cat.id ? 'text-primary' : 'text-slate-400'}">chevron_right</span>
+                                    <span class="truncate">${cat.name}</span>
+                                </span>
+                                <span class="text-[11px] px-2 py-0.5 rounded-full ml-1 flex-shrink-0 ${selectedCategory == cat.id ? 'bg-primary text-white font-bold' : 'bg-surface-container text-on-surface-variant'}">${cat.productCount}</span>
+                            </a>
+                        </li>
+                    </c:forEach>
                 </ul>
             </div>
 
@@ -272,7 +392,7 @@
                     <div class="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/80 hover:border-primary/50 overflow-hidden group flex flex-col hover:-translate-y-1 relative">
                         <!-- Product Image Clickable -->
                         <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="relative w-full h-48 bg-surface-container overflow-hidden block">
-                            <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-75' : ''}">
+                            <img src="${not empty item.imageUrl ? item.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isOutOfStock ? 'grayscale opacity-75' : ''}">
                             <div class="absolute top-3 left-3 bg-primary/95 backdrop-blur-xs text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                                 <c:out value="${item.categoryName}"/>
                             </div>
@@ -443,6 +563,7 @@
                 </div>
             </c:if>
         </div>
+    </div>
     </div>
 </main>
 
@@ -687,6 +808,54 @@
         box.classList.remove('scale-100');
         box.classList.add('scale-90');
     }
+
+    // --- XỬ LÝ THANH LỰA CHỌN DANH MỤC HÀNG NGANG & MENU TRƯỢT XUỐNG ---
+    function toggleCategoryDropdown() {
+        const menu = document.getElementById('categoryDropdownMenu');
+        const arrow = document.getElementById('catDropdownArrow');
+        if (menu) {
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                if (arrow) arrow.classList.add('rotate-180');
+            } else {
+                menu.classList.add('hidden');
+                if (arrow) arrow.classList.remove('rotate-180');
+            }
+        }
+    }
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('categoryDropdownWrapper');
+        const menu = document.getElementById('categoryDropdownMenu');
+        const arrow = document.getElementById('catDropdownArrow');
+        if (wrapper && menu && !wrapper.contains(e.target)) {
+            menu.classList.add('hidden');
+            if (arrow) arrow.classList.remove('rotate-180');
+        }
+    });
+
+    // Cuộn danh mục hàng ngang (Pill track)
+    function scrollCategoryPills(direction) {
+        const track = document.getElementById('categoryPillsTrack');
+        if (track) {
+            const scrollAmount = 260;
+            if (direction === 'left') {
+                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+    }
+
+    // Tự động cuộn đến danh mục đang chọn trên thanh trượt khi tải trang
+    window.addEventListener('DOMContentLoaded', function() {
+        const activePill = document.querySelector('#categoryPillsTrack a.active-pill');
+        if (activePill) {
+            activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    });
 </script>
 
 <!-- MODAL HẾT HÀNG CHO TRANG SHOP -->

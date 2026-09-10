@@ -15,6 +15,11 @@ public class ProductMapper implements IRowMapper<ProductModel> {
             product.setName(rs.getString("name"));
             product.setDescription(rs.getString("description"));
             product.setPrice(rs.getDouble("price"));
+            try {
+                product.setCostPrice(rs.getDouble("cost_price"));
+            } catch (SQLException e) {
+                product.setCostPrice(0.0);
+            }
             product.setStock(rs.getInt("stock"));
             product.setImageUrl(rs.getString("image_url"));
             product.setStatus(rs.getBoolean("status"));

@@ -241,7 +241,7 @@
                             <div class="flex justify-between items-center text-xs">
                                 <div class="flex items-center gap-2.5">
                                     <div class="relative w-11 h-11 rounded-lg border border-outline-variant overflow-hidden flex-shrink-0">
-                                        <img src="${item.imageUrl}" class="w-full h-full object-cover">
+                                        <img src="${not empty item.imageUrl ? item.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" class="w-full h-full object-cover">
                                         <span class="absolute -top-1 -right-1 bg-surface-variant text-on-surface-variant text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                                             <c:out value="${item.quantity}"/>
                                         </span>

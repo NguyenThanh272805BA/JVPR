@@ -2,9 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex-nowrap gap-2 md:gap-4">
         <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
-        <a class="group flex items-center gap-3 transition-all duration-300 select-none" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
+        <a class="group flex items-center gap-2.5 md:gap-3 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
             <div class="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-[0_4px_16px_rgba(101,163,13,0.35)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 relative overflow-hidden flex-shrink-0 border border-white/30">
                 <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent"></div>
                 <svg class="w-6 h-6 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +23,7 @@
         </a>
 
         <!-- Menu điều hướng đồng bộ icon -->
-        <div class="hidden lg:flex space-x-6 items-center">
+        <div class="hidden lg:flex space-x-4 xl:space-x-6 items-center flex-shrink-0">
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/home">
                 <span class="material-symbols-outlined text-[18px]">home</span> Trang chủ
             </a>
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Thanh Tìm kiếm Real-time với Autocomplete Dropdown -->
-        <div class="relative hidden sm:block w-44 md:w-56 lg:w-64" id="navbar-search-wrapper">
+        <div class="relative hidden sm:block min-w-[120px] max-w-[180px] md:max-w-[210px] lg:max-w-[220px] xl:max-w-[260px] flex-1" id="navbar-search-wrapper">
             <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
                 <input type="text" id="navbar-search-input" name="keyword" autocomplete="off"
                        placeholder="Tìm trái cây, rau củ..."
@@ -60,7 +60,7 @@
         </div>
 
         <!-- Tiện ích người dùng & Giỏ hàng -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 md:space-x-3.5 flex-shrink-0">
             <a id="navbar-cart-btn" href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative inline-block" title="Giỏ hàng">
                 <span id="navbar-cart-icon" class="material-symbols-outlined inline-block transition-transform select-none">shopping_cart</span>
                 <c:if test="${not empty sessionScope.CART_TOTAL_ITEMS && sessionScope.CART_TOTAL_ITEMS > 0}">
@@ -259,17 +259,17 @@
             </c:if>
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                    <div class="group relative cursor-pointer py-2">
-                        <div class="flex items-center gap-2 text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors">
+                    <div class="group relative cursor-pointer py-2 flex-shrink-0">
+                        <div class="flex items-center gap-1.5 md:gap-2 text-primary hover:bg-surface-container-highest p-1.5 md:p-2 rounded-full transition-colors">
                             <c:choose>
                                 <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
-                                    <img src="${sessionScope.USERMODEL.avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-primary">
+                                    <img src="${sessionScope.USERMODEL.avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-primary flex-shrink-0">
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+                                    <span class="material-symbols-outlined text-[28px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">account_circle</span>
                                 </c:otherwise>
                             </c:choose>
-                            <span class="font-label-bold hidden md:block max-w-[120px] truncate"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
+                            <span class="font-label-bold hidden sm:inline-block max-w-[85px] md:max-w-[110px] xl:max-w-[150px] truncate whitespace-nowrap text-xs md:text-sm" title="<c:out value="${sessionScope.USERMODEL.fullName}"/>"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
                         </div>
 
                         <!-- Dropdown menu -->

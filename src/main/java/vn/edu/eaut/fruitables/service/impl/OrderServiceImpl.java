@@ -30,11 +30,21 @@ public class OrderServiceImpl implements IOrderService {
 
         if (orderId != null) {
             orderModel.setId(orderId);
+            vn.edu.eaut.fruitables.dao.IProductDAO productDAO = new vn.edu.eaut.fruitables.dao.impl.ProductDAOImpl();
             for (CartItemDTO item : cart.values()) {
+                double currentCostPrice = 0.0;
+                try {
+                    vn.edu.eaut.fruitables.model.entity.ProductModel p = productDAO.findById(item.getProductId());
+                    if (p != null && p.getCostPrice() != null) {
+                        currentCostPrice = p.getCostPrice();
+                    }
+                } catch (Exception ignored) {}
+
                 orderDAO.saveOrderDetail(
                         orderId,
                         item.getProductId(),
                         item.getPrice(),
+                        currentCostPrice,
                         item.getQuantity(),
                         item.getSubTotal()
                 );

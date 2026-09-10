@@ -13,6 +13,8 @@ public interface IDashboardDAO {
     List<ProductModel> getLowStockProducts(int threshold);
 
     // Mở rộng các phương thức nâng cao
+    double getTotalCost();
+    double getGrossProfit();
     Map<String, Object> getComparativeRevenueChartData(String filterType);
     Map<String, Object> getOrderStatusDistribution(String filterType);
     Map<String, Object> getCategoryProductDistribution();

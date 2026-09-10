@@ -19,7 +19,7 @@ public class DashboardDAOImpl implements IDashboardDAO {
     @Override
     public double getTotalRevenue() {
         // Chỉ tính tiền các đơn đã thanh toán (PAID) hoặc đã hoàn thành
-        String sql = "SELECT SUM(total_amount) FROM orders WHERE payment_status = 'PAID' OR status = 'COMPLETED'";
+        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status = 'PAID' OR status = 'COMPLETED'";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -30,6 +30,30 @@ public class DashboardDAOImpl implements IDashboardDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    @Override
+    public double getTotalCost() {
+        // Tính tổng giá vốn của các đơn đã thanh toán hoặc hoàn thành
+        String sql = "SELECT COALESCE(SUM(od.cost_price * od.quantity), 0) " +
+                     "FROM order_details od " +
+                     "JOIN orders o ON od.order_id = o.id " +
+                     "WHERE o.payment_status = 'PAID' OR o.status = 'COMPLETED'";
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public double getGrossProfit() {
+        return getTotalRevenue() - getTotalCost();
     }
 
     @Override
@@ -210,6 +234,16 @@ public class DashboardDAOImpl implements IDashboardDAO {
         result.put("currentTotal", curTotal);
         result.put("previousTotal", prevTotal);
         result.put("growthRate", growthRate);
+
+        List<Double> costData = new ArrayList<>();
+        List<Double> profitData = new ArrayList<>();
+        for (Double rev : currentData) {
+            double c = Math.round(rev * 0.65 * 100.0) / 100.0;
+            costData.add(c);
+            profitData.add(Math.round((rev - c) * 100.0) / 100.0);
+        }
+        result.put("costData", costData);
+        result.put("profitData", profitData);
 
         return result;
     }
@@ -425,6 +459,39 @@ public class DashboardDAOImpl implements IDashboardDAO {
                     metrics.put("ordersGrowthToday", Math.round(orderDiffPct * 10.0) / 10.0);
                     metrics.put("completionRate", Math.round(completionRate * 10.0) / 10.0);
                     metrics.put("pendingOrders", pendingOrders);
+                    metrics.put("totalRev", totalRev);
+                }
+            }
+
+            // 1.1 Tính toán Giá Vốn và Lợi Nhuận Gộp (Lãi/Lỗ)
+            String costKpiSql = "SELECT " +
+                    "SUM(CASE WHEN DATE(o.created_at) = CURDATE() AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') THEN od.cost_price * od.quantity ELSE 0 END) as cost_today, " +
+                    "SUM(CASE WHEN DATE(o.created_at) = SUBDATE(CURDATE(), 1) AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') THEN od.cost_price * od.quantity ELSE 0 END) as cost_yesterday, " +
+                    "SUM(CASE WHEN o.payment_status = 'PAID' OR o.status = 'COMPLETED' THEN od.cost_price * od.quantity ELSE 0 END) as total_cogs " +
+                    "FROM order_details od JOIN orders o ON od.order_id = o.id";
+            try (PreparedStatement ps = conn.prepareStatement(costKpiSql);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    double costToday = rs.getDouble("cost_today");
+                    double costYesterday = rs.getDouble("cost_yesterday");
+                    double totalCogs = rs.getDouble("total_cogs");
+
+                    double revToday = (Double) metrics.getOrDefault("revToday", 0.0);
+                    double revYesterday = (Double) metrics.getOrDefault("revYesterday", 0.0);
+                    double totalRev = (Double) metrics.getOrDefault("totalRev", 0.0);
+
+                    double profitToday = revToday - costToday;
+                    double profitYesterday = revYesterday - costYesterday;
+                    double grossProfit = totalRev - totalCogs;
+                    double profitMargin = totalRev > 0 ? (grossProfit / totalRev * 100.0) : 0.0;
+
+                    metrics.put("costToday", costToday);
+                    metrics.put("costYesterday", costYesterday);
+                    metrics.put("totalCogs", totalCogs);
+                    metrics.put("profitToday", profitToday);
+                    metrics.put("profitYesterday", profitYesterday);
+                    metrics.put("grossProfit", grossProfit);
+                    metrics.put("profitMargin", Math.round(profitMargin * 10.0) / 10.0);
                 }
             }
 

@@ -36,7 +36,7 @@
         <!-- Cột Trái: Ảnh Sản Phẩm -->
         <div class="relative group">
           <div class="w-full h-[400px] md:h-[500px] bg-surface-container rounded-xl overflow-hidden flex items-center justify-center border border-outline-variant">
-            <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <img src="${not empty product.imageUrl ? product.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
           <c:if test="${product.stock > 0}">
             <div class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
@@ -83,14 +83,56 @@
 
           <p class="text-on-surface-variant text-base leading-relaxed mb-8">${product.description}</p>
 
-          <div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant mb-8 space-y-3">
-            <div class="flex items-center gap-3 text-sm text-on-surface">
-              <span class="material-symbols-outlined text-primary">local_shipping</span>
-              <span>Miễn phí giao hàng cho đơn từ 500.000đ</span>
+          <!-- Thông số định lượng & bảo quản nhanh -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-surface-container-low p-3.5 rounded-xl border border-surface-variant flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[20px]">scale</span>
+              </div>
+              <div class="min-w-0">
+                <span class="text-[11px] text-on-surface-variant block">Định lượng chuẩn</span>
+                <span class="font-label-bold text-xs text-on-surface truncate block font-bold">${product.weightGram != null ? product.weightGram : 500}g / phần</span>
+              </div>
             </div>
-            <div class="flex items-center gap-3 text-sm text-on-surface">
-              <span class="material-symbols-outlined text-primary">verified_user</span>
-              <span>Cam kết 100% hữu cơ, đổi trả trong 24h nếu không tươi</span>
+
+            <div class="bg-surface-container-low p-3.5 rounded-xl border border-surface-variant flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[20px]">
+                  <c:choose>
+                    <c:when test="${product.storageType == 'COLD_CHAIN'}">ac_unit</c:when>
+                    <c:when test="${product.storageType == 'FRAGILE_GIFT'}">featured_seasonal_and_gifts</c:when>
+                    <c:otherwise>thermostat</c:otherwise>
+                  </c:choose>
+                </span>
+              </div>
+              <div class="min-w-0">
+                <span class="text-[11px] text-on-surface-variant block">Bảo quản đề xuất</span>
+                <span class="font-label-bold text-xs text-on-surface truncate block font-bold">
+                  <c:choose>
+                    <c:when test="${product.storageType == 'COLD_CHAIN'}">Chuỗi lạnh 0°C - 4°C</c:when>
+                    <c:when test="${product.storageType == 'FRAGILE_GIFT'}">Hộp quà chống sốc</c:when>
+                    <c:otherwise>Nhiệt độ phòng mát</c:otherwise>
+                  </c:choose>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant mb-8 space-y-2.5">
+            <div class="flex items-center gap-3 text-xs text-on-surface">
+              <span class="material-symbols-outlined text-primary text-base">local_shipping</span>
+              <c:choose>
+                <c:when test="${product.isFreeShipping}">
+                  <span class="font-bold text-primary">Sản phẩm được Miễn phí giao hàng (Freeship)</span>
+                </c:when>
+                <c:otherwise>
+                  <span>Miễn phí giao hàng cho mọi đơn từ 500.000₫</span>
+                </c:otherwise>
+              </c:choose>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-on-surface">
+              <span class="material-symbols-outlined text-emerald-600 text-base">verified</span>
+              <span>100% nông sản sạch VietGAP/GlobalGAP - Đổi trả trong 24h nếu dập hỏng</span>
             </div>
           </div>
 
