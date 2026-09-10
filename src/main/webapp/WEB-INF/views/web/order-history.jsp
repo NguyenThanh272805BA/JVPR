@@ -238,12 +238,33 @@
                                     </c:otherwise>
                                 </c:choose>
                             </p>
+                            <c:if test="${order.shippingFee != null && order.shippingFee > 0}">
+                                <p class="text-[11px] text-on-surface-variant mt-1.5 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px] text-primary">local_shipping</span>
+                                    Phí ship: <span class="font-semibold text-on-surface"><fmt:formatNumber value="${order.shippingFee}" type="number" groupingUsed="true"/> ₫</span>
+                                    <c:if test="${order.distanceKm != null && order.distanceKm > 0}">
+                                        (~<fmt:formatNumber value="${order.distanceKm}" maxFractionDigits="1"/> km)
+                                    </c:if>
+                                    <c:if test="${order.shippingDiscount != null && order.shippingDiscount > 0}">
+                                        - <span class="text-emerald-600 font-semibold">Freeship -<fmt:formatNumber value="${order.shippingDiscount}" type="number" groupingUsed="true"/> ₫</span>
+                                    </c:if>
+                                </p>
+                            </c:if>
                         </div>
-                        <div class="flex items-center gap-4 flex-wrap">
+                        <div class="flex items-center gap-3 flex-wrap">
                             <div class="text-right">
                                 <p class="text-xs text-on-surface-variant mb-0.5">Tổng cộng</p>
                                 <p class="font-price-tag text-xl text-primary font-bold"><fmt:formatNumber value="${order.totalAmount}" type="number" groupingUsed="true"/> ₫</p>
                             </div>
+
+                            <!-- Nút Mua Lại Đơn Này (1-Click Reorder) -->
+                            <form action="${pageContext.request.contextPath}/order-history" method="POST" class="inline-block">
+                                <input type="hidden" name="action" value="reorder">
+                                <input type="hidden" name="orderId" value="${order.id}">
+                                <button type="submit" class="px-4 py-2 bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/30 rounded-full font-label-bold text-xs shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="material-symbols-outlined text-[16px]">replay</span> Mua lại đơn
+                                </button>
+                            </form>
 
                             <!-- Nút Hủy Đơn Hàng (Chỉ khi status là PENDING) -->
                             <c:if test="${order.status == 'PENDING'}">

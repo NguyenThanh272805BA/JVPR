@@ -65,4 +65,24 @@ public class ProductServiceImpl implements IProductService {
     public List<ProductModel> findFlashSaleProducts(int limit) {
         return productDAO.findFlashSaleProducts(limit);
     }
+
+    @Override
+    public List<ProductModel> adminSearchAndFilter(String keyword, Integer categoryId, String status, String stockStatus, String storageType, String sortOption, Double minPrice, Double maxPrice) {
+        return productDAO.adminSearchAndFilter(keyword, categoryId, status, stockStatus, storageType, sortOption, minPrice, maxPrice);
+    }
+
+    @Override
+    public java.util.Map<String, Object> getProductStats() {
+        return productDAO.getProductStats();
+    }
+
+    @Override
+    public boolean deleteProduct(Long id) {
+        return productDAO.deleteProduct(id);
+    }
+
+    @Override
+    public boolean toggleProductStatus(Long id) {
+        return productDAO.toggleProductStatus(id);
+    }
 }

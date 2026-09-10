@@ -141,7 +141,39 @@
                         </div>
                     </div>
 
-                    <!-- Card 5: Hình ảnh -->
+                    <!-- Card 5: Cấu hình vận chuyển & Bảo quản -->
+                    <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-6">
+                        <h2 class="text-lg font-label-bold mb-4 border-b border-surface-variant pb-2 text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl">local_shipping</span> Vận chuyển & Bảo quản
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block font-label-bold text-sm mb-1">Trọng lượng (Gram) <span class="text-error">*</span></label>
+                                <input type="number" name="weightGram" value="${product != null && product.weightGram != null ? product.weightGram : '500'}" required min="1" step="10" placeholder="VD: 500 hoặc 1000"
+                                       class="w-full border border-outline-variant px-4 py-2.5 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-surface text-sm">
+                                <p class="text-[11px] text-on-surface-variant mt-1">Dùng để cộng dồn tính phụ phí hàng nặng (> 5kg: +5.000 ₫/kg).</p>
+                            </div>
+
+                            <div>
+                                <label class="block font-label-bold text-sm mb-1">Quy cách bảo quản</label>
+                                <select name="storageType" class="w-full border border-outline-variant px-4 py-2.5 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-surface text-sm">
+                                    <option value="NORMAL" ${product == null || product.storageType == 'NORMAL' ? 'selected' : ''}>Tiêu chuẩn (Nhiệt độ phòng thường)</option>
+                                    <option value="COLD_CHAIN" ${product != null && product.storageType == 'COLD_CHAIN' ? 'selected' : ''}>❄️ Chuỗi lạnh / Ướp đá (+10.000 ₫ ship)</option>
+                                    <option value="FRAGILE_GIFT" ${product != null && product.storageType == 'FRAGILE_GIFT' ? 'selected' : ''}>🎁 Dễ dập nát / Hộp quà cao cấp (+20.000 ₫ ship)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-2">
+                                <input type="checkbox" name="isFreeShipping" id="isFreeShipping" ${product != null && product.isFreeShipping ? 'checked' : ''}
+                                       class="w-5 h-5 text-primary border-outline-variant rounded focus:ring-primary">
+                                <label for="isFreeShipping" class="font-label-bold text-sm cursor-pointer select-none text-on-surface">
+                                    ⚡ Hỗ trợ Freeship riêng cho sản phẩm này
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Hình ảnh -->
                     <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-6">
                         <h2 class="text-lg font-label-bold mb-4 border-b border-surface-variant pb-2 text-primary">Hình ảnh</h2>
                         <div>

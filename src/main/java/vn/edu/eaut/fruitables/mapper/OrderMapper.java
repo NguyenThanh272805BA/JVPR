@@ -22,6 +22,9 @@ public class OrderMapper implements IRowMapper<OrderModel> {
             try { order.setRecipientName(rs.getString("recipient_name")); } catch (Exception ignored) {}
             try { order.setCustomerEmail(rs.getString("customer_email")); } catch (Exception ignored) {}
             try { order.setOrderNotes(rs.getString("order_notes")); } catch (Exception ignored) {}
+            try { order.setShippingFee(rs.getDouble("shipping_fee")); } catch (Exception ignored) {}
+            try { order.setDistanceKm(rs.getDouble("distance_km")); } catch (Exception ignored) {}
+            try { order.setShippingDiscount(rs.getDouble("shipping_discount")); } catch (Exception ignored) {}
             return order;
         } catch (SQLException e) {
             e.printStackTrace();

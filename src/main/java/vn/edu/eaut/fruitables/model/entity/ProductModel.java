@@ -23,6 +23,11 @@ public class ProductModel {
     // Thuộc tính bổ sung: Số lượt mua hàng (đã bán)
     private Integer totalSold;
 
+    // Thuộc tính bổ sung: Vận chuyển & Bảo quản
+    private Integer weightGram;
+    private String storageType; // NORMAL, COLD_CHAIN, FRAGILE_GIFT
+    private Boolean isFreeShipping;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -68,4 +73,13 @@ public class ProductModel {
 
     public Integer getTotalSold() { return totalSold; }
     public void setTotalSold(Integer totalSold) { this.totalSold = totalSold; }
+
+    public Integer getWeightGram() { return weightGram; }
+    public void setWeightGram(Integer weightGram) { this.weightGram = weightGram; }
+
+    public String getStorageType() { return storageType; }
+    public void setStorageType(String storageType) { this.storageType = storageType; }
+
+    public Boolean getIsFreeShipping() { return isFreeShipping; }
+    public void setIsFreeShipping(Boolean isFreeShipping) { this.isFreeShipping = isFreeShipping; }
 }

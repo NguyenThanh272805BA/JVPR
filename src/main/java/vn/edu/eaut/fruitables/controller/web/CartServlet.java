@@ -80,7 +80,10 @@ public class CartServlet extends HttpServlet {
                                 product.getImageUrl(),
                                 actualPrice,
                                 qtyToAdd,
-                                product.getTaxRate() != null ? product.getTaxRate() : 0.0
+                                product.getTaxRate() != null ? product.getTaxRate() : 0.0,
+                                product.getWeightGram() != null ? product.getWeightGram() : 500,
+                                product.getStorageType() != null ? product.getStorageType() : "NORMAL",
+                                Boolean.TRUE.equals(product.getIsFreeShipping())
                         );
                         cart.put(productId, newItem);
                     }

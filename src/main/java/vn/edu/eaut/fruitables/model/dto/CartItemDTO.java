@@ -7,6 +7,9 @@ public class CartItemDTO {
     private Double price;
     private Integer quantity;
     private Double taxRate; // Thuộc tính lưu % thuế của sản phẩm
+    private Integer weightGram; // Trọng lượng mỗi đơn vị (gram)
+    private String storageType; // NORMAL, COLD_CHAIN, FRAGILE_GIFT
+    private Boolean isFreeShipping;
 
     public CartItemDTO() {}
 
@@ -18,6 +21,21 @@ public class CartItemDTO {
         this.price = price;
         this.quantity = quantity;
         this.taxRate = taxRate;
+        this.weightGram = 500;
+        this.storageType = "NORMAL";
+        this.isFreeShipping = false;
+    }
+
+    public CartItemDTO(Long productId, String name, String imageUrl, Double price, Integer quantity, Double taxRate, Integer weightGram, String storageType, Boolean isFreeShipping) {
+        this.productId = productId;
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.price = price;
+        this.quantity = quantity;
+        this.taxRate = taxRate;
+        this.weightGram = weightGram != null ? weightGram : 500;
+        this.storageType = storageType != null ? storageType : "NORMAL";
+        this.isFreeShipping = isFreeShipping != null ? isFreeShipping : false;
     }
 
     // Tính tổng tiền của riêng sản phẩm này (Giá x Số lượng) - Chưa bao gồm thuế
@@ -49,4 +67,13 @@ public class CartItemDTO {
 
     public Double getTaxRate() { return taxRate; }
     public void setTaxRate(Double taxRate) { this.taxRate = taxRate; }
+
+    public Integer getWeightGram() { return weightGram != null ? weightGram : 500; }
+    public void setWeightGram(Integer weightGram) { this.weightGram = weightGram; }
+
+    public String getStorageType() { return storageType != null ? storageType : "NORMAL"; }
+    public void setStorageType(String storageType) { this.storageType = storageType; }
+
+    public Boolean getIsFreeShipping() { return isFreeShipping != null ? isFreeShipping : false; }
+    public void setIsFreeShipping(Boolean isFreeShipping) { this.isFreeShipping = isFreeShipping; }
 }

@@ -16,8 +16,22 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
 
     @Override
     public Long saveOrder(OrderModel order) {
-        String sql = "INSERT INTO orders (order_code, user_id, recipient_name, total_amount, shipping_address, phone, customer_email, order_notes, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        return insert(sql, order.getOrderCode(), order.getUserId(), order.getRecipientName(), order.getTotalAmount(), order.getShippingAddress(), order.getPhone(), order.getCustomerEmail(), order.getOrderNotes(), order.getPaymentMethod(), order.getStatus());
+        String sql = "INSERT INTO orders (order_code, user_id, recipient_name, total_amount, shipping_fee, distance_km, shipping_discount, shipping_address, phone, customer_email, order_notes, payment_method, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return insert(sql, 
+                order.getOrderCode(), 
+                order.getUserId(), 
+                order.getRecipientName(), 
+                order.getTotalAmount(), 
+                order.getShippingFee() != null ? order.getShippingFee() : 0.0,
+                order.getDistanceKm() != null ? order.getDistanceKm() : 0.0,
+                order.getShippingDiscount() != null ? order.getShippingDiscount() : 0.0,
+                order.getShippingAddress(), 
+                order.getPhone(), 
+                order.getCustomerEmail(), 
+                order.getOrderNotes(), 
+                order.getPaymentMethod(), 
+                order.getStatus()
+        );
     }
 
     @Override

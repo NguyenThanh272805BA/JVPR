@@ -23,7 +23,7 @@
         </a>
 
         <!-- Menu điều hướng đồng bộ icon -->
-        <div class="hidden md:flex space-x-8 items-center">
+        <div class="hidden lg:flex space-x-6 items-center">
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/home">
                 <span class="material-symbols-outlined text-[18px]">home</span> Trang chủ
             </a>
@@ -36,6 +36,27 @@
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/guest-tracking">
                 <span class="material-symbols-outlined text-[18px]">local_shipping</span> Tra cứu đơn hàng
             </a>
+        </div>
+
+        <!-- Thanh Tìm kiếm Real-time với Autocomplete Dropdown -->
+        <div class="relative hidden sm:block w-44 md:w-56 lg:w-64" id="navbar-search-wrapper">
+            <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
+                <input type="text" id="navbar-search-input" name="keyword" autocomplete="off"
+                       placeholder="Tìm trái cây, rau củ..."
+                       class="w-full pl-9 pr-4 py-1.5 text-xs rounded-full border border-outline-variant bg-surface-container-low focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/60">
+                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
+            </form>
+
+            <!-- Autocomplete Dropdown Result Box -->
+            <div id="navbar-search-results" class="hidden absolute left-0 right-0 top-full mt-2 w-72 md:w-80 bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant overflow-hidden z-[120] transition-all">
+                <div id="navbar-search-list" class="max-h-80 overflow-y-auto divide-y divide-surface-variant"></div>
+                <div id="navbar-search-footer" class="p-2.5 bg-surface-container-low border-t border-surface-variant text-center hidden">
+                    <a id="navbar-search-view-all" href="#" class="text-xs font-label-bold text-primary hover:underline inline-flex items-center gap-1">
+                        <span>Xem tất cả kết quả</span>
+                        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Tiện ích người dùng & Giỏ hàng -->
@@ -282,3 +303,97 @@
         </div>
     </div>
 </nav>
+
+<!-- Script: Live Search Autocomplete -->
+<script>
+    (function() {
+        const searchInput = document.getElementById('navbar-search-input');
+        const searchResults = document.getElementById('navbar-search-results');
+        const searchList = document.getElementById('navbar-search-list');
+        const searchFooter = document.getElementById('navbar-search-footer');
+        const searchViewAll = document.getElementById('navbar-search-view-all');
+        let searchTimeout = null;
+
+        if (!searchInput) return;
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                searchList.innerHTML = '';
+                searchFooter.classList.add('hidden');
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch('${pageContext.request.contextPath}/api/search-products?keyword=' + encodeURIComponent(query))
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!Array.isArray(data) || data.length === 0) {
+                            searchList.innerHTML = `
+                                <div class="p-4 text-center text-xs text-on-surface-variant">
+                                    Không tìm thấy sản phẩm phù hợp với "<strong>\${escapeHtml(query)}</strong>"
+                                </div>
+                            `;
+                            searchFooter.classList.add('hidden');
+                            searchResults.classList.remove('hidden');
+                            return;
+                        }
+
+                        searchList.innerHTML = data.map(p => {
+                            const price = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+                            const priceFmt = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
+                            const origPriceFmt = (p.discountPrice && p.discountPrice > 0)
+                                ? `<span class="line-through text-on-surface-variant/70 text-[10px] ml-1">\${new Intl.NumberFormat('vi-VN').format(p.price)} ₫</span>`
+                                : '';
+                            const img = p.imageUrl || '${pageContext.request.contextPath}/assets/web/images/placeholder.png';
+
+                            return `
+                                <a href="${pageContext.request.contextPath}/product-detail?id=\${p.id}" class="flex items-center gap-3 p-3 hover:bg-surface-container transition-colors">
+                                    <img src="\${img}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant flex-shrink-0 bg-surface-container">
+                                    <div class="flex-1 min-w-0">
+                                        <h5 class="text-xs font-bold text-on-surface truncate">\${escapeHtml(p.name)}</h5>
+                                        <div class="flex items-center gap-1 mt-0.5">
+                                            <span class="text-xs font-extrabold text-primary font-price-tag">\${priceFmt}</span>
+                                            \${origPriceFmt}
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                        }).join('');
+
+                        searchViewAll.href = '${pageContext.request.contextPath}/shop?keyword=' + encodeURIComponent(query);
+                        searchFooter.classList.remove('hidden');
+                        searchResults.classList.remove('hidden');
+                    })
+                    .catch(err => {
+                        console.error('Lỗi tìm kiếm sản phẩm:', err);
+                    });
+            }, 250);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('navbar-search-wrapper')?.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2 && searchList.children.length > 0) {
+                searchResults.classList.remove('hidden');
+            }
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    })();
+</script>

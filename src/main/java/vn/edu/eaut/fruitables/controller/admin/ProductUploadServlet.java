@@ -57,6 +57,20 @@ public class ProductUploadServlet extends HttpServlet {
             // Xử lý bắt tham số Mô tả chi tiết CKEditor (Mới)
             String detailedDescription = request.getParameter("detailedDescription");
 
+            // Xử lý thông số vận chuyển & bảo quản
+            int weightGram = 500;
+            String weightStr = request.getParameter("weightGram");
+            if (weightStr != null && !weightStr.trim().isEmpty()) {
+                try { weightGram = Integer.parseInt(weightStr.trim()); } catch (Exception ignored) {}
+            }
+
+            String storageType = request.getParameter("storageType");
+            if (storageType == null || storageType.trim().isEmpty()) {
+                storageType = "NORMAL";
+            }
+
+            boolean isFreeShipping = request.getParameter("isFreeShipping") != null;
+
             // Xử lý File Upload
             Part filePart = request.getPart("imageFile");
             String fileName = extractFileName(filePart);
@@ -91,6 +105,9 @@ public class ProductUploadServlet extends HttpServlet {
             product.setDetailedDescription(detailedDescription); // Thêm mô tả chi tiết
             product.setStatus(status);
             product.setImageUrl(dbImageUrl);
+            product.setWeightGram(weightGram);
+            product.setStorageType(storageType);
+            product.setIsFreeShipping(isFreeShipping);
 
             // Lưu Database
             productService.save(product);

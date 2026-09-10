@@ -143,32 +143,42 @@ public class ApplyCouponServlet extends HttpServlet {
                     if (cartTotal >= minOrderValue) {
                         double discountAmount = 0;
 
-                        if (specificProductId != null) {
-                            // Áp dụng chiết khấu riêng cho sản phẩm đó
-                            CartItemDTO targetItem = cart.get(specificProductId);
-                            double itemTotal = targetItem.getSubTotal();
-                            if ("PERCENT".equalsIgnoreCase(discountType)) {
-                                discountAmount = (itemTotal * discountValue) / 100.0;
-                            } else {
-                                discountAmount = Math.min(discountValue, itemTotal);
-                            }
+                        if ("FREESHIP".equalsIgnoreCase(discountType)) {
+                            // Mã giảm giá phí vận chuyển
+                            discountAmount = discountValue;
+                            session.setAttribute("APPLIED_COUPON_TYPE", "FREESHIP");
+                            session.setAttribute("DISCOUNT_AMOUNT", discountAmount);
+                            session.setAttribute("APPLIED_COUPON_CODE", codeUpper);
+                            session.setAttribute("COUPON_MESSAGE", "Áp dụng mã miễn phí vận chuyển " + codeUpper + " (Giảm tối đa " + String.format("%,.0f", discountAmount) + " ₫ phí ship) thành công!");
                         } else {
-                            // Áp dụng chiết khấu toàn đơn
-                            if ("PERCENT".equalsIgnoreCase(discountType)) {
-                                discountAmount = (cartTotal * discountValue) / 100.0;
+                            if (specificProductId != null) {
+                                // Áp dụng chiết khấu riêng cho sản phẩm đó
+                                CartItemDTO targetItem = cart.get(specificProductId);
+                                double itemTotal = targetItem.getSubTotal();
+                                if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                    discountAmount = (itemTotal * discountValue) / 100.0;
+                                } else {
+                                    discountAmount = Math.min(discountValue, itemTotal);
+                                }
                             } else {
-                                discountAmount = discountValue;
+                                // Áp dụng chiết khấu toàn đơn
+                                if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                    discountAmount = (cartTotal * discountValue) / 100.0;
+                                } else {
+                                    discountAmount = discountValue;
+                                }
                             }
-                        }
 
-                        // Đảm bảo mức giảm không vượt quá tổng tiền hàng
-                        if (discountAmount > cartTotal) {
-                            discountAmount = cartTotal;
-                        }
+                            // Đảm bảo mức giảm không vượt quá tổng tiền hàng
+                            if (discountAmount > cartTotal) {
+                                discountAmount = cartTotal;
+                            }
 
-                        session.setAttribute("DISCOUNT_AMOUNT", discountAmount);
-                        session.setAttribute("APPLIED_COUPON_CODE", codeUpper);
-                        session.setAttribute("COUPON_MESSAGE", "Áp dụng mã giảm giá " + codeUpper + " thành công!");
+                            session.setAttribute("APPLIED_COUPON_TYPE", discountType != null ? discountType.toUpperCase() : "DISCOUNT");
+                            session.setAttribute("DISCOUNT_AMOUNT", discountAmount);
+                            session.setAttribute("APPLIED_COUPON_CODE", codeUpper);
+                            session.setAttribute("COUPON_MESSAGE", "Áp dụng mã giảm giá " + codeUpper + " thành công!");
+                        }
                         session.removeAttribute("COUPON_ERROR");
                     } else {
                         session.setAttribute("COUPON_ERROR", "Đơn hàng phải đạt tối thiểu " + String.format("%,.0f", minOrderValue) + " ₫ để dùng mã này (Hiện tại: " + String.format("%,.0f", cartTotal) + " ₫)!");

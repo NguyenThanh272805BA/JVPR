@@ -64,6 +64,20 @@ public class ProductEditServlet extends HttpServlet {
             String detailedDescription = request.getParameter("detailedDescription");
             // --- KẾT THÚC ---
 
+            // --- THÔNG SỐ VẬN CHUYỂN & BẢO QUẢN ---
+            int weightGram = 500;
+            String weightStr = request.getParameter("weightGram");
+            if (weightStr != null && !weightStr.trim().isEmpty()) {
+                try { weightGram = Integer.parseInt(weightStr.trim()); } catch (Exception ignored) {}
+            }
+
+            String storageType = request.getParameter("storageType");
+            if (storageType == null || storageType.trim().isEmpty()) {
+                storageType = "NORMAL";
+            }
+
+            boolean isFreeShipping = request.getParameter("isFreeShipping") != null;
+
             int stock = Integer.parseInt(request.getParameter("stock"));
             String description = request.getParameter("description");
             boolean status = request.getParameter("status") != null;
@@ -97,6 +111,9 @@ public class ProductEditServlet extends HttpServlet {
             product.setDetailedDescription(detailedDescription); // Gán dữ liệu mô tả chi tiết
             product.setStatus(status);
             product.setImageUrl(dbImageUrl);
+            product.setWeightGram(weightGram);
+            product.setStorageType(storageType);
+            product.setIsFreeShipping(isFreeShipping);
 
             // Cập nhật CSDL
             productService.updateProduct(product);

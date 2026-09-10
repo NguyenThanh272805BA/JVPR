@@ -39,6 +39,13 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
+        // Lấy danh sách địa chỉ đã lưu nếu khách đã đăng nhập
+        UserModel user = (UserModel) session.getAttribute("USERMODEL");
+        if (user != null) {
+            vn.edu.eaut.fruitables.dao.IUserAddressDAO userAddressDAO = new vn.edu.eaut.fruitables.dao.impl.UserAddressDAOImpl();
+            request.setAttribute("savedAddresses", userAddressDAO.findByUserId(user.getId()));
+        }
+
         // Nếu hợp lệ, hiển thị trang checkout
         request.getRequestDispatcher("/WEB-INF/views/web/checkout.jsp").forward(request, response);
     }
@@ -67,6 +74,59 @@ public class CheckoutServlet extends HttpServlet {
             email = user.getEmail();
         }
 
+        // Lấy các tham số vận chuyển
+        double shippingFee = 0.0;
+        double distanceKm = 0.0;
+        double shippingDiscount = 0.0;
+
+        try {
+            String sFee = request.getParameter("shippingFee");
+            if (sFee != null && !sFee.trim().isEmpty()) {
+                shippingFee = Double.parseDouble(sFee.trim());
+            } else if (session.getAttribute("SHIPPING_RAW_FEE") != null) {
+                shippingFee = (Double) session.getAttribute("SHIPPING_RAW_FEE");
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            String sDist = request.getParameter("distanceKm");
+            if (sDist != null && !sDist.trim().isEmpty()) {
+                distanceKm = Double.parseDouble(sDist.trim());
+            } else if (session.getAttribute("SHIPPING_DISTANCE_KM") != null) {
+                distanceKm = (Double) session.getAttribute("SHIPPING_DISTANCE_KM");
+            }
+        } catch (Exception ignored) {}
+
+        try {
+            String sDisc = request.getParameter("shippingDiscount");
+            if (sDisc != null && !sDisc.trim().isEmpty()) {
+                shippingDiscount = Double.parseDouble(sDisc.trim());
+            } else if (session.getAttribute("SHIPPING_DISCOUNT") != null) {
+                shippingDiscount = (Double) session.getAttribute("SHIPPING_DISCOUNT");
+            }
+        } catch (Exception ignored) {}
+
+        double finalShippingFee = Math.max(0.0, shippingFee - shippingDiscount);
+
+        // Lưu địa chỉ vào sổ nếu người dùng tick chọn
+        String saveAddressParam = request.getParameter("saveAddress");
+        if (("1".equals(saveAddressParam) || "true".equalsIgnoreCase(saveAddressParam)) && user != null && address != null && !address.trim().isEmpty()) {
+            try {
+                vn.edu.eaut.fruitables.dao.IUserAddressDAO userAddressDAO = new vn.edu.eaut.fruitables.dao.impl.UserAddressDAOImpl();
+                vn.edu.eaut.fruitables.model.entity.UserAddressModel newAddr = new vn.edu.eaut.fruitables.model.entity.UserAddressModel();
+                newAddr.setUserId(user.getId());
+                newAddr.setRecipientName(fullName);
+                newAddr.setPhone(phone);
+                newAddr.setProvince(request.getParameter("provinceName") != null ? request.getParameter("provinceName") : "");
+                newAddr.setDistrict(request.getParameter("districtName") != null ? request.getParameter("districtName") : "");
+                newAddr.setWard(request.getParameter("wardName") != null ? request.getParameter("wardName") : "");
+                newAddr.setStreetAddress(request.getParameter("street") != null ? request.getParameter("street") : address);
+                newAddr.setFullAddress(address);
+                newAddr.setIsDefault(false);
+                userAddressDAO.save(newAddr);
+            } catch (Exception ignored) {}
+        }
+
         // 3. Lấy giỏ hàng từ Session
         @SuppressWarnings("unchecked")
         Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
@@ -81,15 +141,22 @@ public class CheckoutServlet extends HttpServlet {
                 totalTax += item.getTaxAmount(); // Lấy tiền thuế của từng món
             }
 
-            // Cộng thuế vào tổng hóa đơn cuối cùng
+            // Cộng thuế vào tổng hóa đơn
             totalAmount += totalTax;
 
-            // XỬ LÝ MÃ GIẢM GIÁ (Trừ tiền nếu có Voucher trong Session)
+            // XỬ LÝ MÃ GIẢM GIÁ
+            String couponType = (String) session.getAttribute("APPLIED_COUPON_TYPE");
             Double discountAmount = (Double) session.getAttribute("DISCOUNT_AMOUNT");
-            if (discountAmount != null && discountAmount > 0) {
+
+            if ("FREESHIP".equalsIgnoreCase(couponType)) {
+                // Mã Freeship đã được trừ vào phí ship (finalShippingFee)
+            } else if (discountAmount != null && discountAmount > 0) {
                 totalAmount -= discountAmount;
                 if (totalAmount < 0) totalAmount = 0;
             }
+
+            // Cộng tiền phí vận chuyển thực tế vào tổng tiền đơn hàng
+            totalAmount += finalShippingFee;
 
             // Sinh mã đơn hàng ảo (VD: FRUIT-A1B2)
             String orderCode = "FRUIT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -102,6 +169,9 @@ public class CheckoutServlet extends HttpServlet {
             newOrder.setCustomerEmail(email);
             newOrder.setOrderNotes(notes);
             newOrder.setTotalAmount(totalAmount);
+            newOrder.setShippingFee(shippingFee);
+            newOrder.setDistanceKm(distanceKm);
+            newOrder.setShippingDiscount(shippingDiscount);
             newOrder.setShippingAddress(address);
             newOrder.setPhone(phone);
             newOrder.setPaymentMethod(paymentMethod);
@@ -145,6 +215,11 @@ public class CheckoutServlet extends HttpServlet {
                     session.removeAttribute("DISCOUNT_AMOUNT");
                     session.removeAttribute("APPLIED_COUPON_CODE");
                     session.removeAttribute("COUPON_MESSAGE");
+                    session.removeAttribute("SHIPPING_DISTANCE_KM");
+                    session.removeAttribute("SHIPPING_RAW_FEE");
+                    session.removeAttribute("SHIPPING_DISCOUNT");
+                    session.removeAttribute("SHIPPING_FINAL_FEE");
+                    session.removeAttribute("APPLIED_COUPON_TYPE");
 
                     session.setAttribute("orderSuccess", "Đặt hàng thành công! Mã đơn: " + orderCode + " (Thanh toán khi nhận hàng)");
 

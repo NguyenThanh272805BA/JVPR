@@ -14,4 +14,8 @@ public interface IProductDAO extends GenericDAO<ProductModel> {
     Long save(ProductModel product);
     void updateProduct(ProductModel product);
     List<ProductModel> findFlashSaleProducts(int limit);
+    List<ProductModel> adminSearchAndFilter(String keyword, Integer categoryId, String status, String stockStatus, String storageType, String sortOption, Double minPrice, Double maxPrice);
+    java.util.Map<String, Object> getProductStats();
+    boolean deleteProduct(Long id);
+    boolean toggleProductStatus(Long id);
 }

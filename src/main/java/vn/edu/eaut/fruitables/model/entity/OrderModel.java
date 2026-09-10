@@ -19,6 +19,11 @@ public class OrderModel {
     private String customerEmail;
     private String orderNotes;
 
+    // Thuộc tính bổ sung: Vận chuyển & Khoảng cách
+    private Double shippingFee;
+    private Double distanceKm;
+    private Double shippingDiscount;
+
     // Thuộc tính bổ sung để lưu danh sách sản phẩm của đơn hàng
     private List<OrderDetailModel> details;
 
@@ -65,4 +70,13 @@ public class OrderModel {
     // Getters and Setters cho danh sách chi tiết đơn hàng
     public List<OrderDetailModel> getDetails() { return details; }
     public void setDetails(List<OrderDetailModel> details) { this.details = details; }
+
+    public Double getShippingFee() { return shippingFee; }
+    public void setShippingFee(Double shippingFee) { this.shippingFee = shippingFee; }
+
+    public Double getDistanceKm() { return distanceKm; }
+    public void setDistanceKm(Double distanceKm) { this.distanceKm = distanceKm; }
+
+    public Double getShippingDiscount() { return shippingDiscount; }
+    public void setShippingDiscount(Double shippingDiscount) { this.shippingDiscount = shippingDiscount; }
 }

@@ -47,6 +47,26 @@ public class ProductMapper implements IRowMapper<ProductModel> {
                 product.setTotalSold(0);
             }
 
+            // Map thông số vận chuyển & bảo quản
+            try {
+                product.setWeightGram(rs.getObject("weight_gram") != null ? rs.getInt("weight_gram") : 500);
+            } catch (SQLException e) {
+                product.setWeightGram(500);
+            }
+
+            try {
+                String storage = rs.getString("storage_type");
+                product.setStorageType(storage != null ? storage : "NORMAL");
+            } catch (SQLException e) {
+                product.setStorageType("NORMAL");
+            }
+
+            try {
+                product.setIsFreeShipping(rs.getBoolean("is_free_shipping"));
+            } catch (SQLException e) {
+                product.setIsFreeShipping(false);
+            }
+
             return product;
         } catch (SQLException e) {
             e.printStackTrace();
