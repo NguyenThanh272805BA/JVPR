@@ -190,6 +190,35 @@
                         </div>
                     </div>
 
+                    <!-- CHỌN KHUNG GIỜ GIAO HÀNG & BẢO QUẢN HOA QUẢ TƯƠI 4°C -->
+                    <div class="mt-5 p-4 rounded-2xl bg-surface-container/60 border border-outline-variant space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="font-label-bold text-sm text-on-surface flex items-center gap-1.5 text-primary">
+                                <span class="material-symbols-outlined text-lg">alarm_on</span>
+                                Khung giờ nhận hàng mong muốn:
+                            </label>
+                            <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">ac_unit</span> Đóng thùng ướp lạnh 4°C
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-on-surface-variant mb-1 font-medium">Khung giờ giao:</label>
+                                <select name="deliverySlot" id="deliverySlot" class="w-full px-3 py-2 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs font-medium">
+                                    <option value="FAST_1_2H" selected>⚡ Hỏa tốc 1 - 2 giờ (Thùng giữ nhiệt lạnh 4°C)</option>
+                                    <option value="SLOT_MORNING">🌅 Buổi Sáng (08:30 - 11:30)</option>
+                                    <option value="SLOT_AFTERNOON">☀️ Buổi Chiều (14:00 - 17:00)</option>
+                                    <option value="SLOT_EVENING">🌙 Buổi Tối (18:30 - 20:30)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-on-surface-variant mb-1 font-medium">Ngày nhận hàng:</label>
+                                <input type="date" name="deliveryDate" id="deliveryDate" class="w-full px-3 py-2 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs font-medium">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mt-4">
                         <label class="block font-label-bold text-sm text-on-surface mb-1.5">Ghi chú đơn hàng (Tùy chọn)</label>
                         <textarea name="notes" rows="2" placeholder="Ví dụ: Giao giờ hành chính, chọn quả ngọt mọng nước, đóng gói hộp quà..."
@@ -309,7 +338,40 @@
                             </span>
                             <span id="summaryShippingDiscount">- 0 ₫</span>
                         </div>
+
+                        <!-- Giảm giá từ Dùng Điểm Tích Lũy Thành Viên -->
+                        <div id="rowPointsDiscount" class="flex justify-between items-center text-amber-600 font-semibold hidden">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">stars</span> Dùng điểm tích lũy
+                            </span>
+                            <span id="summaryPointsDiscount">- 0 ₫</span>
+                        </div>
                     </div>
+
+                    <!-- THẺ THÀNH VIÊN & DÙNG ĐIỂM TÍCH LŨY -->
+                    <c:if test="${not empty sessionScope.USERMODEL}">
+                        <div class="mb-5 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-amber-800 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-base">military_tech</span>
+                                    Hạng thành viên:
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold text-white" style="background-color: ${sessionScope.USERMODEL.vipTierColor}">
+                                    ${sessionScope.USERMODEL.vipTier}
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-amber-900/80 flex items-center justify-between">
+                                <span>Điểm khả dụng:</span>
+                                <span class="font-bold text-amber-700 font-price-tag text-xs">${sessionScope.USERMODEL.points} điểm (~<fmt:formatNumber value="${sessionScope.USERMODEL.points * 100}" type="number" groupingUsed="true"/>₫)</span>
+                            </div>
+                            <c:if test="${sessionScope.USERMODEL.points > 0}">
+                                <label class="flex items-center gap-2 pt-1 border-t border-amber-500/20 cursor-pointer select-none">
+                                    <input type="checkbox" name="usePoints" id="usePointsCheckbox" value="1" class="w-4 h-4 text-amber-600 focus:ring-amber-500 rounded">
+                                    <span class="text-xs font-semibold text-amber-950">Dùng điểm để trừ tiền đơn hàng này (1 điểm = 100₫)</span>
+                                </label>
+                            </c:if>
+                        </div>
+                    </c:if>
 
                     <!-- TỔNG TIỀN CUỐI CÙNG ĐÃ TRỪ GIẢM GIÁ VÀ CỘNG SHIP -->
                     <div class="flex justify-between items-center mb-6">
@@ -584,9 +646,40 @@
                 rowShippingDiscount.classList.add('hidden');
             }
 
-            // Tính Tổng thanh toán cuối cùng
-            const calculatedGrandTotal = Math.max(0, (baseMerchSubTotal + baseTax - merchDiscount + finalFee));
-            summaryGrandTotal.innerText = formatCurrency(calculatedGrandTotal);
+            currentFinalShippingFee = finalFee;
+            recalculateGrandTotal();
+        }
+
+        const usePointsCheckbox = document.getElementById('usePointsCheckbox');
+        const rowPointsDiscount = document.getElementById('rowPointsDiscount');
+        const summaryPointsDiscount = document.getElementById('summaryPointsDiscount');
+        let currentFinalShippingFee = 0;
+
+        function recalculateGrandTotal() {
+            let total = Math.max(0, (baseMerchSubTotal + baseTax - merchDiscount + currentFinalShippingFee));
+            if (usePointsCheckbox && usePointsCheckbox.checked) {
+                const userPoints = ${sessionScope.USERMODEL != null && sessionScope.USERMODEL.points != null ? sessionScope.USERMODEL.points : 0};
+                const maxPointsMoney = userPoints * 100;
+                const pointsDiscount = Math.min(total, maxPointsMoney);
+                total = Math.max(0, total - pointsDiscount);
+                if (rowPointsDiscount) rowPointsDiscount.classList.remove('hidden');
+                if (summaryPointsDiscount) summaryPointsDiscount.innerText = '- ' + formatCurrency(pointsDiscount);
+            } else {
+                if (rowPointsDiscount) rowPointsDiscount.classList.add('hidden');
+            }
+            summaryGrandTotal.innerText = formatCurrency(total);
+        }
+
+        if (usePointsCheckbox) {
+            usePointsCheckbox.addEventListener('change', recalculateGrandTotal);
+        }
+
+        // Set min date và giá trị mặc định cho ngày nhận hàng
+        const deliveryDateInput = document.getElementById('deliveryDate');
+        if (deliveryDateInput) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            deliveryDateInput.min = todayStr;
+            deliveryDateInput.value = todayStr;
         }
     });
 </script>

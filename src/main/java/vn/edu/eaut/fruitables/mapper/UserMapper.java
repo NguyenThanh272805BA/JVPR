@@ -31,6 +31,14 @@ public class UserMapper implements IRowMapper<UserModel> {
                 user.setAvatarUrl(rs.getString("avatar_url"));
             } catch (SQLException e) {}
 
+            try {
+                user.setPoints(rs.getInt("points"));
+            } catch (SQLException e) {}
+
+            try {
+                user.setAccumulatedPoints(rs.getInt("accumulated_points"));
+            } catch (SQLException e) {}
+
             return user;
         } catch (SQLException e) {
             e.printStackTrace();

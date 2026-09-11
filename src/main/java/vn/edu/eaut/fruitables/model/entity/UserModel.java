@@ -53,4 +53,38 @@ public class UserModel {
 
     public String getLoginType() { return loginType; }
     public void setLoginType(String loginType) { this.loginType = loginType; }
+
+    // Tích điểm & Hạng VIP
+    private Integer points = 0;
+    private Integer accumulatedPoints = 0;
+
+    public Integer getPoints() { return points != null ? points : 0; }
+    public void setPoints(Integer points) { this.points = points; }
+
+    public Integer getAccumulatedPoints() { return accumulatedPoints != null ? accumulatedPoints : 0; }
+    public void setAccumulatedPoints(Integer accumulatedPoints) { this.accumulatedPoints = accumulatedPoints; }
+
+    public String getVipTier() {
+        int acc = getAccumulatedPoints();
+        if (acc >= 1000) return "KIM CƯƠNG";
+        if (acc >= 500) return "VÀNG";
+        if (acc >= 100) return "BẠC";
+        return "ĐỒNG";
+    }
+
+    public String getVipTierColor() {
+        int acc = getAccumulatedPoints();
+        if (acc >= 1000) return "#00b4d8"; // Cyan Diamond
+        if (acc >= 500) return "#e67e22";  // Gold / Orange
+        if (acc >= 100) return "#7f8c8d";  // Silver Gray
+        return "#b37426";                   // Bronze
+    }
+
+    public int getVipDiscountPercent() {
+        int acc = getAccumulatedPoints();
+        if (acc >= 1000) return 10;
+        if (acc >= 500) return 5;
+        if (acc >= 100) return 2;
+        return 0;
+    }
 }

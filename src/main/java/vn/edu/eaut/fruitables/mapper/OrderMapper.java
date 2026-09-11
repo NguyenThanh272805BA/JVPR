@@ -25,6 +25,16 @@ public class OrderMapper implements IRowMapper<OrderModel> {
             try { order.setShippingFee(rs.getDouble("shipping_fee")); } catch (Exception ignored) {}
             try { order.setDistanceKm(rs.getDouble("distance_km")); } catch (Exception ignored) {}
             try { order.setShippingDiscount(rs.getDouble("shipping_discount")); } catch (Exception ignored) {}
+            try { order.setDeliverySlot(rs.getString("delivery_slot")); } catch (Exception ignored) {}
+            try { order.setDeliveryDate(rs.getDate("delivery_date")); } catch (Exception ignored) {}
+            try {
+                long sId = rs.getLong("shipper_id");
+                if (!rs.wasNull()) order.setShipperId(sId);
+            } catch (Exception ignored) {}
+            try { order.setTrackingNumber(rs.getString("tracking_number")); } catch (Exception ignored) {}
+            try { order.setEstimatedDeliveryTime(rs.getString("estimated_delivery_time")); } catch (Exception ignored) {}
+            try { order.setUsedPoints(rs.getInt("used_points")); } catch (Exception ignored) {}
+            try { order.setPointsDiscount(rs.getDouble("points_discount")); } catch (Exception ignored) {}
             return order;
         } catch (SQLException e) {
             e.printStackTrace();

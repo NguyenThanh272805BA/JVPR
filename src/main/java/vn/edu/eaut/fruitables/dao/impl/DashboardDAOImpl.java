@@ -18,8 +18,11 @@ public class DashboardDAOImpl implements IDashboardDAO {
 
     @Override
     public double getTotalRevenue() {
-        // Chỉ tính tiền các đơn đã thanh toán (PAID) hoặc đã hoàn thành
-        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status = 'PAID' OR status = 'COMPLETED'";
+        // Chỉ tính tiền các đơn đã thanh toán hoặc hoàn thành, loại trừ các đơn hủy / hoàn trả / thất bại
+        String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders " +
+                     "WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                     "AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') " +
+                     "AND payment_status != 'REFUNDED'";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -34,11 +37,13 @@ public class DashboardDAOImpl implements IDashboardDAO {
 
     @Override
     public double getTotalCost() {
-        // Tính tổng giá vốn của các đơn đã thanh toán hoặc hoàn thành
+        // Tính tổng giá vốn của các đơn hợp lệ đã thanh toán hoặc hoàn thành
         String sql = "SELECT COALESCE(SUM(od.cost_price * od.quantity), 0) " +
                      "FROM order_details od " +
                      "JOIN orders o ON od.order_id = o.id " +
-                     "WHERE o.payment_status = 'PAID' OR o.status = 'COMPLETED'";
+                     "WHERE (o.payment_status = 'PAID' OR o.status = 'COMPLETED') " +
+                     "AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') " +
+                     "AND o.payment_status != 'REFUNDED'";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -58,7 +63,8 @@ public class DashboardDAOImpl implements IDashboardDAO {
 
     @Override
     public int getTotalOrders() {
-        String sql = "SELECT COUNT(*) FROM orders";
+        // Tổng số đơn hàng hợp lệ (loại trừ các đơn rác / hủy)
+        String sql = "SELECT COUNT(*) FROM orders WHERE status NOT IN ('CANCELLED', 'FAILED')";
         return executeCountQuery(sql);
     }
 
@@ -79,8 +85,10 @@ public class DashboardDAOImpl implements IDashboardDAO {
         Map<String, Double> data = new LinkedHashMap<>();
         String sql = "";
 
-        // Chỉ tính đơn hàng đã thanh toán (PAID) hoặc hoàn thành (COMPLETED)
-        String baseCondition = "WHERE payment_status = 'PAID' OR status = 'COMPLETED' ";
+        // Chỉ tính đơn hàng đã thanh toán hợp lệ (loại trừ CANCELLED, RETURNED, FAILED)
+        String baseCondition = "WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                "AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') " +
+                "AND payment_status != 'REFUNDED' ";
         if ("day".equals(filterType)) {
             sql = "SELECT DATE_FORMAT(MAX(created_at), '%d/%m/%Y') as label, SUM(total_amount) as value " +
                     "FROM orders " + baseCondition +
@@ -166,6 +174,8 @@ public class DashboardDAOImpl implements IDashboardDAO {
         List<Double> currentData = new ArrayList<>();
         List<Double> previousData = new ArrayList<>();
 
+        String validOrderCond = "(payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED'";
+
         if ("day".equals(filterType)) {
             // So sánh 7 ngày gần nhất (Kỳ hiện tại) với 7 ngày trước đó (Kỳ trước)
             for (int i = 6; i >= 0; i--) {
@@ -173,11 +183,11 @@ public class DashboardDAOImpl implements IDashboardDAO {
             }
 
             String currentSql = "SELECT DATE(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 7 DAY GROUP BY DATE(created_at)";
 
             String prevSql = "SELECT DATE(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY GROUP BY DATE(created_at)";
 
             currentData = queryTimeSeriesData(currentSql, 7, 0);
@@ -186,10 +196,10 @@ public class DashboardDAOImpl implements IDashboardDAO {
         } else if ("week".equals(filterType)) {
             labels = java.util.Arrays.asList("Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "Tuần 5");
             String currentSql = "SELECT WEEK(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 5 WEEK GROUP BY YEAR(created_at), WEEK(created_at)";
             String prevSql = "SELECT WEEK(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 10 WEEK AND created_at < NOW() - INTERVAL 5 WEEK GROUP BY YEAR(created_at), WEEK(created_at)";
 
             currentData = queryTimeSeriesData(currentSql, 5, 0);
@@ -198,10 +208,10 @@ public class DashboardDAOImpl implements IDashboardDAO {
         } else if ("quarter".equals(filterType)) {
             labels = java.util.Arrays.asList("Quý 1", "Quý 2", "Quý 3", "Quý 4");
             String currentSql = "SELECT QUARTER(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 1 YEAR GROUP BY YEAR(created_at), QUARTER(created_at)";
             String prevSql = "SELECT QUARTER(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 2 YEAR AND created_at < NOW() - INTERVAL 1 YEAR GROUP BY YEAR(created_at), QUARTER(created_at)";
 
             currentData = queryTimeSeriesData(currentSql, 4, 0);
@@ -211,10 +221,10 @@ public class DashboardDAOImpl implements IDashboardDAO {
             // Mặc định: 6 tháng gần nhất
             labels = java.util.Arrays.asList("Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6");
             String currentSql = "SELECT MONTH(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 6 MONTH GROUP BY YEAR(created_at), MONTH(created_at)";
             String prevSql = "SELECT MONTH(created_at) as dt, SUM(total_amount) as val " +
-                    "FROM orders WHERE (payment_status = 'PAID' OR status = 'COMPLETED') " +
+                    "FROM orders WHERE " + validOrderCond + " " +
                     "AND created_at >= NOW() - INTERVAL 12 MONTH AND created_at < NOW() - INTERVAL 6 MONTH GROUP BY YEAR(created_at), MONTH(created_at)";
 
             currentData = queryTimeSeriesData(currentSql, 6, 0);
@@ -409,16 +419,16 @@ public class DashboardDAOImpl implements IDashboardDAO {
         Map<String, Object> metrics = new HashMap<>();
 
         try (Connection conn = DBConnectionUtil.getConnection()) {
-            // 1. Doanh thu hôm nay vs Hôm qua
+            // 1. Doanh thu hôm nay vs Hôm qua (Chỉ tính đơn hợp lệ đã thanh toán, loại trừ CANCELLED, RETURNED, FAILED)
             String revSql = "SELECT " +
-                    "SUM(CASE WHEN DATE(created_at) = CURDATE() AND (payment_status = 'PAID' OR status = 'COMPLETED') THEN total_amount ELSE 0 END) as rev_today, " +
-                    "SUM(CASE WHEN DATE(created_at) = SUBDATE(CURDATE(), 1) AND (payment_status = 'PAID' OR status = 'COMPLETED') THEN total_amount ELSE 0 END) as rev_yesterday, " +
-                    "SUM(CASE WHEN payment_method IN ('VNPAY', 'MOMO') AND (payment_status = 'PAID' OR status = 'COMPLETED') THEN total_amount ELSE 0 END) as rev_online, " +
-                    "SUM(CASE WHEN payment_method = 'COD' AND (payment_status = 'PAID' OR status = 'COMPLETED') THEN total_amount ELSE 0 END) as rev_cod, " +
-                    "SUM(CASE WHEN payment_status = 'PAID' OR status = 'COMPLETED' THEN total_amount ELSE 0 END) as total_rev, " +
+                    "SUM(CASE WHEN DATE(created_at) = CURDATE() AND (payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED' THEN total_amount ELSE 0 END) as rev_today, " +
+                    "SUM(CASE WHEN DATE(created_at) = SUBDATE(CURDATE(), 1) AND (payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED' THEN total_amount ELSE 0 END) as rev_yesterday, " +
+                    "SUM(CASE WHEN payment_method IN ('VNPAY', 'MOMO') AND (payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED' THEN total_amount ELSE 0 END) as rev_online, " +
+                    "SUM(CASE WHEN payment_method = 'COD' AND (payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED' THEN total_amount ELSE 0 END) as rev_cod, " +
+                    "SUM(CASE WHEN (payment_status = 'PAID' OR status = 'COMPLETED') AND status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND payment_status != 'REFUNDED' THEN total_amount ELSE 0 END) as total_rev, " +
                     "COUNT(*) as total_orders, " +
-                    "SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as orders_today, " +
-                    "SUM(CASE WHEN DATE(created_at) = SUBDATE(CURDATE(), 1) THEN 1 ELSE 0 END) as orders_yesterday, " +
+                    "SUM(CASE WHEN DATE(created_at) = CURDATE() AND status NOT IN ('CANCELLED', 'FAILED') THEN 1 ELSE 0 END) as orders_today, " +
+                    "SUM(CASE WHEN DATE(created_at) = SUBDATE(CURDATE(), 1) AND status NOT IN ('CANCELLED', 'FAILED') THEN 1 ELSE 0 END) as orders_yesterday, " +
                     "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as completed_orders, " +
                     "SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) as pending_orders " +
                     "FROM orders";
@@ -465,9 +475,9 @@ public class DashboardDAOImpl implements IDashboardDAO {
 
             // 1.1 Tính toán Giá Vốn và Lợi Nhuận Gộp (Lãi/Lỗ)
             String costKpiSql = "SELECT " +
-                    "SUM(CASE WHEN DATE(o.created_at) = CURDATE() AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') THEN od.cost_price * od.quantity ELSE 0 END) as cost_today, " +
-                    "SUM(CASE WHEN DATE(o.created_at) = SUBDATE(CURDATE(), 1) AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') THEN od.cost_price * od.quantity ELSE 0 END) as cost_yesterday, " +
-                    "SUM(CASE WHEN o.payment_status = 'PAID' OR o.status = 'COMPLETED' THEN od.cost_price * od.quantity ELSE 0 END) as total_cogs " +
+                    "SUM(CASE WHEN DATE(o.created_at) = CURDATE() AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND o.payment_status != 'REFUNDED' THEN od.cost_price * od.quantity ELSE 0 END) as cost_today, " +
+                    "SUM(CASE WHEN DATE(o.created_at) = SUBDATE(CURDATE(), 1) AND (o.payment_status = 'PAID' OR o.status = 'COMPLETED') AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND o.payment_status != 'REFUNDED' THEN od.cost_price * od.quantity ELSE 0 END) as cost_yesterday, " +
+                    "SUM(CASE WHEN (o.payment_status = 'PAID' OR o.status = 'COMPLETED') AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') AND o.payment_status != 'REFUNDED' THEN od.cost_price * od.quantity ELSE 0 END) as total_cogs " +
                     "FROM order_details od JOIN orders o ON od.order_id = o.id";
             try (PreparedStatement ps = conn.prepareStatement(costKpiSql);
                  ResultSet rs = ps.executeQuery()) {

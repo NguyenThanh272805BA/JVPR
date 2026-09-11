@@ -46,15 +46,15 @@ public class CancelOrderServlet extends HttpServlet {
             } else if (!"PENDING".equalsIgnoreCase(order.getStatus())) {
                 session.setAttribute("ORDER_MESSAGE_ERROR", "Chỉ có thể hủy đơn hàng khi đơn đang ở trạng thái 'Đang xử lý' (Chưa giao đi).");
             } else {
-                // Kiểm tra quyền hủy đơn: user đăng nhập hoặc mã đơn hàng khớp
+                // Kiểm tra quyền hủy đơn: user đăng nhập sở hữu đơn HOẶC khách vãng lai cung cấp đồng thời khớp cả orderCode VÀ phone
                 UserModel user = (UserModel) session.getAttribute("USERMODEL");
                 boolean authorized = false;
 
                 if (user != null && order.getUserId() != null && order.getUserId().equals(user.getId())) {
                     authorized = true;
-                } else if (orderCode != null && orderCode.equalsIgnoreCase(order.getOrderCode())) {
-                    authorized = true;
-                } else if (phone != null && phone.equals(order.getPhone())) {
+                } else if (orderCode != null && phone != null 
+                        && orderCode.trim().equalsIgnoreCase(order.getOrderCode()) 
+                        && phone.trim().equals(order.getPhone())) {
                     authorized = true;
                 }
 

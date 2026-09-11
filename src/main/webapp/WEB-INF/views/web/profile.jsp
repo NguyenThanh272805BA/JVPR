@@ -62,8 +62,56 @@
       </div>
     </aside>
 
-    <!-- FORM CẬP NHẬT HỒ SƠ -->
-    <div class="w-full md:w-3/4">
+    <!-- FORM CẬP NHẬT HỒ SƠ & THẺ THÀNH VIÊN VIP -->
+    <div class="w-full md:w-3/4 space-y-6">
+
+      <!-- THẺ HỘI VIÊN VIP CARD -->
+      <div class="rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 border border-emerald-500/30">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-900" style="background-color: ${sessionScope.USERMODEL.vipTierColor}">
+                ⭐ Hạng ${sessionScope.USERMODEL.vipTier}
+              </span>
+              <span class="text-xs text-slate-300 font-medium">Fruitables Loyalty Member</span>
+            </div>
+            <h2 class="text-2xl font-black text-white">${sessionScope.USERMODEL.fullName}</h2>
+            <p class="text-xs text-emerald-200/80">Thành viên thân thiết từ <fmt:formatDate value="${sessionScope.USERMODEL.createdAt}" pattern="MM/yyyy"/></p>
+          </div>
+
+          <div class="flex items-center gap-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
+            <div class="text-right">
+              <span class="text-[11px] text-slate-300 block">Điểm khả dụng:</span>
+              <span class="font-price-tag text-2xl font-black text-amber-400">
+                ${sessionScope.USERMODEL.points} <span class="text-xs font-normal text-slate-300">điểm</span>
+              </span>
+              <span class="text-[10px] text-emerald-300 block mt-0.5">
+                (~<fmt:formatNumber value="${sessionScope.USERMODEL.points * 100}" type="number" groupingUsed="true"/> ₫ mua sắm)
+              </span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-2xl">stars</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative z-10 mt-6 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-emerald-400">percent</span>
+            <span>Ưu đãi hạng: <strong class="text-white">${sessionScope.USERMODEL.vipDiscountPercent}%</strong> toàn đơn</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-amber-400">savings</span>
+            <span>Tích lũy trọn đời: <strong class="text-white">${sessionScope.USERMODEL.accumulatedPoints} điểm</strong></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-sky-400">redeem</span>
+            <span>Quy đổi: <strong class="text-white">1 điểm = 100₫</strong> trừ tiền mặt</span>
+          </div>
+        </div>
+        <span class="material-symbols-outlined absolute -right-8 -bottom-8 text-[180px] text-white/5 pointer-events-none">loyalty</span>
+      </div>
+
       <div class="bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-outline-variant">
         <h1 class="font-headline-md text-2xl text-on-surface mb-6 border-b border-surface-variant pb-4 font-bold">Thông tin cá nhân</h1>
 

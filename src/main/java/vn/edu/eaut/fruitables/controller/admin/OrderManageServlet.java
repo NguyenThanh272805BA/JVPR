@@ -29,6 +29,9 @@ public class OrderManageServlet extends HttpServlet {
         String endDate = request.getParameter("endDate");
 
         List<OrderModel> orders = orderService.searchAndFilterOrders(keyword, status, startDate, endDate);
+        vn.edu.eaut.fruitables.dao.IShipperDAO shipperDAO = new vn.edu.eaut.fruitables.dao.impl.ShipperDAOImpl();
+        List<vn.edu.eaut.fruitables.model.entity.ShipperModel> shippers = shipperDAO.findAll();
+        request.setAttribute("shippers", shippers);
         request.setAttribute("orders", orders);
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("selectedStatus", status != null ? status : "ALL");

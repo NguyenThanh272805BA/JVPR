@@ -39,9 +39,15 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Lấy danh sách địa chỉ đã lưu nếu khách đã đăng nhập
+        // Lấy danh sách địa chỉ đã lưu & cập nhật điểm thành viên nếu khách đã đăng nhập
         UserModel user = (UserModel) session.getAttribute("USERMODEL");
         if (user != null) {
+            vn.edu.eaut.fruitables.dao.IUserDAO userDAO = new vn.edu.eaut.fruitables.dao.impl.UserDAOImpl();
+            UserModel freshUser = userDAO.findById(user.getId());
+            if (freshUser != null) {
+                session.setAttribute("USERMODEL", freshUser);
+                user = freshUser;
+            }
             vn.edu.eaut.fruitables.dao.IUserAddressDAO userAddressDAO = new vn.edu.eaut.fruitables.dao.impl.UserAddressDAOImpl();
             request.setAttribute("savedAddresses", userAddressDAO.findByUserId(user.getId()));
         }
@@ -132,25 +138,79 @@ public class CheckoutServlet extends HttpServlet {
         Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
 
         if (cart != null && !cart.isEmpty()) {
-            // Tính tổng tiền đơn hàng và tổng thuế
-            double totalAmount = 0;
+            // 1. Tính tổng tiền hàng và tổng thuế VAT thực tế từ giỏ
+            double subtotalGoods = 0;
             double totalTax = 0;
 
             for (CartItemDTO item : cart.values()) {
-                totalAmount += item.getSubTotal();
-                totalTax += item.getTaxAmount(); // Lấy tiền thuế của từng món
+                subtotalGoods += item.getSubTotal();
+                totalTax += item.getTaxAmount(); // Tiền thuế của từng món
             }
 
-            // Cộng thuế vào tổng hóa đơn
-            totalAmount += totalTax;
+            double totalAmount = subtotalGoods + totalTax;
 
-            // XỬ LÝ MÃ GIẢM GIÁ
-            String couponType = (String) session.getAttribute("APPLIED_COUPON_TYPE");
-            Double discountAmount = (Double) session.getAttribute("DISCOUNT_AMOUNT");
+            // 2. RE-VALIDATE VOUCHER TỪ CSDL ĐỂ CHỐNG GIAN LẬN GIÁ (Session Bleed Exploit)
+            String appliedCoupon = (String) session.getAttribute("APPLIED_COUPON_CODE");
+            double discountAmount = 0.0;
+            boolean couponValid = false;
 
-            if ("FREESHIP".equalsIgnoreCase(couponType)) {
-                // Mã Freeship đã được trừ vào phí ship (finalShippingFee)
-            } else if (discountAmount != null && discountAmount > 0) {
+            if (appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
+                String checkCouponSql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id WHERE c.code = ?";
+                try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection();
+                     java.sql.PreparedStatement ps = conn.prepareStatement(checkCouponSql)) {
+                    ps.setString(1, appliedCoupon.trim());
+                    try (java.sql.ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            boolean status = rs.getBoolean("status");
+                            java.sql.Timestamp startDate = rs.getTimestamp("start_date");
+                            java.sql.Timestamp endDate = rs.getTimestamp("end_date");
+                            int usageLimit = rs.getInt("usage_limit");
+                            int usedCount = rs.getInt("used_count");
+                            Long specificProductId = rs.getObject("product_id") != null ? rs.getLong("product_id") : null;
+                            double minOrderValue = rs.getDouble("min_order_value");
+                            String discountType = rs.getString("discount_type");
+                            double discountValue = rs.getDouble("discount_value");
+                            java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
+
+                            boolean isValid = status
+                                    && (startDate == null || !now.before(startDate))
+                                    && (endDate == null || !now.after(endDate))
+                                    && (usageLimit <= 0 || usedCount < usageLimit)
+                                    && (subtotalGoods >= minOrderValue);
+
+                            if (isValid && specificProductId != null && !cart.containsKey(specificProductId)) {
+                                isValid = false;
+                            }
+
+                            if (isValid) {
+                                couponValid = true;
+                                if ("FREESHIP".equalsIgnoreCase(discountType)) {
+                                    discountAmount = 0.0; // Đã trừ vào finalShippingFee
+                                } else if (specificProductId != null) {
+                                    CartItemDTO targetItem = cart.get(specificProductId);
+                                    double itemTotal = targetItem.getSubTotal();
+                                    if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                        discountAmount = (itemTotal * discountValue) / 100.0;
+                                    } else {
+                                        discountAmount = Math.min(discountValue, itemTotal);
+                                    }
+                                } else {
+                                    if ("PERCENT".equalsIgnoreCase(discountType)) {
+                                        discountAmount = (subtotalGoods * discountValue) / 100.0;
+                                    } else {
+                                        discountAmount = discountValue;
+                                    }
+                                }
+                                discountAmount = Math.min(discountAmount, subtotalGoods);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (discountAmount > 0) {
                 totalAmount -= discountAmount;
                 if (totalAmount < 0) totalAmount = 0;
             }
@@ -158,7 +218,47 @@ public class CheckoutServlet extends HttpServlet {
             // Cộng tiền phí vận chuyển thực tế vào tổng tiền đơn hàng
             totalAmount += finalShippingFee;
 
-            // Sinh mã đơn hàng ảo (VD: FRUIT-A1B2)
+            // Xử lý khung giờ giao hàng & ngày giao mong muốn
+            String deliverySlot = request.getParameter("deliverySlot");
+            if (deliverySlot == null || deliverySlot.trim().isEmpty()) {
+                deliverySlot = "FAST_1_2H";
+            }
+            java.sql.Date deliveryDate = null;
+            try {
+                String dDate = request.getParameter("deliveryDate");
+                if (dDate != null && !dDate.trim().isEmpty()) {
+                    deliveryDate = java.sql.Date.valueOf(dDate.trim());
+                }
+            } catch (Exception ignored) {}
+
+            // Xử lý Dùng Điểm Tích Lũy (Redeem Points)
+            String usePointsParam = request.getParameter("usePoints");
+            int usedPoints = 0;
+            double pointsDiscount = 0.0;
+            if (("1".equals(usePointsParam) || "true".equalsIgnoreCase(usePointsParam)) && user != null) {
+                vn.edu.eaut.fruitables.dao.IUserDAO userDAO = new vn.edu.eaut.fruitables.dao.impl.UserDAOImpl();
+                UserModel freshUser = userDAO.findById(user.getId());
+                int available = (freshUser != null && freshUser.getPoints() != null) ? freshUser.getPoints() : 0;
+                if (available > 0) {
+                    int maxPointsCanUse = (int) (totalAmount / 100.0);
+                    usedPoints = Math.min(available, maxPointsCanUse);
+                    if (usedPoints > 0) {
+                        pointsDiscount = usedPoints * 100.0;
+                        totalAmount -= pointsDiscount;
+                        if (totalAmount < 0) totalAmount = 0.0;
+
+                        // Trừ điểm của user
+                        try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection();
+                             java.sql.PreparedStatement ps = conn.prepareStatement("UPDATE users SET points = points - ? WHERE id = ?")) {
+                            ps.setInt(1, usedPoints);
+                            ps.setLong(2, user.getId());
+                            ps.executeUpdate();
+                        } catch (Exception ignored) {}
+                    }
+                }
+            }
+
+            // Sinh mã đơn hàng (VD: FRUIT-A1B2)
             String orderCode = "FRUIT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
             // ĐÓNG GÓI MODEL ĐỂ GỌI SERVICE LƯU DB
@@ -176,11 +276,27 @@ public class CheckoutServlet extends HttpServlet {
             newOrder.setPhone(phone);
             newOrder.setPaymentMethod(paymentMethod);
             newOrder.setStatus("PENDING"); // Đơn hàng mới luôn là PENDING
+            newOrder.setDeliverySlot(deliverySlot);
+            newOrder.setDeliveryDate(deliveryDate);
+            newOrder.setUsedPoints(usedPoints);
+            newOrder.setPointsDiscount(pointsDiscount);
 
             // LƯU DB: Gọi tầng service lưu Order và Order_Details
             OrderModel savedOrder = orderService.createOrder(newOrder, cart);
 
             if (savedOrder != null) {
+                // Ghi log giao dịch trừ điểm nếu có
+                if (usedPoints > 0 && userId != null) {
+                    try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection();
+                         java.sql.PreparedStatement ps = conn.prepareStatement("INSERT INTO point_transactions (user_id, order_id, points_amount, transaction_type, description) VALUES (?, ?, ?, 'REDEEM', ?)")) {
+                        ps.setLong(1, userId);
+                        ps.setLong(2, savedOrder.getId());
+                        ps.setInt(3, usedPoints);
+                        ps.setString(4, "Dùng " + usedPoints + " điểm giảm " + String.format("%,.0f", pointsDiscount) + "đ cho đơn #" + orderCode);
+                        ps.executeUpdate();
+                    } catch (Exception ignored) {}
+                }
+
                 if (userId != null) {
                     try {
                         vn.edu.eaut.fruitables.dao.INotificationDAO notificationDAO = new vn.edu.eaut.fruitables.dao.impl.NotificationDAOImpl();
@@ -194,51 +310,46 @@ public class CheckoutServlet extends HttpServlet {
                         );
                     } catch (Exception ignored) {}
                 }
-                // RẼ NHÁNH LOGIC THANH TOÁN SAU KHI LƯU DB THÀNH CÔNG
+
+                // TRỪ TỒN KHO ĐỒNG NHẤT CHO MỌI PHƯƠNG THỨC THANH TOÁN (COD, VNPAY, MOMO)
+                // Giữ hàng ngay tại thời điểm tạo đơn, ngăn chặn hoàn toàn tình trạng bán âm kho (Overselling)
+                ProductDAOImpl productDAO = new ProductDAOImpl();
+                for (CartItemDTO item : cart.values()) {
+                    productDAO.update("UPDATE products SET stock = stock - ? WHERE id = ?", item.getQuantity(), item.getProductId());
+                }
+
+                // TĂNG SỐ LƯỢT ĐÃ DÙNG CHO VOUCHER (NẾU HỢP LỆ)
+                if (couponValid && appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
+                    productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
+                }
+
+                // XÓA GIỎ HÀNG VÀ DỌN DẸP DỮ LIỆU SESSION
+                session.removeAttribute("CART");
+                session.removeAttribute("CART_TOTAL_ITEMS");
+                session.removeAttribute("DISCOUNT_AMOUNT");
+                session.removeAttribute("APPLIED_COUPON_CODE");
+                session.removeAttribute("COUPON_MESSAGE");
+                session.removeAttribute("SHIPPING_DISTANCE_KM");
+                session.removeAttribute("SHIPPING_RAW_FEE");
+                session.removeAttribute("SHIPPING_DISCOUNT");
+                session.removeAttribute("SHIPPING_FINAL_FEE");
+                session.removeAttribute("APPLIED_COUPON_TYPE");
+
+                // RẼ NHÁNH LOGIC THEO PHƯƠNG THỨC THANH TOÁN
                 if ("COD".equals(paymentMethod)) {
-
-                    // TỰ ĐỘNG TRỪ TỒN KHO TRONG CSDL CHO ĐƠN COD
-                    ProductDAOImpl productDAO = new ProductDAOImpl();
-                    for (CartItemDTO item : cart.values()) {
-                        productDAO.update("UPDATE products SET stock = stock - ? WHERE id = ?", item.getQuantity(), item.getProductId());
-                    }
-
-                    // TĂNG SỐ LƯỢT ĐÃ DÙNG CHO VOUCHER
-                    String appliedCoupon = (String) session.getAttribute("APPLIED_COUPON_CODE");
-                    if (appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
-                        productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
-                    }
-
-                    // Xóa giỏ hàng và dữ liệu mã giảm giá
-                    session.removeAttribute("CART");
-                    session.removeAttribute("CART_TOTAL_ITEMS");
-                    session.removeAttribute("DISCOUNT_AMOUNT");
-                    session.removeAttribute("APPLIED_COUPON_CODE");
-                    session.removeAttribute("COUPON_MESSAGE");
-                    session.removeAttribute("SHIPPING_DISTANCE_KM");
-                    session.removeAttribute("SHIPPING_RAW_FEE");
-                    session.removeAttribute("SHIPPING_DISCOUNT");
-                    session.removeAttribute("SHIPPING_FINAL_FEE");
-                    session.removeAttribute("APPLIED_COUPON_TYPE");
-
                     session.setAttribute("orderSuccess", "Đặt hàng thành công! Mã đơn: " + orderCode + " (Thanh toán khi nhận hàng)");
-
                     response.sendRedirect(request.getContextPath() + "/home");
-
                 } else if ("MOMO".equals(paymentMethod)) {
                     // Nếu là MOMO -> Chuyển sang trang quét mã QR MoMo
                     session.setAttribute("PENDING_ORDER_CODE", orderCode);
                     session.setAttribute("PENDING_TOTAL_AMOUNT", totalAmount);
                     session.setAttribute("PENDING_METHOD", "MOMO");
-
                     response.sendRedirect(request.getContextPath() + "/momo-payment");
-
                 } else {
                     // Nếu là VNPAY -> Chuyển sang Servlet tạo Link thanh toán thật
                     session.setAttribute("PENDING_ORDER_CODE", orderCode);
                     session.setAttribute("PENDING_TOTAL_AMOUNT", totalAmount);
                     session.setAttribute("PENDING_METHOD", paymentMethod);
-
                     response.sendRedirect(request.getContextPath() + "/create-vnpay-payment");
                 }
             } else {

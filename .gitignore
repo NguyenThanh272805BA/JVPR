@@ -3,8 +3,16 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
+### Database & Dumps ###
 fruitables_db.sql
 *.sql
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.dump
+src/main/resources/migrations/
+compile.ps1
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

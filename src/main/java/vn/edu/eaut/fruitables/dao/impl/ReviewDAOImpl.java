@@ -38,12 +38,18 @@ public class ReviewDAOImpl {
     }
 
     public Long getValidOrderIdForReview(Long userId, Long productId) {
+        // CHỐNG SPAM: Mỗi lần mua thành công 1 sản phẩm trong đơn hàng COMPLETED chỉ được đánh giá DUY NHẤT 1 LẦN
         String sql = "SELECT o.id FROM orders o JOIN order_details od ON o.id = od.order_id " +
-                "WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'COMPLETED' LIMIT 1";
+                "WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'COMPLETED' " +
+                "AND NOT EXISTS (" +
+                "    SELECT 1 FROM reviews r WHERE r.user_id = ? AND r.product_id = ? AND r.order_id = o.id" +
+                ") LIMIT 1";
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
             ps.setLong(2, productId);
+            ps.setLong(3, userId);
+            ps.setLong(4, productId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getLong("id");
             }

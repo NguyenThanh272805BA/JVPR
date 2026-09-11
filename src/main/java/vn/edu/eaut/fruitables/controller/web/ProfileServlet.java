@@ -25,9 +25,15 @@ public class ProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        if (session.getAttribute("USERMODEL") == null) {
+        UserModel user = (UserModel) session.getAttribute("USERMODEL");
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
+        }
+        vn.edu.eaut.fruitables.dao.IUserDAO userDAO = new vn.edu.eaut.fruitables.dao.impl.UserDAOImpl();
+        UserModel freshUser = userDAO.findById(user.getId());
+        if (freshUser != null) {
+            session.setAttribute("USERMODEL", freshUser);
         }
         request.getRequestDispatcher("/WEB-INF/views/web/profile.jsp").forward(request, response);
     }

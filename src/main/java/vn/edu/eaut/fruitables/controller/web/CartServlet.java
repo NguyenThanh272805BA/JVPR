@@ -98,9 +98,27 @@ public class CartServlet extends HttpServlet {
                         cart.get(productId).setQuantity(quantity);
                     }
                 }
+                // CHỐNG GIAN LẬN VOUCHER (Session Bleed): Hủy voucher cũ nếu thay đổi giỏ hàng
+                if (session.getAttribute("APPLIED_COUPON_CODE") != null) {
+                    session.removeAttribute("DISCOUNT_AMOUNT");
+                    session.removeAttribute("APPLIED_COUPON_CODE");
+                    session.removeAttribute("APPLIED_COUPON_TYPE");
+                    session.removeAttribute("COUPON_MESSAGE");
+                    session.removeAttribute("SHIPPING_DISCOUNT");
+                    session.setAttribute("COUPON_ERROR", "Giỏ hàng đã thay đổi. Vui lòng áp dụng lại mã giảm giá nếu đơn hàng vẫn thỏa mãn điều kiện!");
+                }
             } else if ("remove".equals(action)) {
                 // Xóa hẳn khỏi giỏ
                 cart.remove(productId);
+                // CHỐNG GIAN LẬN VOUCHER (Session Bleed): Hủy voucher cũ khi xóa món khỏi giỏ
+                if (session.getAttribute("APPLIED_COUPON_CODE") != null) {
+                    session.removeAttribute("DISCOUNT_AMOUNT");
+                    session.removeAttribute("APPLIED_COUPON_CODE");
+                    session.removeAttribute("APPLIED_COUPON_TYPE");
+                    session.removeAttribute("COUPON_MESSAGE");
+                    session.removeAttribute("SHIPPING_DISCOUNT");
+                    session.setAttribute("COUPON_ERROR", "Giỏ hàng đã thay đổi. Vui lòng áp dụng lại mã giảm giá nếu đơn hàng vẫn thỏa mãn điều kiện!");
+                }
             }
 
             // Lưu lại giỏ hàng vào Session

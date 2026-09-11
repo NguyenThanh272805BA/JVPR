@@ -102,14 +102,10 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public void updateOrderStatus(Long orderId, String status) {
         OrderModel order = orderDAO.findById(orderId);
-        orderDAO.updateOrderStatus(orderId, status);
+        // Cập nhật trạng thái và tự động hoàn trả tồn kho nếu là CANCELLED hoặc RETURNED trong cùng 1 Transaction
+        orderDAO.updateStatusAndRestoreStock(orderId, status);
 
         if (order != null) {
-            // Hoàn kho nếu hủy hoặc hoàn đơn
-            if ("CANCELLED".equalsIgnoreCase(status) || "RETURNED".equalsIgnoreCase(status)) {
-                orderDAO.cancelOrderAndRestoreStock(orderId);
-            }
-
             // Gửi email & thông báo khi đơn đang giao (SHIPPING)
             if ("SHIPPING".equalsIgnoreCase(status)) {
                 if (order.getUserId() != null) {

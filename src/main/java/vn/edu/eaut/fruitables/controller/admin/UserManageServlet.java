@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -81,11 +82,34 @@ public class UserManageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        Integer roleId = Integer.parseInt(request.getParameter("roleId"));
-        String status = request.getParameter("status");
+        HttpSession session = request.getSession(false);
+        UserModel currentUser = (session != null) ? (UserModel) session.getAttribute("USERMODEL") : null;
 
-        userDAO.updateUserRoleAndStatus(id, roleId, status);
-        response.sendRedirect(request.getContextPath() + "/admin/users?msg=success");
+        // BẢO MẬT & PHÂN QUYỀN (RBAC):
+        // 1. Chỉ Super Admin (Role 1) mới có quyền thay đổi vai trò hoặc trạng thái tài khoản
+        if (currentUser == null || currentUser.getRoleId() == null || currentUser.getRoleId() != 1) {
+            response.sendRedirect(request.getContextPath() + "/admin/users?error=permission_denied");
+            return;
+        }
+
+        try {
+            Long id = Long.parseLong(request.getParameter("id"));
+            Integer roleId = Integer.parseInt(request.getParameter("roleId"));
+            String status = request.getParameter("status");
+
+            // 2. Chống tự khóa tài khoản hoặc tự hạ quyền (Prevent Self-Lockout & Self-Demotion)
+            if (currentUser.getId().equals(id)) {
+                if (roleId != 1 || "LOCKED".equalsIgnoreCase(status)) {
+                    response.sendRedirect(request.getContextPath() + "/admin/users?error=cannot_modify_self");
+                    return;
+                }
+            }
+
+            userDAO.updateUserRoleAndStatus(id, roleId, status);
+            response.sendRedirect(request.getContextPath() + "/admin/users?msg=success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/admin/users?error=system_error");
+        }
     }
 }

@@ -24,6 +24,18 @@ public class OrderModel {
     private Double distanceKm;
     private Double shippingDiscount;
 
+    // Thuộc tính mới: Khung giờ giao hàng & Điều phối Shipper
+    private String deliverySlot;
+    private java.sql.Date deliveryDate;
+    private Long shipperId;
+    private String trackingNumber;
+    private String estimatedDeliveryTime;
+    private ShipperModel shipper;
+
+    // Thuộc tính mới: Tích điểm & Trừ điểm
+    private Integer usedPoints;
+    private Double pointsDiscount;
+
     // Thuộc tính bổ sung để lưu danh sách sản phẩm của đơn hàng
     private List<OrderDetailModel> details;
 
@@ -79,4 +91,28 @@ public class OrderModel {
 
     public Double getShippingDiscount() { return shippingDiscount; }
     public void setShippingDiscount(Double shippingDiscount) { this.shippingDiscount = shippingDiscount; }
+
+    public String getDeliverySlot() { return deliverySlot; }
+    public void setDeliverySlot(String deliverySlot) { this.deliverySlot = deliverySlot; }
+
+    public java.sql.Date getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(java.sql.Date deliveryDate) { this.deliveryDate = deliveryDate; }
+
+    public Long getShipperId() { return shipperId; }
+    public void setShipperId(Long shipperId) { this.shipperId = shipperId; }
+
+    public String getTrackingNumber() { return trackingNumber; }
+    public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
+
+    public String getEstimatedDeliveryTime() { return estimatedDeliveryTime; }
+    public void setEstimatedDeliveryTime(String estimatedDeliveryTime) { this.estimatedDeliveryTime = estimatedDeliveryTime; }
+
+    public ShipperModel getShipper() { return shipper; }
+    public void setShipper(ShipperModel shipper) { this.shipper = shipper; }
+
+    public Integer getUsedPoints() { return usedPoints; }
+    public void setUsedPoints(Integer usedPoints) { this.usedPoints = usedPoints; }
+
+    public Double getPointsDiscount() { return pointsDiscount; }
+    public void setPointsDiscount(Double pointsDiscount) { this.pointsDiscount = pointsDiscount; }
 }

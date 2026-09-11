@@ -31,8 +31,16 @@ public class GuestOrderTrackingServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         String orderCode = request.getParameter("orderCode");
 
+        // BẢO MẬT: Bắt buộc cung cấp ĐỒNG THỜI cả Số điện thoại VÀ Mã đơn hàng
+        if (phone == null || phone.trim().isEmpty() || orderCode == null || orderCode.trim().isEmpty()) {
+            request.setAttribute("trackingError", "Để bảo mật thông tin đơn hàng, quý khách vui lòng nhập đầy đủ cả Số điện thoại và Mã đơn hàng!");
+            request.setAttribute("searched", false);
+            request.getRequestDispatcher("/WEB-INF/views/web/guest-order-tracking.jsp").forward(request, response);
+            return;
+        }
+
         // Gọi DB tìm kiếm
-        List<OrderModel> foundOrders = orderService.findByPhoneOrOrderCode(phone, orderCode);
+        List<OrderModel> foundOrders = orderService.findByPhoneOrOrderCode(phone.trim(), orderCode.trim());
 
         request.setAttribute("foundOrders", foundOrders);
         request.setAttribute("searched", true);

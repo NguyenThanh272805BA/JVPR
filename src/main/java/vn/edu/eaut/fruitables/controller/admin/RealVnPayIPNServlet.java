@@ -64,21 +64,19 @@ public class RealVnPayIPNServlet extends HttpServlet {
 
                 if (order != null) {
                     if ("00".equals(vnp_ResponseCode)) {
-                        // 1. Cập nhật trạng thái đơn hàng sang PAID
-                        orderDAO.update("UPDATE orders SET payment_status = 'PAID', status = 'PACKING' WHERE order_code = ?", orderCode);
-
-                        // 2. TỰ ĐỘNG TRỪ TỒN KHO SẢN PHẨM KHỔI KHO
-                        ProductDAOImpl productDAO = new ProductDAOImpl();
-                        productDAO.update(
-                                "UPDATE products p JOIN order_details od ON p.id = od.product_id " +
-                                        "SET p.stock = p.stock - od.quantity " +
-                                        "WHERE od.order_id = ?", order.getId()
-                        );
+                        // 1. Kiểm tra tính Idempotent: Chỉ cập nhật nếu đơn chưa PAID để tránh xử lý trùng lặp khi VNPay retry
+                        if (!"PAID".equalsIgnoreCase(order.getPaymentStatus())) {
+                            orderDAO.update("UPDATE orders SET payment_status = 'PAID', status = 'PACKING' WHERE order_code = ?", orderCode);
+                        }
 
                         jsonRes.addProperty("RspCode", "00");
                         jsonRes.addProperty("Message", "Confirm Success");
                     } else {
-                        orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'CANCELLED' WHERE order_code = ?", orderCode);
+                        // Giao dịch thất bại: Hủy đơn và hoàn trả tồn kho an toàn (do lúc checkout đã trừ kho)
+                        if (!"CANCELLED".equalsIgnoreCase(order.getStatus())) {
+                            orderDAO.updateStatusAndRestoreStock(order.getId(), "CANCELLED");
+                            orderDAO.update("UPDATE orders SET payment_status = 'UNPAID' WHERE id = ?", order.getId());
+                        }
                         jsonRes.addProperty("RspCode", "00");
                         jsonRes.addProperty("Message", "Confirm Success");
                     }

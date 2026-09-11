@@ -30,6 +30,9 @@
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/shop">
                 <span class="material-symbols-outlined text-[18px]">storefront</span> Cửa hàng
             </a>
+            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 text-emerald-700 font-semibold" href="${pageContext.request.contextPath}/gift-basket-builder">
+                <span class="material-symbols-outlined text-[18px] text-amber-500">featured_seasonal_and_gifts</span> Tự mix giỏ quà
+            </a>
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/promotions">
                 <span class="material-symbols-outlined text-[18px]">redeem</span> Khuyến mãi
             </a>

@@ -13,53 +13,9 @@
 </head>
 <body class="bg-background text-on-surface font-body-md flex h-screen overflow-hidden">
 
-<c:set var="currentURI" value="${requestScope['javax.servlet.forward.request_uri']}" />
-<aside class="w-64 bg-surface-container-lowest border-r border-surface-variant flex flex-col h-full flex-shrink-0 z-20 shadow-sm hidden md:flex">
-  <div class="h-20 flex items-center px-6 border-b border-surface-variant">
-    <a class="group flex items-center gap-2.5" href="${pageContext.request.contextPath}/admin/dashboard">
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
-            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C12 2 12.5 5 10 7C7.5 9 6 12 6 15C6 18.3137 8.68629 21 12 21C15.3137 21 18 18.3137 18 15C18 12 16.5 9 14 7C11.5 5 12 2 12 2Z" fill="currentColor"/>
-                <path d="M12 2C12 2 13.2 4.2 15.5 4.2C17.5 4.2 18.5 2.8 18.5 2.8C18.5 2.8 18 5.2 16 5.8C14 6.4 12.5 5.2 12 2Z" fill="#fef08a"/>
-            </svg>
-        </div>
-        <div class="flex flex-col">
-            <span class="text-base font-black tracking-tight leading-none text-slate-900">Fruit<span class="text-primary">ables</span></span>
-            <span class="text-[8px] font-bold text-primary tracking-wider uppercase mt-0.5">Admin Portal</span>
-        </div>
-    </a>
-  </div>
-  <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/dashboard') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/dashboard">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="font-label-bold">Tổng quan</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/products') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/products">
-      <span class="material-symbols-outlined">inventory_2</span>
-      <span class="font-label-bold">Sản phẩm</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/inventory') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/inventory">
-      <span class="material-symbols-outlined">local_shipping</span>
-      <span class="font-label-bold">Kho nhập hàng</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/categories') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/categories">
-      <span class="material-symbols-outlined">category</span>
-      <span class="font-label-bold">Danh mục</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/orders') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/orders">
-      <span class="material-symbols-outlined">receipt_long</span>
-      <span class="font-label-bold">Đơn hàng</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/coupons') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/coupons">
-      <span class="material-symbols-outlined">redeem</span>
-      <span class="font-label-bold">Mã khuyến mãi</span>
-    </a>
-    <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentURI.contains('/chat') ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" href="${pageContext.request.contextPath}/admin/chat">
-      <span class="material-symbols-outlined">support_agent</span>
-      <span class="font-label-bold">Live Chat CSKH</span>
-    </a>
-  </nav>
-</aside>
+<!-- SIDEBAR CHUẨN ĐỒNG BỘ -->
+<jsp:include page="/WEB-INF/views/components/admin-sidebar.jsp" />
+
 
 <main class="flex-1 flex flex-col h-screen overflow-hidden">
   <header class="h-20 bg-surface flex items-center justify-between px-6 shadow-sm z-10 flex-shrink-0 border-b border-surface-variant">
@@ -309,28 +265,34 @@
                   </c:if>
 
                   <!-- Bước 3: PACKING -> SHIPPING (Kích hoạt Email & Web Notification nếu có) -->
-                  <c:if test="${order.status == 'PACKING'}">
-                    <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
-                      <input type="hidden" name="action" value="updateStatus">
-                      <input type="hidden" name="orderId" value="${order.id}">
-                      <input type="hidden" name="status" value="SHIPPING">
-                      <input type="hidden" name="filterStatus" value="${selectedStatus}">
-                      <input type="hidden" name="startDate" value="${startDate}">
-                      <input type="hidden" name="endDate" value="${endDate}">
-                      <input type="hidden" name="keyword" value="${keyword}">
-                      <c:choose>
-                        <c:when test="${not empty order.userId || not empty order.customerEmail}">
-                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách có tài khoản: Đi giao + Báo Gmail & Web Notification">
-                            <span class="material-symbols-outlined text-[14px]">forward_to_inbox</span> Đi giao (Báo Gmail)
-                          </button>
-                        </c:when>
-                        <c:otherwise>
-                          <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách vãng lai: Giao hàng (Khách tra cứu tiến độ qua SĐT)">
-                            <span class="material-symbols-outlined text-[14px]">local_shipping</span> Đi giao (Khách SĐT)
-                          </button>
-                        </c:otherwise>
-                      </c:choose>
-                    </form>
+                  <c:if test="${order.status == 'PACKING' || order.status == 'CONFIRMED'}">
+                    <button type="button" onclick="openDispatchModal('${order.id}', '${order.orderCode}', '${order.recipientName}', '${order.shippingAddress}', '${order.deliverySlot}')"
+                            class="px-2.5 py-1.5 bg-amber-500 text-white hover:bg-amber-600 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Gán Shipper nội bộ Fruitables">
+                      <span class="material-symbols-outlined text-[14px]">two_wheeler</span> Điều phối Shipper
+                    </button>
+                    <c:if test="${order.status == 'PACKING'}">
+                      <form action="${pageContext.request.contextPath}/admin/orders" method="POST" class="inline" onsubmit="handleOrderStatusSubmit(event, this)">
+                        <input type="hidden" name="action" value="updateStatus">
+                        <input type="hidden" name="orderId" value="${order.id}">
+                        <input type="hidden" name="status" value="SHIPPING">
+                        <input type="hidden" name="filterStatus" value="${selectedStatus}">
+                        <input type="hidden" name="startDate" value="${startDate}">
+                        <input type="hidden" name="endDate" value="${endDate}">
+                        <input type="hidden" name="keyword" value="${keyword}">
+                        <c:choose>
+                          <c:when test="${not empty order.userId || not empty order.customerEmail}">
+                            <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách có tài khoản: Đi giao + Báo Gmail & Web Notification">
+                              <span class="material-symbols-outlined text-[14px]">forward_to_inbox</span> Đi giao (Báo Gmail)
+                            </button>
+                          </c:when>
+                          <c:otherwise>
+                            <button type="submit" class="px-2.5 py-1.5 bg-sky-600 text-white hover:bg-sky-700 rounded-lg font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all" title="Khách vãng lai: Giao hàng (Khách tra cứu tiến độ qua SĐT)">
+                              <span class="material-symbols-outlined text-[14px]">local_shipping</span> Đi giao (Khách SĐT)
+                            </button>
+                          </c:otherwise>
+                        </c:choose>
+                      </form>
+                    </c:if>
                   </c:if>
 
                   <!-- Bước 4: SHIPPING -> DELIVERED / FAILED / RETURNED -->
@@ -733,6 +695,105 @@
       setTimeout(() => toast.remove(), 300);
     }, 3200);
   }
+
+  // 7. ĐIỀU PHỐI SHIPPER NỘI BỘ FRUITABLES
+  function openDispatchModal(orderId, orderCode, recipient, address, slot) {
+    document.getElementById('dispatchOrderId').value = orderId;
+    document.getElementById('dispatchOrderCodeDisplay').innerText = '#' + orderCode;
+    document.getElementById('dispatchRecipientDisplay').innerText = recipient || 'Khách hàng';
+    document.getElementById('dispatchAddressDisplay').innerText = address || 'Theo thông tin đơn';
+    
+    let slotText = '⚡ Hỏa tốc 1 - 2H';
+    if (slot === 'SLOT_MORNING') slotText = '🌅 Buổi Sáng (08:30 - 11:30)';
+    else if (slot === 'SLOT_AFTERNOON') slotText = '☀️ Buổi Chiều (14:00 - 17:00)';
+    else if (slot === 'SLOT_EVENING') slotText = '🌙 Buổi Tối (18:30 - 20:30)';
+    document.getElementById('dispatchSlotDisplay').innerText = slotText;
+
+    const modal = document.getElementById('dispatchShipperModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeDispatchModal() {
+    const modal = document.getElementById('dispatchShipperModal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
 </script>
+
+<!-- MODAL ĐIỀU PHỐI SHIPPER NỘI BỘ -->
+<div id="dispatchShipperModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity">
+  <div class="bg-surface-container-lowest rounded-2xl max-w-md w-full p-6 shadow-2xl border border-outline-variant transform transition-transform">
+    <div class="flex items-center justify-between pb-3 border-b border-surface-variant">
+      <div class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold text-sm">
+          <span class="material-symbols-outlined text-lg">two_wheeler</span>
+        </span>
+        <h3 class="font-headline-md text-base text-on-surface font-bold">Bàn Giao Shipper Nội Bộ</h3>
+      </div>
+      <button type="button" onclick="closeDispatchModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <form action="${pageContext.request.contextPath}/admin/orders/dispatch" method="POST" class="mt-4 space-y-4">
+      <input type="hidden" name="orderId" id="dispatchOrderId" value="">
+
+      <!-- Thông tin tóm tắt đơn -->
+      <div class="p-3.5 rounded-xl bg-surface-container/60 border border-outline-variant space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-on-surface-variant">Mã đơn hàng:</span>
+          <span class="font-bold text-primary" id="dispatchOrderCodeDisplay">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-on-surface-variant">Người nhận:</span>
+          <span class="font-semibold text-on-surface" id="dispatchRecipientDisplay">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-on-surface-variant">Khung giờ:</span>
+          <span class="font-bold text-amber-600" id="dispatchSlotDisplay">--</span>
+        </div>
+        <div class="pt-1 border-t border-surface-variant text-[11px] text-on-surface-variant truncate" id="dispatchAddressDisplay">
+          --
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface mb-1.5">Chọn tài xế giao hàng Fruitables <span class="text-red-500">*</span></label>
+        <select name="shipperId" required class="w-full px-3 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-xs font-medium focus:border-primary outline-none">
+          <c:forEach var="s" items="${shippers}">
+            <option value="${s.id}" ${s.status == 'AVAILABLE' ? 'selected' : ''}>
+              ${s.status == 'AVAILABLE' ? '🟢 Sẵn sàng' : '🟡 Đang bận'} - ${s.fullName} (${s.phone} - ${s.vehiclePlate})
+            </option>
+          </c:forEach>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-on-surface mb-1.5">Thời gian dự kiến giao đến:</label>
+        <input type="text" name="estimatedTime" value="Giao trong 45 - 60 phút" placeholder="Ví dụ: Giao trước 11:30..."
+               class="w-full px-3 py-2 rounded-xl border border-outline-variant bg-surface-container-low text-xs focus:border-primary outline-none">
+      </div>
+
+      <div class="p-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-[11px] flex items-center gap-2">
+        <span class="material-symbols-outlined text-sky-600 text-sm">info</span>
+        <span>Hệ thống sẽ tự động chuyển trạng thái đơn sang <strong>SHIPPING</strong>, sinh mã vận đơn và gửi thông báo cho khách.</span>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-surface-variant">
+        <button type="button" onclick="closeDispatchModal()" class="px-4 py-2 text-xs font-semibold text-on-surface-variant hover:bg-surface-container rounded-xl">
+          Hủy bỏ
+        </button>
+        <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-md flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">send</span> Bàn giao ngay
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 </body>
 </html>

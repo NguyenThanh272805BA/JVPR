@@ -182,12 +182,91 @@
                                     </div>
                                 </div>
 
+                                <!-- THẺ SHIPPERS NỘI BỘ REAL-TIME ĐANG GIAO HÀNG -->
                                 <c:if test="${order.status == 'SHIPPING'}">
-                                    <div class="mt-3 p-2.5 rounded-lg bg-sky-50 text-sky-800 text-xs flex items-center gap-2 border border-sky-200">
-                                        <span class="material-symbols-outlined text-sky-600 text-base flex-shrink-0 animate-pulse">local_shipping</span>
-                                        <span><strong>Đơn hàng đang đến!</strong> Shipper đang trên đường vận chuyển hoa quả tươi đến địa chỉ của bạn.</span>
+                                    <div class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-teal-50 to-emerald-50 border border-sky-300 shadow-sm space-y-3">
+                                        <div class="flex items-center justify-between flex-wrap gap-2">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                                                <span class="font-label-bold text-xs text-sky-900 uppercase tracking-wider">Shipper Fruitables đang trên đường giao hàng</span>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-full bg-sky-600 text-white text-[11px] font-bold shadow-xs">
+                                                Mã vận đơn: <c:out value="${not empty order.trackingNumber ? order.trackingNumber : 'FRUIT-EXPRESS'}"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="flex items-center justify-between flex-wrap gap-4 bg-white/80 backdrop-blur-sm p-3.5 rounded-xl border border-sky-200">
+                                            <div class="flex items-center gap-3">
+                                                <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500 shadow-xs flex-shrink-0">
+                                                    <img src="${not empty order.shipper ? order.shipper.avatarUrl : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}"
+                                                         alt="Shipper Avatar" class="w-full h-full object-cover">
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+                                                        <span><c:out value="${not empty order.shipper ? order.shipper.fullName : 'Nguyễn Văn Hưng (Đội xe hỏa tốc)'}"/></span>
+                                                        <span class="material-symbols-outlined text-base text-emerald-600" title="Tài xế uy tín Fruitables">verified</span>
+                                                    </div>
+                                                    <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                                                        <span>Biển số: <strong class="text-slate-700"><c:out value="${not empty order.shipper ? order.shipper.vehiclePlate : '29B1-889.99'}"/></strong></span>
+                                                        <span>•</span>
+                                                        <span>Thùng giữ nhiệt lạnh: <strong class="text-emerald-700">4°C ❄️</strong></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2">
+                                                <a href="tel:${not empty order.shipper ? order.shipper.phone : '0912345678'}"
+                                                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all hover:scale-105">
+                                                    <span class="material-symbols-outlined text-sm">call</span>
+                                                    Gọi điện (${not empty order.shipper ? order.shipper.phone : '0912345678'})
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center justify-between text-[11px] text-slate-600 pt-1">
+                                            <span class="flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-sm text-sky-600">schedule</span>
+                                                Dự kiến đến: <strong class="text-sky-900"><c:out value="${not empty order.estimatedDeliveryTime ? order.estimatedDeliveryTime : 'Trong 30 - 45 phút tới'}"/></strong>
+                                            </span>
+                                            <span class="text-emerald-700 font-medium">Khách hàng được quyền đồng kiểm hoa quả trước khi nhận</span>
+                                        </div>
                                     </div>
                                 </c:if>
+
+                                <!-- THÔNG TIN KHUNG GIỜ GIAO & TÍCH ĐIỂM -->
+                                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    <div class="p-2.5 rounded-xl bg-surface-container/60 border border-outline-variant flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary text-base">alarm</span>
+                                        <div>
+                                            <span class="text-on-surface-variant text-[10px] block">Khung giờ nhận:</span>
+                                            <span class="font-bold text-on-surface">
+                                                <c:choose>
+                                                    <c:when test="${order.deliverySlot == 'FAST_1_2H'}">⚡ Hỏa tốc 1 - 2 giờ (Thùng lạnh 4°C)</c:when>
+                                                    <c:when test="${order.deliverySlot == 'SLOT_MORNING'}">🌅 Buổi Sáng (08:30 - 11:30)</c:when>
+                                                    <c:when test="${order.deliverySlot == 'SLOT_AFTERNOON'}">☀️ Buổi Chiều (14:00 - 17:00)</c:when>
+                                                    <c:when test="${order.deliverySlot == 'SLOT_EVENING'}">🌙 Buổi Tối (18:30 - 20:30)</c:when>
+                                                    <c:otherwise>Giao tiêu chuẩn</c:otherwise>
+                                                </c:choose>
+                                                <c:if test="${not empty order.deliveryDate}">
+                                                    (<fmt:formatDate value="${order.deliveryDate}" pattern="dd/MM/yyyy"/>)
+                                                </c:if>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <c:if test="${order.usedPoints > 0}">
+                                        <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-amber-600 text-base">stars</span>
+                                            <div>
+                                                <span class="text-amber-800 text-[10px] block">Ưu đãi thành viên:</span>
+                                                <span class="font-bold text-amber-900">
+                                                    Đã dùng <strong>${order.usedPoints} điểm</strong> (-<fmt:formatNumber value="${order.pointsDiscount}" type="number" groupingUsed="true"/>₫)
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                </div>
+
                                 <c:if test="${order.status == 'DELIVERED'}">
                                     <div class="mt-3 p-2.5 rounded-lg bg-emerald-50 text-emerald-800 text-xs flex items-center gap-2 border border-emerald-200">
                                         <span class="material-symbols-outlined text-emerald-600 text-base flex-shrink-0">task_alt</span>
@@ -197,7 +276,7 @@
                                 <c:if test="${order.status == 'COMPLETED'}">
                                     <div class="mt-3 p-2.5 rounded-lg bg-green-50 text-green-800 text-xs flex items-center gap-2 border border-green-200">
                                         <span class="material-symbols-outlined text-green-600 text-base flex-shrink-0">check_circle</span>
-                                        <span><strong>Giao dịch hoàn tất!</strong> Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm hoa quả tươi của Fruitables.</span>
+                                        <span><strong>Giao dịch hoàn tất!</strong> Cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm hoa quả tươi của Fruitables. Bạn đã được tích điểm thưởng cho đơn hàng này!</span>
                                     </div>
                                 </c:if>
                             </div>
@@ -265,6 +344,13 @@
                                     <span class="material-symbols-outlined text-[16px]">replay</span> Mua lại đơn
                                 </button>
                             </form>
+
+                            <!-- Nút Bảo Hành Hoa Quả 1 Đổi 1 (Chỉ khi COMPLETED hoặc DELIVERED) -->
+                            <c:if test="${order.status == 'COMPLETED' || order.status == 'DELIVERED'}">
+                                <a href="${pageContext.request.contextPath}/order/claim?orderId=${order.id}" class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 rounded-full font-label-bold text-xs shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap" title="Cam kết bảo hành hoa quả tươi 1 đổi 1">
+                                    <span class="material-symbols-outlined text-[16px]">verified_user</span> Đổi trả 1 đổi 1
+                                </a>
+                            </c:if>
 
                             <!-- Nút Hủy Đơn Hàng (Chỉ khi status là PENDING) -->
                             <c:if test="${order.status == 'PENDING'}">
