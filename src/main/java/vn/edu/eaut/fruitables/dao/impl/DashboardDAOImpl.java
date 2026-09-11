@@ -818,16 +818,58 @@ public class DashboardDAOImpl implements IDashboardDAO {
 
     @Override
     public Map<String, Object> getOrderTrendsChartData(String startDate, String endDate) {
+        return getOrderTrendsChartData("day", startDate, endDate);
+    }
+
+    @Override
+    public Map<String, Object> getOrderTrendsChartData(String filterType, String startDate, String endDate) {
         Map<String, Object> result = new LinkedHashMap<>();
         List<Object> params = new ArrayList<>();
+
+        if (filterType == null || filterType.trim().isEmpty()) {
+            filterType = "day";
+        }
+
+        boolean hasCustomDate = (startDate != null && !startDate.trim().isEmpty()) ||
+                                (endDate != null && !endDate.trim().isEmpty());
+
         String dateFilter = buildDateFilter("", startDate, endDate, params);
 
-        String sql = "SELECT DATE_FORMAT(created_at, '%d/%m') as dt_label, DATE(created_at) as raw_dt, " +
-                     "COUNT(*) as total_orders, " +
-                     "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as success_orders, " +
-                     "SUM(CASE WHEN status IN ('FAILED', 'RETURNED') THEN 1 ELSE 0 END) as failed_orders " +
-                     "FROM orders WHERE 1=1 " + dateFilter +
-                     "GROUP BY DATE(created_at), dt_label ORDER BY raw_dt ASC";
+        String sql;
+        if ("week".equalsIgnoreCase(filterType)) {
+            String timeCond = hasCustomDate ? dateFilter : " AND created_at >= NOW() - INTERVAL 8 WEEK ";
+            sql = "SELECT YEAR(created_at) as yr, WEEK(created_at, 1) as wk, " +
+                  "COUNT(*) as total_orders, " +
+                  "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as success_orders, " +
+                  "SUM(CASE WHEN status IN ('FAILED', 'RETURNED') THEN 1 ELSE 0 END) as failed_orders " +
+                  "FROM orders WHERE 1=1 " + timeCond +
+                  "GROUP BY yr, wk ORDER BY yr ASC, wk ASC";
+        } else if ("month".equalsIgnoreCase(filterType)) {
+            String timeCond = hasCustomDate ? dateFilter : " AND created_at >= NOW() - INTERVAL 12 MONTH ";
+            sql = "SELECT YEAR(created_at) as yr, MONTH(created_at) as mo, " +
+                  "COUNT(*) as total_orders, " +
+                  "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as success_orders, " +
+                  "SUM(CASE WHEN status IN ('FAILED', 'RETURNED') THEN 1 ELSE 0 END) as failed_orders " +
+                  "FROM orders WHERE 1=1 " + timeCond +
+                  "GROUP BY yr, mo ORDER BY yr ASC, mo ASC";
+        } else if ("quarter".equalsIgnoreCase(filterType)) {
+            String timeCond = hasCustomDate ? dateFilter : " AND created_at >= NOW() - INTERVAL 2 YEAR ";
+            sql = "SELECT YEAR(created_at) as yr, QUARTER(created_at) as qtr, " +
+                  "COUNT(*) as total_orders, " +
+                  "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as success_orders, " +
+                  "SUM(CASE WHEN status IN ('FAILED', 'RETURNED') THEN 1 ELSE 0 END) as failed_orders " +
+                  "FROM orders WHERE 1=1 " + timeCond +
+                  "GROUP BY yr, qtr ORDER BY yr ASC, qtr ASC";
+        } else {
+            // "day" hoặc mặc định
+            String timeCond = hasCustomDate ? dateFilter : " AND created_at >= NOW() - INTERVAL 14 DAY ";
+            sql = "SELECT DATE_FORMAT(created_at, '%d/%m') as dt_label, DATE(created_at) as raw_dt, " +
+                  "COUNT(*) as total_orders, " +
+                  "SUM(CASE WHEN status IN ('COMPLETED', 'DELIVERED') THEN 1 ELSE 0 END) as success_orders, " +
+                  "SUM(CASE WHEN status IN ('FAILED', 'RETURNED') THEN 1 ELSE 0 END) as failed_orders " +
+                  "FROM orders WHERE 1=1 " + timeCond +
+                  "GROUP BY DATE(created_at), dt_label ORDER BY raw_dt ASC";
+        }
 
         List<String> labels = new ArrayList<>();
         List<Integer> totalOrders = new ArrayList<>();
@@ -841,7 +883,17 @@ public class DashboardDAOImpl implements IDashboardDAO {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    labels.add(rs.getString("dt_label"));
+                    String label;
+                    if ("week".equalsIgnoreCase(filterType)) {
+                        label = "Tuần " + rs.getInt("wk");
+                    } else if ("month".equalsIgnoreCase(filterType)) {
+                        label = "Tháng " + rs.getInt("mo");
+                    } else if ("quarter".equalsIgnoreCase(filterType)) {
+                        label = "Quý " + rs.getInt("qtr") + "/" + rs.getInt("yr");
+                    } else {
+                        label = rs.getString("dt_label");
+                    }
+                    labels.add(label);
                     totalOrders.add(rs.getInt("total_orders"));
                     successOrders.add(rs.getInt("success_orders"));
                     failedOrders.add(rs.getInt("failed_orders"));
@@ -852,10 +904,27 @@ public class DashboardDAOImpl implements IDashboardDAO {
         }
 
         if (labels.isEmpty()) {
-            labels = java.util.Arrays.asList("05/09", "06/09", "07/09", "08/09", "09/09", "10/09", "11/09");
-            totalOrders = java.util.Arrays.asList(4, 5, 6, 7, 5, 8, 6);
-            successOrders = java.util.Arrays.asList(4, 5, 5, 6, 4, 7, 4);
-            failedOrders = java.util.Arrays.asList(0, 0, 1, 1, 1, 1, 2);
+            if ("week".equalsIgnoreCase(filterType)) {
+                labels = java.util.Arrays.asList("Tuần 33", "Tuần 34", "Tuần 35", "Tuần 36", "Tuần 37");
+                totalOrders = java.util.Arrays.asList(3, 4, 6, 8, 7);
+                successOrders = java.util.Arrays.asList(3, 4, 5, 7, 6);
+                failedOrders = java.util.Arrays.asList(0, 0, 1, 1, 1);
+            } else if ("month".equalsIgnoreCase(filterType)) {
+                labels = java.util.Arrays.asList("Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9");
+                totalOrders = java.util.Arrays.asList(15, 20, 25, 30, 38);
+                successOrders = java.util.Arrays.asList(13, 18, 23, 27, 34);
+                failedOrders = java.util.Arrays.asList(1, 1, 2, 2, 3);
+            } else if ("quarter".equalsIgnoreCase(filterType)) {
+                labels = java.util.Arrays.asList("Quý 4/2025", "Quý 1/2026", "Quý 2/2026", "Quý 3/2026");
+                totalOrders = java.util.Arrays.asList(40, 48, 55, 62);
+                successOrders = java.util.Arrays.asList(36, 44, 50, 56);
+                failedOrders = java.util.Arrays.asList(3, 3, 4, 5);
+            } else {
+                labels = java.util.Arrays.asList("05/09", "06/09", "07/09", "08/09", "09/09", "10/09", "11/09");
+                totalOrders = java.util.Arrays.asList(4, 5, 6, 7, 5, 8, 6);
+                successOrders = java.util.Arrays.asList(4, 5, 5, 6, 4, 7, 4);
+                failedOrders = java.util.Arrays.asList(0, 0, 1, 1, 1, 1, 2);
+            }
         }
 
         result.put("labels", labels);

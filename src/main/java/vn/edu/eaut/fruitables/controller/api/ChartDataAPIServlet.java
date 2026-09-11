@@ -29,7 +29,6 @@ import java.util.Map;
         "/api/shipper-performance",
         "/api/delivery-slots",
         "/api/shipper-failure-stats",
-        "/api/customer-growth",
         "/api/customer-engagement"
 })
 public class ChartDataAPIServlet extends HttpServlet {
@@ -68,8 +67,8 @@ public class ChartDataAPIServlet extends HttpServlet {
             // 5. Cơ cấu sản phẩm theo danh mục
             overview.put("categoryData", dashboardDAO.getCategoryProductDistribution());
 
-            // 6. Xu hướng đơn hàng theo ngày
-            overview.put("orderTrendsData", dashboardDAO.getOrderTrendsChartData(startDate, endDate));
+            // 6. Xu hướng đơn hàng theo ngày / tuần / tháng / quý
+            overview.put("orderTrendsData", dashboardDAO.getOrderTrendsChartData(filter != null ? filter : "day", startDate, endDate));
 
             // 7. Hiệu suất Shipper
             overview.put("shipperData", dashboardDAO.getShipperPerformanceData(startDate, endDate));
@@ -77,10 +76,7 @@ public class ChartDataAPIServlet extends HttpServlet {
             // 8. Khung giờ giao hàng
             overview.put("deliverySlotsData", dashboardDAO.getDeliverySlotDistribution(startDate, endDate));
 
-            // 9. Thống kê tăng trưởng & đăng ký khách hàng (Biểu đồ 9)
-            overview.put("customerGrowthData", dashboardDAO.getCustomerGrowthChartData(filter != null ? filter : "day", startDate, endDate));
-
-            // 10. Cơ cấu tương tác khách hàng & sử dụng web (Biểu đồ 10)
+            // 9. Cơ cấu tương tác khách hàng & sử dụng web (Biểu đồ 9)
             overview.put("customerEngagementData", dashboardDAO.getCustomerEngagementStats(startDate, endDate));
 
             // Thẻ KPI động
@@ -102,7 +98,7 @@ public class ChartDataAPIServlet extends HttpServlet {
             response.getWriter().write(gson.toJson(data));
 
         } else if ("/api/order-trends".equals(servletPath)) {
-            Map<String, Object> data = dashboardDAO.getOrderTrendsChartData(startDate, endDate);
+            Map<String, Object> data = dashboardDAO.getOrderTrendsChartData(filter != null ? filter : "day", startDate, endDate);
             response.getWriter().write(gson.toJson(data));
 
         } else if ("/api/shipper-performance".equals(servletPath)) {
@@ -144,11 +140,6 @@ public class ChartDataAPIServlet extends HttpServlet {
             } catch (Exception ignored) {}
             List<ProductModel> products = dashboardDAO.getProductsByCategory(catId);
             response.getWriter().write(gson.toJson(products));
-
-        } else if ("/api/customer-growth".equals(servletPath)) {
-            if (filter == null || filter.isEmpty()) filter = "day";
-            Map<String, Object> data = dashboardDAO.getCustomerGrowthChartData(filter, startDate, endDate);
-            response.getWriter().write(gson.toJson(data));
 
         } else if ("/api/customer-engagement".equals(servletPath)) {
             Map<String, Object> data = dashboardDAO.getCustomerEngagementStats(startDate, endDate);

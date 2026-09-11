@@ -324,12 +324,38 @@
 
             <!-- Biểu đồ 6: Xu hướng Số lượng Đơn hàng theo Thời gian (Area Spline Chart) -->
             <div class="lg:col-span-6 chart-card flex flex-col justify-between">
-                <div class="mb-4">
-                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sky-600 text-base">timeline</span>
-                        Biểu đồ 6: Xu hướng Phát sinh Đơn hàng theo Thời gian
-                    </h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Biểu đồ miền diện tích thể hiện nhịp độ đặt hàng và tỷ lệ giao thành công</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sky-600 text-base">timeline</span>
+                            Biểu đồ 6: Xu hướng Phát sinh Đơn hàng theo Thời gian
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Biểu đồ miền diện tích thể hiện nhịp độ đặt hàng và tỷ lệ giao thành công</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- Bộ lọc Từ ngày - Đến ngày riêng cho Biểu đồ 6 -->
+                        <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 text-xs">
+                            <span class="text-[10px] text-slate-400 font-semibold">Từ:</span>
+                            <input type="date" id="chart6StartDate" class="bg-transparent text-[11px] text-slate-700 outline-none border-none p-0 focus:ring-0">
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200 text-xs">
+                            <span class="text-[10px] text-slate-400 font-semibold">Đến:</span>
+                            <input type="date" id="chart6EndDate" class="bg-transparent text-[11px] text-slate-700 outline-none border-none p-0 focus:ring-0">
+                        </div>
+                        <button type="button" onclick="queryChart6DateRange()" class="px-2.5 py-1 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1" title="Tra cứu xu hướng đơn hàng theo khoảng ngày">
+                            <span class="material-symbols-outlined text-[13px]">search</span> Tra cứu
+                        </button>
+                        <button type="button" onclick="resetChart6DateRange()" class="p-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" title="Đặt lại mốc thời gian">
+                            <span class="material-symbols-outlined text-sm">restart_alt</span>
+                        </button>
+
+                        <select id="orderTrendsGroupingFilter" onchange="changeOrderTrendsGrouping(this.value)" class="border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-slate-700 outline-none focus:border-primary bg-slate-50">
+                            <option value="day" selected>Theo ngày</option>
+                            <option value="week">Theo tuần</option>
+                            <option value="month">Theo tháng</option>
+                            <option value="quarter">Theo quý</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="relative h-[280px] w-full">
                     <canvas id="orderTrendsChart"></canvas>
@@ -467,43 +493,28 @@
                 </div>
             </div>
 
-            <!-- Grid 2 Biểu đồ 9 & 10 -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Biểu đồ 9: Tăng trưởng & Kênh đăng ký theo thời gian (Grouped Bar / Spline Chart) -->
-                <div class="lg:col-span-7 chart-card flex flex-col justify-between">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-base">trending_up</span>
-                                Biểu đồ 9: Tăng trưởng Khách hàng & Kênh Đăng ký mới
-                            </h3>
-                            <p class="text-[11px] text-slate-400 mt-0.5">So sánh lượt đăng ký qua Tài khoản thường (Xanh lá) vs Google OAuth (Xanh dương)</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 bg-slate-50 p-1 rounded-xl border border-slate-200 text-xs">
-                            <button type="button" onclick="changeCustomerGrowthFilter('day', this)" class="customer-filter-btn px-2.5 py-1 rounded-lg font-bold bg-white text-primary shadow-xs transition-all">7 ngày</button>
-                            <button type="button" onclick="changeCustomerGrowthFilter('30day', this)" class="customer-filter-btn px-2.5 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-800 transition-all">30 ngày</button>
-                            <button type="button" onclick="changeCustomerGrowthFilter('month', this)" class="customer-filter-btn px-2.5 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-800 transition-all">Theo tháng</button>
-                        </div>
-                    </div>
-                    <div class="relative h-[300px] w-full">
-                        <canvas id="customerGrowthChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Biểu đồ 10: Phân khúc Khách hàng & Tương tác Mua sắm (Doughnut Chart) -->
-                <div class="lg:col-span-5 chart-card flex flex-col justify-between">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-purple-600 text-base">donut_large</span>
-                            Biểu đồ 10: Phân khúc Khách hàng & Mức độ Sử dụng Web
+            <!-- Biểu đồ 9: Phân khúc Khách hàng & Mức độ Sử dụng Web (Doughnut Chart) -->
+            <div class="chart-card">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-600 text-lg">donut_large</span>
+                            <span>Biểu đồ 9: Phân khúc Khách hàng & Mức độ Sử dụng Web</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Cơ cấu khách trung thành, khách mua lần đầu, khách mới đăng ký và tài khoản tạm khóa</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Cơ cấu khách trung thành (≥ 2 đơn), khách mua lần đầu, khách tiềm năng và tài khoản tạm khóa</p>
                     </div>
-                    <div class="relative h-[220px] w-full flex items-center justify-center">
+                    <span class="text-xs font-semibold text-purple-700 bg-purple-50 border border-purple-100 px-3 py-1 rounded-full flex items-center gap-1.5 w-fit">
+                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span> Phân tích tương tác mua sắm
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-5 relative h-[260px] w-full flex items-center justify-center">
                         <canvas id="customerEngagementChart"></canvas>
                     </div>
-                    <div id="customerEngagementLegend" class="mt-4 space-y-1.5 text-xs">
-                        <!-- Dynamic Legend JS -->
+                    <div class="lg:col-span-7">
+                        <div id="customerEngagementLegend" class="space-y-2.5 text-xs">
+                            <!-- Dynamic Legend JS -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -573,8 +584,7 @@
     let chart6_orderTrends = null;
     let chart7_shipper = null;
     let chart8_deliverySlot = null;
-    let chart9_growth = null;
-    let chart10_engagement = null;
+    let chart9_engagement = null;
 
     let currentFilterType = 'month';
     let currentStartDate = '';
@@ -583,7 +593,7 @@
 
     const currencyFmt = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
 
-    // HÀM TẢI TOÀN BỘ DỮ LIỆU ĐỒNG BỘ 10 BIỂU ĐỒ & CÁC THẺ KPI
+    // HÀM TẢI TOÀN BỘ DỮ LIỆU ĐỒNG BỘ 9 BIỂU ĐỒ & CÁC THẺ KPI
     function loadAllDashboardData(startDate, endDate, filterType) {
         currentStartDate = startDate || '';
         currentEndDate = endDate || '';
@@ -610,10 +620,9 @@
                 renderChart7_Shipper(data.shipperData);
                 renderChart8_DeliverySlots(data.deliverySlotsData);
 
-                // 3. Cập nhật KPI & Vẽ 2 biểu đồ khách hàng và tương tác web (Biểu đồ 9 & 10)
+                // 3. Cập nhật KPI & Vẽ biểu đồ phân khúc khách hàng (Biểu đồ 9)
                 updateCustomerKpiCards(data.customerEngagementData);
-                renderChart9_CustomerGrowth(data.customerGrowthData);
-                renderChart10_CustomerEngagement(data.customerEngagementData);
+                renderChart9_CustomerEngagement(data.customerEngagementData);
             })
             .catch(err => console.error('Lỗi khi tải dữ liệu Dashboard tổng quan:', err));
     }
@@ -1220,7 +1229,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data) {
-                    renderChart1_Revenue(data);
+                    renderChart1_RevenueBar(data);
                 }
             })
             .catch(err => {
@@ -1234,6 +1243,69 @@
         document.getElementById('chart1EndDate').value = '';
         document.getElementById('revenueGroupingFilter').value = 'month';
         changeRevenueGrouping('month');
+    }
+
+    // =========================================================================
+    // XỬ LÝ TRUY VẤN TỪ NGÀY - ĐẾN NGÀY & PHÂN NHÓM RIÊNG BIỆT CHO BIỂU ĐỒ 6
+    // =========================================================================
+    function queryChart6DateRange() {
+        const s = document.getElementById('chart6StartDate').value;
+        const e = document.getElementById('chart6EndDate').value;
+        const grouping = document.getElementById('orderTrendsGroupingFilter').value || 'day';
+
+        if (!s && !e) {
+            alert('Vui lòng chọn ngày bắt đầu hoặc ngày kết thúc để tra cứu Xu hướng đơn hàng!');
+            return;
+        }
+        if (s && e && s > e) {
+            alert('Ngày bắt đầu không được lớn hơn ngày kết thúc!');
+            return;
+        }
+
+        const params = new URLSearchParams();
+        if (s) params.append('startDate', s);
+        if (e) params.append('endDate', e);
+        params.append('filter', grouping);
+
+        fetch('${pageContext.request.contextPath}/api/order-trends?' + params.toString())
+            .then(res => res.json())
+            .then(data => {
+                if (data) {
+                    renderChart6_OrderTrends(data);
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi tra cứu Biểu đồ 6:', err);
+                alert('Có lỗi xảy ra khi truy vấn dữ liệu Xu hướng đơn hàng!');
+            });
+    }
+
+    function changeOrderTrendsGrouping(val) {
+        const s = document.getElementById('chart6StartDate').value;
+        const e = document.getElementById('chart6EndDate').value;
+
+        const params = new URLSearchParams();
+        if (s) params.append('startDate', s);
+        if (e) params.append('endDate', e);
+        params.append('filter', val);
+
+        fetch('${pageContext.request.contextPath}/api/order-trends?' + params.toString())
+            .then(res => res.json())
+            .then(data => {
+                if (data) {
+                    renderChart6_OrderTrends(data);
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi đổi nhóm thời gian Biểu đồ 6:', err);
+            });
+    }
+
+    function resetChart6DateRange() {
+        document.getElementById('chart6StartDate').value = '';
+        document.getElementById('chart6EndDate').value = '';
+        document.getElementById('orderTrendsGroupingFilter').value = 'day';
+        changeOrderTrendsGrouping('day');
     }
 
     // =========================================================================
@@ -1303,7 +1375,7 @@
     }
 
     // =========================================================================
-    // THỐNG KÊ KHÁCH HÀNG & MỨC ĐỘ SỬ DỤNG WEB (BIỂU ĐỒ 9 & 10)
+    // THỐNG KÊ KHÁCH HÀNG & MỨC ĐỘ SỬ DỤNG WEB (BIỂU ĐỒ 9)
     // =========================================================================
     function updateCustomerKpiCards(metrics) {
         if (!metrics) return;
@@ -1326,83 +1398,13 @@
         if (ggEl && metrics.googleCount !== undefined) ggEl.innerText = metrics.googleCount;
     }
 
-    // BIỂU ĐỒ 9: TĂNG TRƯỞNG & ĐĂNG KÝ KHÁCH HÀNG (MULTI-BAR / COMBO CHART)
-    function renderChart9_CustomerGrowth(data) {
-        if (!data) return;
-        const canvas = document.getElementById('customerGrowthChart');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (chart9_growth) chart9_growth.destroy();
-
-        chart9_growth = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [
-                    {
-                        label: 'Tài khoản thường (Local)',
-                        data: data.localData,
-                        backgroundColor: '#84cc16',
-                        borderRadius: 6,
-                        barPercentage: 0.6
-                    },
-                    {
-                        label: 'Google OAuth',
-                        data: data.googleData,
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 6,
-                        barPercentage: 0.6
-                    },
-                    {
-                        label: 'Tổng đăng ký mới',
-                        data: data.totalData,
-                        type: 'line',
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: false,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#f59e0b'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                plugins: {
-                    legend: { position: 'top', labels: { font: { size: 11, weight: 'bold' } } },
-                    tooltip: {
-                        callbacks: {
-                            label: function(c) {
-                                return ' ' + c.dataset.label + ': ' + c.raw + ' người dùng';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { precision: 0, font: { size: 10 } },
-                        grid: { color: '#f1f5f9' }
-                    },
-                    x: {
-                        ticks: { font: { size: 10 } },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-    }
-
-    // BIỂU ĐỒ 10: PHÂN KHÚC KHÁCH HÀNG & MỨC ĐỘ SỬ DỤNG WEB (DOUGHNUT CHART)
-    function renderChart10_CustomerEngagement(data) {
+    // BIỂU ĐỒ 9: PHÂN KHÚC KHÁCH HÀNG & MỨC ĐỘ SỬ DỤNG WEB (DOUGHNUT CHART)
+    function renderChart9_CustomerEngagement(data) {
         if (!data) return;
         const canvas = document.getElementById('customerEngagementChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        if (chart10_engagement) chart10_engagement.destroy();
+        if (chart9_engagement) chart9_engagement.destroy();
 
         const loyal = data.loyalBuyers || 0;
         const firstTime = data.firstTimeBuyers || 0;
@@ -1414,7 +1416,7 @@
         const segmentLabels = ['Khách trung thành (>= 2 đơn)', 'Khách mua lần đầu (1 đơn)', 'Chưa phát sinh đơn hàng', 'Tài khoản tạm khóa'];
         const segmentColors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
-        chart10_engagement = new Chart(ctx, {
+        chart9_engagement = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: segmentLabels,
@@ -1452,43 +1454,19 @@
             segmentLabels.forEach((label, idx) => {
                 const count = segmentData[idx];
                 const pct = Math.round((count / total * 100) * 10) / 10;
-                html += '<div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0">' +
-                    '<div class="flex items-center gap-2">' +
-                        '<span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ' + segmentColors[idx] + '"></span>' +
-                        '<span class="text-slate-600 font-medium">' + label + '</span>' +
+                html += '<div class="flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-slate-50 transition-colors">' +
+                    '<div class="flex items-center gap-2.5">' +
+                        '<span class="w-3.5 h-3.5 rounded-full flex-shrink-0 shadow-xs" style="background-color: ' + segmentColors[idx] + '"></span>' +
+                        '<span class="text-slate-700 font-semibold text-xs">' + label + '</span>' +
                     '</div>' +
-                    '<div class="flex items-center gap-2">' +
-                        '<span class="font-bold text-slate-800">' + count + '</span>' +
-                        '<span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">' + pct + '%</span>' +
+                    '<div class="flex items-center gap-3">' +
+                        '<span class="font-black text-slate-800 text-sm">' + count + ' khách</span>' +
+                        '<span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded-lg">' + pct + '%</span>' +
                     '</div>' +
                 '</div>';
             });
             legendEl.innerHTML = html;
         }
-    }
-
-    // ĐỔI BỘ LỌC THỜI GIAN BIỂU ĐỒ 9 (TĂNG TRƯỞNG KHÁCH HÀNG)
-    function changeCustomerGrowthFilter(val, btn) {
-        if (btn) {
-            document.querySelectorAll('.customer-filter-btn').forEach(b => {
-                b.classList.remove('bg-white', 'text-primary', 'shadow-xs');
-                b.classList.add('text-slate-500');
-            });
-            btn.classList.add('bg-white', 'text-primary', 'shadow-xs');
-            btn.classList.remove('text-slate-500');
-        }
-
-        const params = new URLSearchParams();
-        params.append('filter', val);
-        if (currentStartDate) params.append('startDate', currentStartDate);
-        if (currentEndDate) params.append('endDate', currentEndDate);
-
-        fetch('${pageContext.request.contextPath}/api/customer-growth?' + params.toString())
-            .then(res => res.json())
-            .then(data => {
-                renderChart9_CustomerGrowth(data);
-            })
-            .catch(err => console.error('Lỗi khi tải biểu đồ tăng trưởng khách hàng:', err));
     }
 
     // TẢI BAN ĐẦU KHI VÀO TRANG

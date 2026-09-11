@@ -27,6 +27,7 @@ public interface IDashboardDAO {
     Map<String, Object> getPaymentMethodDistribution(String startDate, String endDate);
     Map<String, Object> getTopSellingProducts(int limit, String startDate, String endDate);
     Map<String, Object> getOrderTrendsChartData(String startDate, String endDate);
+    Map<String, Object> getOrderTrendsChartData(String filterType, String startDate, String endDate);
     Map<String, Object> getShipperPerformanceData(String startDate, String endDate);
     Map<String, Object> getDeliverySlotDistribution(String startDate, String endDate);
     Map<String, Object> getDynamicKpiMetrics(String startDate, String endDate);
