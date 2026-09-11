@@ -8,7 +8,9 @@ import vn.edu.eaut.fruitables.util.DBConnectionUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAOImpl extends AbstractDAO<UserModel> implements IUserDAO {
 
@@ -259,5 +261,258 @@ public class UserDAOImpl extends AbstractDAO<UserModel> implements IUserDAO {
             e.printStackTrace();
         }
         return summary;
+    }
+
+    // =========================================================================
+    // QUẢN LÝ TÀI KHOẢN KHÁCH HÀNG (CUSTOMER - ROLE 3)
+    // =========================================================================
+    @Override
+    public List<UserModel> findCustomers(String keyword, String status, String loginType) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT u.*, r.name as role_name, NULL as vehicle_plate " +
+            "FROM users u " +
+            "JOIN roles r ON u.role_id = r.id " +
+            "WHERE u.role_id = 3 "
+        );
+        List<Object> params = new java.util.ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (u.username LIKE ? OR u.full_name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?) ");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (status != null && !status.trim().isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            sql.append("AND u.status = ? ");
+            params.add(status.trim());
+        }
+        if (loginType != null && !loginType.trim().isEmpty() && !"ALL".equalsIgnoreCase(loginType)) {
+            sql.append("AND u.login_type = ? ");
+            params.add(loginType.trim());
+        }
+
+        sql.append("ORDER BY u.created_at DESC");
+        return query(sql.toString(), new UserMapper(), params.toArray());
+    }
+
+    @Override
+    public Map<String, Object> getCustomerStats() {
+        Map<String, Object> stats = new HashMap<>();
+        String sql = "SELECT " +
+                "COUNT(*) as total_customers, " +
+                "SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) as active_count, " +
+                "SUM(CASE WHEN status = 'LOCKED' THEN 1 ELSE 0 END) as locked_count, " +
+                "SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as new_today, " +
+                "SUM(CASE WHEN created_at >= NOW() - INTERVAL 7 DAY THEN 1 ELSE 0 END) as new_week, " +
+                "COALESCE(SUM(points), 0) as total_points " +
+                "FROM users WHERE role_id = 3";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                stats.put("totalCustomers", rs.getInt("total_customers"));
+                stats.put("activeCount", rs.getInt("active_count"));
+                stats.put("lockedCount", rs.getInt("locked_count"));
+                stats.put("newToday", rs.getInt("new_today"));
+                stats.put("newWeek", rs.getInt("new_week"));
+                stats.put("totalPoints", rs.getInt("total_points"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    // =========================================================================
+    // QUẢN LÝ TÀI KHOẢN NHÂN VIÊN & PHÂN QUYỀN ROLE (EMPLOYEES - ROLE 1, 2, 4)
+    // =========================================================================
+    @Override
+    public List<UserModel> findEmployees(String keyword, Integer roleId, String status) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT u.*, r.name as role_name, s.vehicle_plate " +
+            "FROM users u " +
+            "JOIN roles r ON u.role_id = r.id " +
+            "LEFT JOIN shippers s ON u.id = s.user_id " +
+            "WHERE u.role_id IN (1, 2, 4) "
+        );
+        List<Object> params = new java.util.ArrayList<>();
+
+        if (roleId != null && roleId > 0) {
+            sql.append("AND u.role_id = ? ");
+            params.add(roleId);
+        }
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (u.username LIKE ? OR u.full_name LIKE ? OR u.email LIKE ? OR u.phone LIKE ? OR s.vehicle_plate LIKE ?) ");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+        if (status != null && !status.trim().isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            sql.append("AND u.status = ? ");
+            params.add(status.trim());
+        }
+
+        sql.append("ORDER BY CASE WHEN u.role_id = 1 THEN 1 WHEN u.role_id = 2 THEN 2 ELSE 3 END, u.id ASC");
+        return query(sql.toString(), new UserMapper(), params.toArray());
+    }
+
+    @Override
+    public Map<String, Object> getEmployeeStats() {
+        Map<String, Object> stats = new HashMap<>();
+        String sql = "SELECT " +
+                "COUNT(*) as total_employees, " +
+                "SUM(CASE WHEN role_id = 1 THEN 1 ELSE 0 END) as admin_count, " +
+                "SUM(CASE WHEN role_id = 2 THEN 1 ELSE 0 END) as sale_count, " +
+                "SUM(CASE WHEN role_id = 4 THEN 1 ELSE 0 END) as shipper_count, " +
+                "SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) as active_count, " +
+                "SUM(CASE WHEN status = 'LOCKED' THEN 1 ELSE 0 END) as locked_count " +
+                "FROM users WHERE role_id IN (1, 2, 4)";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                stats.put("totalEmployees", rs.getInt("total_employees"));
+                stats.put("adminCount", rs.getInt("admin_count"));
+                stats.put("saleCount", rs.getInt("sale_count"));
+                stats.put("shipperCount", rs.getInt("shipper_count"));
+                stats.put("activeCount", rs.getInt("active_count"));
+                stats.put("lockedCount", rs.getInt("locked_count"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    @Override
+    public Long createEmployee(UserModel user, String vehiclePlate) {
+        Connection conn = null;
+        try {
+            conn = DBConnectionUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String userSql = "INSERT INTO users (role_id, username, full_name, email, login_type, password_hash, phone, status, address, avatar_url) " +
+                             "VALUES (?, ?, ?, ?, 'LOCAL', ?, ?, 'ACTIVE', ?, ?)";
+            Long newUserId = null;
+            try (PreparedStatement ps = conn.prepareStatement(userSql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, user.getRoleId());
+                ps.setString(2, user.getUsername());
+                ps.setString(3, user.getFullName());
+                ps.setString(4, user.getEmail());
+                ps.setString(5, user.getPasswordHash());
+                ps.setString(6, user.getPhone());
+                ps.setString(7, user.getAddress() != null ? user.getAddress() : "Trụ sở Fruitables Fresh");
+                ps.setString(8, user.getAvatarUrl() != null ? user.getAvatarUrl() : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150");
+                ps.executeUpdate();
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        newUserId = rs.getLong(1);
+                    }
+                }
+            }
+
+            // Nếu tạo tài khoản là Shipper (Role 4): tự động tạo bản ghi trong bảng shippers
+            if (newUserId != null && user.getRoleId() == 4) {
+                String shipperSql = "INSERT INTO shippers (user_id, full_name, phone, vehicle_plate, avatar_url, status) " +
+                                    "VALUES (?, ?, ?, ?, ?, 'AVAILABLE')";
+                try (PreparedStatement psShp = conn.prepareStatement(shipperSql)) {
+                    psShp.setLong(1, newUserId);
+                    psShp.setString(2, user.getFullName());
+                    psShp.setString(3, user.getPhone());
+                    psShp.setString(4, (vehiclePlate != null && !vehiclePlate.trim().isEmpty()) ? vehiclePlate.trim() : "29X1-888.88");
+                    psShp.setString(5, user.getAvatarUrl() != null ? user.getAvatarUrl() : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150");
+                    psShp.executeUpdate();
+                }
+            }
+
+            conn.commit();
+            return newUserId;
+        } catch (Exception e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (Exception ignored) {}
+            }
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    @Override
+    public boolean updateEmployeeRoleAndStatus(Long userId, Integer newRoleId, String status, String vehiclePlate) {
+        Connection conn = null;
+        try {
+            conn = DBConnectionUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String sql = "UPDATE users SET role_id = ?, status = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, newRoleId);
+                ps.setString(2, status);
+                ps.setLong(3, userId);
+                ps.executeUpdate();
+            }
+
+            // Đồng bộ hồ sơ Shipper nếu vai trò là Role 4
+            if (newRoleId == 4) {
+                String checkSql = "SELECT id FROM shippers WHERE user_id = ?";
+                boolean exists = false;
+                try (PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+                    psCheck.setLong(1, userId);
+                    try (ResultSet rs = psCheck.executeQuery()) {
+                        exists = rs.next();
+                    }
+                }
+
+                if (exists) {
+                    if (vehiclePlate != null && !vehiclePlate.trim().isEmpty()) {
+                        String upSql = "UPDATE shippers SET vehicle_plate = ? WHERE user_id = ?";
+                        try (PreparedStatement psUp = conn.prepareStatement(upSql)) {
+                            psUp.setString(1, vehiclePlate.trim());
+                            psUp.setLong(2, userId);
+                            psUp.executeUpdate();
+                        }
+                    }
+                } else {
+                    // Chưa có trong bảng shippers -> lấy thông tin user để insert
+                    UserModel u = findById(userId);
+                    if (u != null) {
+                        String insSql = "INSERT INTO shippers (user_id, full_name, phone, vehicle_plate, avatar_url, status) " +
+                                        "VALUES (?, ?, ?, ?, ?, 'AVAILABLE')";
+                        try (PreparedStatement psIns = conn.prepareStatement(insSql)) {
+                            psIns.setLong(1, userId);
+                            psIns.setString(2, u.getFullName());
+                            psIns.setString(3, u.getPhone() != null ? u.getPhone() : "0900000000");
+                            psIns.setString(4, (vehiclePlate != null && !vehiclePlate.trim().isEmpty()) ? vehiclePlate.trim() : "29X1-999.99");
+                            psIns.setString(5, u.getAvatarUrl() != null ? u.getAvatarUrl() : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150");
+                            psIns.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (Exception ignored) {}
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (Exception ignored) {}
+            }
+        }
     }
 }

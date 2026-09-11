@@ -16,6 +16,10 @@ public class ShipperMapper implements IRowMapper<ShipperModel> {
             shipper.setAvatarUrl(rs.getString("avatar_url"));
             shipper.setStatus(rs.getString("status"));
             try {
+                long uId = rs.getLong("user_id");
+                if (!rs.wasNull()) shipper.setUserId(uId);
+            } catch (Exception ignored) {}
+            try {
                 shipper.setCreatedAt(rs.getTimestamp("created_at"));
             } catch (Exception ignored) {}
             return shipper;

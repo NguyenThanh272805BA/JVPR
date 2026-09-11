@@ -39,6 +39,14 @@ public class UserMapper implements IRowMapper<UserModel> {
                 user.setAccumulatedPoints(rs.getInt("accumulated_points"));
             } catch (SQLException e) {}
 
+            try {
+                user.setRoleName(rs.getString("role_name"));
+            } catch (SQLException e) {}
+
+            try {
+                user.setVehiclePlate(rs.getString("vehicle_plate"));
+            } catch (SQLException e) {}
+
             return user;
         } catch (SQLException e) {
             e.printStackTrace();

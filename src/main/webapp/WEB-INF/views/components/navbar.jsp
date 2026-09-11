@@ -283,6 +283,16 @@
                                         <span class="material-symbols-outlined text-sm">dashboard</span> Trang Quản Trị
                                     </a>
                                 </c:if>
+                                <c:if test="${sessionScope.USERMODEL.roleId == 4}">
+                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2 px-4 py-2.5 text-amber-700 bg-amber-50 hover:bg-amber-100 font-bold transition-colors">
+                                        <span class="material-symbols-outlined text-sm text-amber-600">local_shipping</span> Cổng Tài Xế (Shipper)
+                                    </a>
+                                </c:if>
+                                <c:if test="${sessionScope.USERMODEL.roleId == 1}">
+                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
+                                        <span class="material-symbols-outlined text-sm text-amber-600">local_shipping</span> Xem Cổng Tài Xế
+                                    </a>
+                                </c:if>
                                 <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
                                     <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
                                 </a>

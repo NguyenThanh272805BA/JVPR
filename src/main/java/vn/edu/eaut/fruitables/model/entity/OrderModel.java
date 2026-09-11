@@ -36,6 +36,12 @@ public class OrderModel {
     private Integer usedPoints;
     private Double pointsDiscount;
 
+    // Thuộc tính giao hàng thất bại & Shipper
+    private String failedReason;
+    private String failedNotes;
+    private Timestamp failedAt;
+    private Integer deliveryAttempts = 1;
+
     // Thuộc tính bổ sung để lưu danh sách sản phẩm của đơn hàng
     private List<OrderDetailModel> details;
 
@@ -115,4 +121,19 @@ public class OrderModel {
 
     public Double getPointsDiscount() { return pointsDiscount; }
     public void setPointsDiscount(Double pointsDiscount) { this.pointsDiscount = pointsDiscount; }
+
+    public String getFailedReason() { return failedReason; }
+    public void setFailedReason(String failedReason) { this.failedReason = failedReason; }
+
+    public String getFailedNotes() { return failedNotes; }
+    public void setFailedNotes(String failedNotes) { this.failedNotes = failedNotes; }
+
+    public Timestamp getFailedAt() { return failedAt; }
+    public void setFailedAt(Timestamp failedAt) { this.failedAt = failedAt; }
+
+    public Integer getDeliveryAttempts() { return deliveryAttempts; }
+    public void setDeliveryAttempts(Integer deliveryAttempts) { this.deliveryAttempts = deliveryAttempts; }
+
+    public List<OrderDetailModel> getOrderDetails() { return details; }
+    public void setOrderDetails(List<OrderDetailModel> details) { this.details = details; }
 }

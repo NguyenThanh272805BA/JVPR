@@ -7,5 +7,6 @@ public interface IShipperDAO extends GenericDAO<ShipperModel> {
     List<ShipperModel> findAll();
     List<ShipperModel> findAvailable();
     ShipperModel findById(Long id);
+    ShipperModel findByUserId(Long userId);
     void updateStatus(Long id, String status);
 }

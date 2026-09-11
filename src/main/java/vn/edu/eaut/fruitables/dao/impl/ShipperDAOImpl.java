@@ -30,6 +30,13 @@ public class ShipperDAOImpl extends AbstractDAO<ShipperModel> implements IShippe
     }
 
     @Override
+    public ShipperModel findByUserId(Long userId) {
+        String sql = "SELECT * FROM shippers WHERE user_id = ?";
+        List<ShipperModel> list = query(sql, shipperMapper, userId);
+        return (list != null && !list.isEmpty()) ? list.get(0) : null;
+    }
+
+    @Override
     public void updateStatus(Long id, String status) {
         String sql = "UPDATE shippers SET status = ? WHERE id = ?";
         update(sql, status, id);

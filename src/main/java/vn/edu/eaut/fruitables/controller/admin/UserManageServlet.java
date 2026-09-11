@@ -54,30 +54,8 @@ public class UserManageServlet extends HttpServlet {
             return;
         }
 
-        // 3. Trang giao diện quản lý người dùng với Tìm kiếm & Lọc
-        String keyword = request.getParameter("keyword");
-        String roleIdStr = request.getParameter("roleId");
-        String status = request.getParameter("status");
-        String loginType = request.getParameter("loginType");
-
-        Integer roleId = null;
-        if (roleIdStr != null && !roleIdStr.trim().isEmpty() && !"ALL".equalsIgnoreCase(roleIdStr)) {
-            try {
-                roleId = Integer.parseInt(roleIdStr);
-            } catch (Exception ignored) {}
-        }
-
-        List<UserModel> users = userDAO.searchAndFilterUsers(keyword, roleId, status, loginType);
-        Map<String, Object> userStats = userDAO.getUserStats();
-
-        request.setAttribute("users", users);
-        request.setAttribute("userStats", userStats);
-        request.setAttribute("keyword", keyword);
-        request.setAttribute("selectedRoleId", roleIdStr);
-        request.setAttribute("selectedStatus", status);
-        request.setAttribute("selectedLoginType", loginType);
-
-        request.getRequestDispatcher("/WEB-INF/views/admin/user-list.jsp").forward(request, response);
+        // 3. Chuyển tiếp tới trang Quản lý Khách hàng
+        response.sendRedirect(request.getContextPath() + "/admin/customers");
     }
 
     @Override

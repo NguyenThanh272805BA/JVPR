@@ -87,4 +87,24 @@ public class UserModel {
         if (acc >= 100) return 2;
         return 0;
     }
+
+    // Thuộc tính bổ sung phục vụ phân hệ quản lý nhân sự & vai trò
+    private String roleName;
+    private String vehiclePlate;
+
+    public String getRoleName() {
+        if (roleName != null && !roleName.isEmpty()) return roleName;
+        if (roleId != null) {
+            if (roleId == 1) return "SUPER_ADMIN";
+            if (roleId == 2) return "SALE";
+            if (roleId == 3) return "USER";
+            if (roleId == 4) return "SHIPPER";
+        }
+        return "USER";
+    }
+
+    public void setRoleName(String roleName) { this.roleName = roleName; }
+
+    public String getVehiclePlate() { return vehiclePlate; }
+    public void setVehiclePlate(String vehiclePlate) { this.vehiclePlate = vehiclePlate; }
 }

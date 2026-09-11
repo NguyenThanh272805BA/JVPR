@@ -78,16 +78,36 @@
             <span class="material-symbols-outlined text-[20px]">redeem</span>
             <span>Mã khuyến mãi</span>
         </a>
-
-        <!-- NHÓM 4: KHÁCH HÀNG & HỖ TRỢ -->
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-3 pb-1">
-            Khách hàng & Hỗ trợ
-        </div>
-        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/users') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
-           href="${pageContext.request.contextPath}/admin/users">
-            <span class="material-symbols-outlined text-[20px]">group</span>
-            <span>Người dùng</span>
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/delivery-failures') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/delivery-failures">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+            <span>Giao Hàng</span>
         </a>
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/shipper/portal') ? 'bg-amber-600 text-white shadow-md font-bold' : 'text-amber-800 bg-amber-50/70 hover:bg-amber-100 font-semibold'}" 
+           href="${pageContext.request.contextPath}/shipper/portal">
+            <span class="material-symbols-outlined text-[20px] text-amber-600">two_wheeler</span>
+            <span>Cổng Tài Xế (Portal)</span>
+        </a>
+
+        <!-- NHÓM 4: QUẢN LÝ TÀI KHOẢN -->
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-3 pb-1">
+            Quản lý Tài khoản
+        </div>
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${(reqURI.contains('/customers') || (reqURI.contains('/users') && !reqURI.contains('/employees'))) ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/customers">
+            <span class="material-symbols-outlined text-[20px]">people</span>
+            <span>Tài khoản Khách hàng</span>
+        </a>
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/employees') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/employees">
+            <span class="material-symbols-outlined text-[20px]">badge</span>
+            <span>Tài khoản Nhân viên</span>
+        </a>
+
+        <!-- NHÓM 5: CHĂM SÓC KHÁCH HÀNG -->
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-3 pb-1">
+            Hỗ trợ & Chăm sóc
+        </div>
         <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/chat') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/chat">
             <div class="flex items-center gap-3">

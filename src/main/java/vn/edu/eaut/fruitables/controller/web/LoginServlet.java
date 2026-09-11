@@ -65,7 +65,16 @@ public class LoginServlet extends HttpServlet {
                 syncCartToDB(user.getId(), cart);
             }
 
-            response.sendRedirect(request.getContextPath() + "/home");
+            if (user.getRoleId() == 4) {
+                // Shipper -> Vào trực tiếp Cổng Tài Xế
+                response.sendRedirect(request.getContextPath() + "/shipper/portal");
+            } else if (user.getRoleId() == 1 || user.getRoleId() == 2) {
+                // Admin / Sale -> Vào Dashboard Quản trị
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else {
+                // Khách hàng -> Về trang chủ
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
         } else {
             request.setAttribute("message", "Tài khoản hoặc mật khẩu không chính xác.");
             request.getRequestDispatcher("/WEB-INF/views/web/login.jsp").forward(request, response);

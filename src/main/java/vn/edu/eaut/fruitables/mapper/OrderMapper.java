@@ -35,6 +35,10 @@ public class OrderMapper implements IRowMapper<OrderModel> {
             try { order.setEstimatedDeliveryTime(rs.getString("estimated_delivery_time")); } catch (Exception ignored) {}
             try { order.setUsedPoints(rs.getInt("used_points")); } catch (Exception ignored) {}
             try { order.setPointsDiscount(rs.getDouble("points_discount")); } catch (Exception ignored) {}
+            try { order.setFailedReason(rs.getString("failed_reason")); } catch (Exception ignored) {}
+            try { order.setFailedNotes(rs.getString("failed_notes")); } catch (Exception ignored) {}
+            try { order.setFailedAt(rs.getTimestamp("failed_at")); } catch (Exception ignored) {}
+            try { order.setDeliveryAttempts(rs.getInt("delivery_attempts")); } catch (Exception ignored) {}
             return order;
         } catch (SQLException e) {
             e.printStackTrace();
