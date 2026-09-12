@@ -67,8 +67,13 @@ public class ShopServlet extends HttpServlet {
         // 2. Gọi DB thông qua bộ lọc động (Lọc đa chiều theo từ khóa, danh mục, khoảng giá, sắp xếp)
         List<ProductModel> products = productService.filterProducts(keyword, categoryId, sortOption, minPrice, maxPrice);
 
-        // 3. TÍCH HỢP MOCK DATA: Nếu DB trống, tạo danh sách hiển thị tạm thời
-        if (products == null || products.isEmpty()) {
+        boolean hasFilter = (keyword != null && !keyword.trim().isEmpty())
+                || categoryId != null
+                || minPrice != null
+                || maxPrice != null;
+
+        // 3. TÍCH HỢP MOCK DATA: Chỉ khi CSDL hoàn toàn trống VÀ người dùng không áp dụng bộ lọc nào
+        if (!hasFilter && (products == null || products.isEmpty())) {
             products = new ArrayList<>();
 
             // (Sản phẩm 1)

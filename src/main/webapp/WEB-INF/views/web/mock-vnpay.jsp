@@ -1,5 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="vn.edu.eaut.fruitables.util.VnPayConfigUtil" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%
+    String pendingCode = (String) session.getAttribute("PENDING_ORDER_CODE");
+    String signSuccess = "";
+    String signFail = "";
+    if (pendingCode != null && !pendingCode.trim().isEmpty()) {
+        signSuccess = VnPayConfigUtil.hmacSHA512(VnPayConfigUtil.secretKey, "vnp_ResponseCode=00&vnp_TxnRef=" + pendingCode.trim());
+        signFail = VnPayConfigUtil.hmacSHA512(VnPayConfigUtil.secretKey, "vnp_ResponseCode=99&vnp_TxnRef=" + pendingCode.trim());
+    }
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -39,6 +49,7 @@
             <form action="${pageContext.request.contextPath}/vnpay-return" method="GET">
                 <input type="hidden" name="vnp_ResponseCode" value="00">
                 <input type="hidden" name="vnp_TxnRef" value="${sessionScope.PENDING_ORDER_CODE}">
+                <input type="hidden" name="vnp_SecureHash" value="<%= signSuccess %>">
                 <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">
                     Mô phỏng: Thanh toán THÀNH CÔNG
                 </button>
@@ -48,6 +59,7 @@
             <form action="${pageContext.request.contextPath}/vnpay-return" method="GET">
                 <input type="hidden" name="vnp_ResponseCode" value="99">
                 <input type="hidden" name="vnp_TxnRef" value="${sessionScope.PENDING_ORDER_CODE}">
+                <input type="hidden" name="vnp_SecureHash" value="<%= signFail %>">
                 <button type="submit" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg transition-colors">
                     Mô phỏng: HỦY thanh toán
                 </button>

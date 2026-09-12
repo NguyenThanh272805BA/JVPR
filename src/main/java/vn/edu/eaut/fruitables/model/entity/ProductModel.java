@@ -54,7 +54,12 @@ public class ProductModel {
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
 
-    public String getImageUrl() { return imageUrl; }
+    public String getImageUrl() {
+        if (imageUrl != null && imageUrl.startsWith("/Fruitables-Web-App/")) {
+            return imageUrl.substring("/Fruitables-Web-App".length());
+        }
+        return imageUrl;
+    }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public Boolean getStatus() { return status; }

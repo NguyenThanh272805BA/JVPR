@@ -41,13 +41,18 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
 
     @Override
     public void saveOrderDetail(Long orderId, Long productId, Double price, Integer quantity, Double subTotal) {
-        saveOrderDetail(orderId, productId, price, 0.0, quantity, subTotal);
+        saveOrderDetail(orderId, productId, price, 0.0, quantity, subTotal, 0.0);
     }
 
     @Override
     public void saveOrderDetail(Long orderId, Long productId, Double price, Double costPrice, Integer quantity, Double subTotal) {
-        String sql = "INSERT INTO order_details (order_id, product_id, price, cost_price, quantity, sub_total) VALUES (?, ?, ?, ?, ?, ?)";
-        insert(sql, orderId, productId, price, costPrice != null ? costPrice : 0.0, quantity, subTotal);
+        saveOrderDetail(orderId, productId, price, costPrice, quantity, subTotal, 0.0);
+    }
+
+    @Override
+    public void saveOrderDetail(Long orderId, Long productId, Double price, Double costPrice, Integer quantity, Double subTotal, Double taxRate) {
+        String sql = "INSERT INTO order_details (order_id, product_id, price, cost_price, quantity, sub_total, tax_rate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        insert(sql, orderId, productId, price, costPrice != null ? costPrice : 0.0, quantity, subTotal, taxRate != null ? taxRate : 0.0);
     }
 
     @Override
@@ -113,9 +118,26 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
     }
 
     @Override
+    public List<OrderModel> findRecentOrdersByPhone(String phone, int limit) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        int max = (limit > 0 && limit <= 20) ? limit : 5;
+        String sql = "SELECT * FROM orders WHERE phone = ? ORDER BY created_at DESC LIMIT ?";
+        List<OrderModel> orders = query(sql, new OrderMapper(), phone.trim(), max);
+        if (orders != null) {
+            for (OrderModel o : orders) {
+                populateShipper(o);
+                o.setDetails(findOrderDetailsByOrderId(o.getId()));
+            }
+            return orders;
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
     public void updateOrderStatus(Long orderId, String status) {
-        String sql = "UPDATE orders SET status = ? WHERE id = ?";
-        update(sql, status, orderId);
+        updateStatusAndRestoreStock(orderId, status);
     }
 
     @Override
@@ -130,7 +152,7 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
             conn.setAutoCommit(false);
 
             // 1. Khóa và kiểm tra trạng thái hiện tại của đơn hàng
-            String checkSql = "SELECT status FROM orders WHERE id = ? FOR UPDATE";
+            String checkSql = "SELECT status, payment_status, user_id, used_points, order_code FROM orders WHERE id = ? FOR UPDATE";
             psCheck = conn.prepareStatement(checkSql);
             psCheck.setLong(1, orderId);
             rsCheck = psCheck.executeQuery();
@@ -139,9 +161,13 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                 return false;
             }
             String currentStatus = rsCheck.getString("status");
+            long userId = rsCheck.getLong("user_id");
+            boolean hasUserId = !rsCheck.wasNull() && userId > 0;
+            int usedPoints = rsCheck.getInt("used_points");
+            String orderCode = rsCheck.getString("order_code");
 
             // 2. Nếu chuyển sang CANCELLED hoặc RETURNED mà đơn trước đó CHƯA bị hủy/hoàn:
-            // -> Hoàn trả tồn kho cho tất cả sản phẩm
+            // -> Hoàn trả tồn kho cho tất cả sản phẩm và hoàn lại điểm tích lũy đã dùng
             boolean isCancellingOrReturning = "CANCELLED".equalsIgnoreCase(newStatus) || "RETURNED".equalsIgnoreCase(newStatus);
             boolean wasAlreadyCancelledOrReturned = "CANCELLED".equalsIgnoreCase(currentStatus) || "RETURNED".equalsIgnoreCase(currentStatus);
 
@@ -156,6 +182,25 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                         psStock.addBatch();
                     }
                     psStock.executeBatch();
+                }
+
+                // Hoàn lại điểm tích lũy thành viên đã sử dụng (nếu có)
+                if (hasUserId && usedPoints > 0) {
+                    String restorePointsSql = "UPDATE users SET points = points + ? WHERE id = ?";
+                    try (PreparedStatement psU = conn.prepareStatement(restorePointsSql)) {
+                        psU.setInt(1, usedPoints);
+                        psU.setLong(2, userId);
+                        psU.executeUpdate();
+                    } catch (Exception ignored) {}
+
+                    String insertRefundLog = "INSERT INTO point_transactions (user_id, order_id, points_amount, transaction_type, description) VALUES (?, ?, ?, 'REFUND', ?)";
+                    try (PreparedStatement psLog = conn.prepareStatement(insertRefundLog)) {
+                        psLog.setLong(1, userId);
+                        psLog.setLong(2, orderId);
+                        psLog.setInt(3, usedPoints);
+                        psLog.setString(4, "Hoàn trả " + usedPoints + " điểm do hủy/hoàn đơn #" + (orderCode != null ? orderCode : orderId));
+                        psLog.executeUpdate();
+                    } catch (Exception ignored) {}
                 }
             }
 

@@ -128,6 +128,7 @@ public class ChatDAOImpl extends AbstractDAO<ChatMessageModel> implements IChatD
                 map.put("phone", rs.getString("phone"));
                 map.put("lastMessage", rs.getString("last_message"));
                 map.put("lastTime", rs.getTimestamp("last_time"));
+                map.put("lastMessageTime", rs.getTimestamp("last_time"));
                 map.put("lastSender", rs.getString("last_sender"));
                 map.put("unreadCount", rs.getInt("unread_count"));
                 list.add(map);

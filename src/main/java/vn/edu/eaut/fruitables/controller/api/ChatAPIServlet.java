@@ -80,9 +80,9 @@ public class ChatAPIServlet extends HttpServlet {
             jsonResponse.addProperty("authenticated", true);
             jsonResponse.addProperty("isAdmin", false);
 
+            int unread = chatDAO.countUnreadForUser(user.getId());
             List<ChatMessageModel> messages = chatDAO.findByUserId(user.getId(), 100);
             chatDAO.markAsReadByUser(user.getId());
-            int unread = chatDAO.countUnreadForUser(user.getId());
 
             jsonResponse.add("messages", gson.toJsonTree(messages));
             jsonResponse.addProperty("unread", unread);

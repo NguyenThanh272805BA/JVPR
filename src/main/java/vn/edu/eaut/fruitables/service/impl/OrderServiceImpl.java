@@ -33,10 +33,16 @@ public class OrderServiceImpl implements IOrderService {
             vn.edu.eaut.fruitables.dao.IProductDAO productDAO = new vn.edu.eaut.fruitables.dao.impl.ProductDAOImpl();
             for (CartItemDTO item : cart.values()) {
                 double currentCostPrice = 0.0;
+                double currentTaxRate = 0.0;
                 try {
                     vn.edu.eaut.fruitables.model.entity.ProductModel p = productDAO.findById(item.getProductId());
-                    if (p != null && p.getCostPrice() != null) {
-                        currentCostPrice = p.getCostPrice();
+                    if (p != null) {
+                        if (p.getCostPrice() != null) {
+                            currentCostPrice = p.getCostPrice();
+                        }
+                        if (p.getTaxRate() != null) {
+                            currentTaxRate = p.getTaxRate();
+                        }
                     }
                 } catch (Exception ignored) {}
 
@@ -46,7 +52,8 @@ public class OrderServiceImpl implements IOrderService {
                         item.getPrice(),
                         currentCostPrice,
                         item.getQuantity(),
-                        item.getSubTotal()
+                        item.getSubTotal(),
+                        currentTaxRate
                 );
             }
             return orderModel;

@@ -66,19 +66,19 @@
 
                     <!-- SỔ ĐỊA CHỈ ĐÃ LƯU (Dành cho thành viên đã đăng nhập) -->
                     <c:if test="${not empty savedAddresses}">
-                        <div class="mb-5 p-4 rounded-xl bg-surface-container/60 border border-outline-variant">
+                        <div class="mb-5 p-4 rounded-xl bg-primary/5 border border-primary/20 shadow-xs">
                             <div class="flex items-center justify-between mb-2">
-                                <label class="font-label-bold text-xs text-on-surface flex items-center gap-1.5 text-primary">
+                                <label class="font-label-bold text-xs text-on-surface flex items-center gap-1.5 text-primary font-bold">
                                     <span class="material-symbols-outlined text-base">bookmarks</span>
-                                    Chọn từ sổ địa chỉ của bạn:
+                                    Sổ địa chỉ đã đặt của bạn (Tự động lưu &amp; điền):
                                 </label>
-                                <button type="button" id="btnNewAddress" class="text-xs text-primary font-bold hover:underline">
-                                    + Dùng địa chỉ mới
+                                <button type="button" id="btnNewAddress" class="text-xs text-primary font-bold hover:underline flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">add_circle</span> Nhập địa chỉ mới
                                 </button>
                             </div>
-                            <select id="savedAddressSelect" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs font-medium">
-                                <option value="">-- Chọn địa chỉ đã lưu hoặc bấm Dùng địa chỉ mới --</option>
-                                <c:forEach var="addr" items="${savedAddresses}">
+                            <select id="savedAddressSelect" class="w-full px-3 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-xs font-medium cursor-pointer shadow-xs">
+                                <option value="">-- Bấm chọn địa chỉ nhận hàng quen thuộc --</option>
+                                <c:forEach var="addr" items="${savedAddresses}" varStatus="loop">
                                     <option value="${addr.id}"
                                             data-recipient="${addr.recipientName}"
                                             data-phone="${addr.phone}"
@@ -87,7 +87,7 @@
                                             data-ward="${addr.ward}"
                                             data-street="${addr.streetAddress}"
                                             data-full="${addr.fullAddress}"
-                                            ${addr.isDefault ? 'selected' : ''}>
+                                            ${(addr.isDefault || loop.first) ? 'selected' : ''}>
                                         ${addr.isDefault ? '⭐ [Mặc định] ' : '📍 '}${addr.recipientName} - ${addr.phone} (${addr.fullAddress})
                                     </option>
                                 </c:forEach>
@@ -438,6 +438,14 @@
             return new Intl.NumberFormat('vi-VN').format(Math.round(num)) + ' ₫';
         }
 
+        // Tự động điền trước thông tin từ sổ địa chỉ đã lưu ngay lập tức
+        if (savedAddressSelect && savedAddressSelect.value) {
+            applySavedAddress(savedAddressSelect.options[savedAddressSelect.selectedIndex]);
+        } else if (savedAddressSelect && savedAddressSelect.options.length > 1) {
+            savedAddressSelect.selectedIndex = 1;
+            applySavedAddress(savedAddressSelect.options[1]);
+        }
+
         // Tải danh sách Tỉnh/Thành từ Open API
         axios.get('https://provinces.open-api.vn/api/?depth=3')
             .then(res => {
@@ -450,9 +458,12 @@
                     districtSelect.disabled = false;
                     wardSelect.disabled = true;
 
-                    const selProvince = provincesData.find(p => p.code == this.value);
-                    if (selProvince) {
-                        selProvince.districts.forEach(d => districtSelect.add(new Option(d.name, d.code)));
+                    const provCode = this.value;
+                    const provObj = provincesData.find(p => p.code == provCode);
+                    inputProvinceName.value = provObj ? provObj.name : '';
+
+                    if (provObj && provObj.districts) {
+                        provObj.districts.forEach(d => districtSelect.add(new Option(d.name, d.code)));
                     }
                     updateFullAddress();
                     scheduleShippingCalculation();
@@ -462,16 +473,28 @@
                     wardSelect.length = 1;
                     wardSelect.disabled = false;
 
-                    const selProvince = provincesData.find(p => p.code == provinceSelect.value);
-                    const selDistrict = selProvince?.districts.find(d => d.code == this.value);
-                    if (selDistrict) {
-                        selDistrict.wards.forEach(w => wardSelect.add(new Option(w.name, w.code)));
+                    const provCode = provinceSelect.value;
+                    const distCode = this.value;
+                    const provObj = provincesData.find(p => p.code == provCode);
+                    const distObj = provObj?.districts.find(d => d.code == distCode);
+                    inputDistrictName.value = distObj ? distObj.name : '';
+
+                    if (distObj && distObj.wards) {
+                        distObj.wards.forEach(w => wardSelect.add(new Option(w.name, w.code)));
                     }
                     updateFullAddress();
                     scheduleShippingCalculation();
                 });
 
                 wardSelect.addEventListener('change', function() {
+                    const provCode = provinceSelect.value;
+                    const distCode = districtSelect.value;
+                    const wardCode = this.value;
+                    const provObj = provincesData.find(p => p.code == provCode);
+                    const distObj = provObj?.districts.find(d => d.code == distCode);
+                    const wardObj = distObj?.wards.find(w => w.code == wardCode);
+                    inputWardName.value = wardObj ? wardObj.name : '';
+
                     updateFullAddress();
                     scheduleShippingCalculation();
                 });

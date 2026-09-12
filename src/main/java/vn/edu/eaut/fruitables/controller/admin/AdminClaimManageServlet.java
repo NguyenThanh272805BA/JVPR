@@ -6,12 +6,17 @@ import vn.edu.eaut.fruitables.dao.impl.ClaimDAOImpl;
 import vn.edu.eaut.fruitables.dao.impl.NotificationDAOImpl;
 import vn.edu.eaut.fruitables.model.entity.OrderClaimModel;
 
+import vn.edu.eaut.fruitables.dao.ICouponDAO;
+import vn.edu.eaut.fruitables.dao.impl.CouponDAOImpl;
+import vn.edu.eaut.fruitables.model.entity.CouponModel;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +55,23 @@ public class AdminClaimManageServlet extends HttpServlet {
                 status = "APPROVED";
                 if ("REFUND_VOUCHER".equalsIgnoreCase(claim.getClaimSolution())) {
                     voucherCode = "CARE-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                    try {
+                        ICouponDAO couponDAO = new CouponDAOImpl();
+                        CouponModel compCoupon = new CouponModel();
+                        compCoupon.setCode(voucherCode);
+                        compCoupon.setDiscountType("PERCENTAGE");
+                        compCoupon.setDiscountValue(100.0);
+                        compCoupon.setMinOrderValue(0.0);
+                        compCoupon.setProductId(null);
+                        compCoupon.setStartDate(new Timestamp(System.currentTimeMillis()));
+                        // Hạn dùng 30 ngày
+                        compCoupon.setEndDate(new Timestamp(System.currentTimeMillis() + 30L * 24 * 3600 * 1000));
+                        compCoupon.setUsageLimit(1);
+                        compCoupon.setStatus(true);
+                        couponDAO.save(compCoupon);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (adminNote == null || adminNote.trim().isEmpty()) {
                     adminNote = "Fruitables chân thành xin lỗi về sự cố quả dập hỏng. Chúng tôi đã duyệt phương án " +

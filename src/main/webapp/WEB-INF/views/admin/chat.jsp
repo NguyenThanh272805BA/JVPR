@@ -193,7 +193,7 @@
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between gap-1 mb-1">
               <h4 class="text-xs font-bold text-on-surface truncate">\${escapeHtml(c.fullName || 'Khách hàng')}</h4>
-              <span class="text-[10px] text-on-surface-variant/70 whitespace-nowrap">\${formatTimestamp(c.lastMessageTime)}</span>
+              <span class="text-[10px] text-on-surface-variant/70 whitespace-nowrap">\${formatTimestamp(c.lastMessageTime || c.lastTime)}</span>
             </div>
             <div class="flex items-center justify-between gap-2">
               <p class="text-[11px] text-on-surface-variant truncate flex-1">\${escapeHtml(c.lastMessage || '')}</p>

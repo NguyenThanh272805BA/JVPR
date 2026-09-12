@@ -66,6 +66,56 @@ public class EmailServiceImpl {
         }
     }
 
+    public boolean sendEmailLinkOTP(String toEmail, String otpCode) {
+        if (fromEmail == null || password == null) {
+            System.out.println("Chưa cấu hình Email hệ thống!");
+            return false;
+        }
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, password);
+            }
+        });
+
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail, "Fruitables Hoa Quả Sạch", "UTF-8"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject("Mã OTP xác minh liên kết Gmail - Fruitables", "UTF-8");
+            message.setContent(
+                    "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 25px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;'>" +
+                            "<div style='text-align: center; margin-bottom: 20px;'>" +
+                            "  <h1 style='color: #81c408; margin: 0; font-size: 26px; font-weight: 800;'>Fruitables</h1>" +
+                            "  <p style='color: #64748b; font-size: 13px; margin-top: 4px;'>Xác minh liên kết tài khoản Gmail</p>" +
+                            "</div>" +
+                            "<p>Xin chào,</p>" +
+                            "<p>Bạn vừa yêu cầu liên kết địa chỉ Gmail này với tài khoản Fruitables để nhận thông báo và phần quà <b>Voucher 50.000₫</b>.</p>" +
+                            "<div style='background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 18px; border-radius: 12px; text-align: center; margin: 25px 0;'>" +
+                            "  <p style='margin: 0; color: #15803d; font-size: 13px; font-weight: bold;'>MÃ XÁC MINH OTP CỦA BẠN LÀ:</p>" +
+                            "  <h1 style='color: #166534; letter-spacing: 8px; margin: 12px 0; font-size: 36px; font-weight: 900;'>" + otpCode + "</h1>" +
+                            "  <p style='margin: 0; color: #64748b; font-size: 12px;'>Mã có hiệu lực trong vòng <b>5 phút</b></p>" +
+                            "</div>" +
+                            "<p style='color: #64748b; font-size: 13px; line-height: 1.5;'>Không chia sẻ mã này với bất kỳ ai để đảm bảo an toàn cho tài khoản của bạn.</p>" +
+                            "<hr style='border: none; border-top: 1px solid #f1f5f9; margin: 20px 0;'/>" +
+                            "<p style='text-align: center; color: #94a3b8; font-size: 11px;'>Fruitables - Thực phẩm sạch cho gia đình bạn.</p>" +
+                            "</div>",
+                    "text/html; charset=utf-8"
+            );
+            Transport.send(message);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean sendPasswordResetOTP(String toEmail, String otpCode) {
         if (fromEmail == null || password == null) {
             System.out.println("Chưa cấu hình Email hệ thống!");

@@ -34,7 +34,9 @@ public class VerifyOtpServlet extends HttpServlet {
         String sessionOtp = (String) session.getAttribute("REGISTER_OTP");
         UserModel pendingUser = (UserModel) session.getAttribute("PENDING_USER");
 
-        if (sessionOtp != null && sessionOtp.equals(userOtp) && pendingUser != null) {
+        boolean otpMatches = (sessionOtp != null && userOtp != null && sessionOtp.trim().equalsIgnoreCase(userOtp.trim()));
+
+        if (otpMatches && pendingUser != null) {
             // Khớp mã OTP -> Lưu User vào Database
             UserModel newUser = userService.register(pendingUser);
 

@@ -45,21 +45,7 @@ public class MomoReturnServlet extends HttpServlet {
                 orderDAO.update("UPDATE orders SET payment_status = 'PAID', status = 'PACKING' WHERE order_code = ?", orderCode);
 
                 if (order != null) {
-                    // 2. Tự động trừ tồn kho sản phẩm khỏi kho hàng
-                    ProductDAOImpl productDAO = new ProductDAOImpl();
-                    productDAO.update(
-                            "UPDATE products p JOIN order_details od ON p.id = od.product_id " +
-                                    "SET p.stock = p.stock - od.quantity " +
-                                    "WHERE od.order_id = ?", order.getId()
-                    );
-
-                    // 3. Tăng lượt dùng voucher nếu có
-                    String appliedCoupon = (String) session.getAttribute("APPLIED_COUPON_CODE");
-                    if (appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
-                        productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
-                    }
-
-                    // 4. Tạo thông báo cho tài khoản người dùng
+                    // Tạo thông báo cho tài khoản người dùng
                     if (order.getUserId() != null) {
                         try {
                             NotificationDAOImpl notificationDAO = new NotificationDAOImpl();
@@ -75,7 +61,7 @@ public class MomoReturnServlet extends HttpServlet {
                     }
                 }
 
-                // 5. Dọn dẹp giỏ hàng trong session
+                // Dọn dẹp giỏ hàng trong session
                 session.removeAttribute("CART");
                 session.removeAttribute("CART_TOTAL_ITEMS");
                 session.removeAttribute("DISCOUNT_AMOUNT");
@@ -84,8 +70,13 @@ public class MomoReturnServlet extends HttpServlet {
 
                 session.setAttribute("orderSuccess", "Thanh toán MoMo thành công! Đơn hàng " + orderCode + " đã được ghi nhận.");
             } else {
-                // Khách hàng chủ động bấm Hủy thanh toán
-                orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'CANCELLED' WHERE order_code = ?", orderCode);
+                // Khách hàng chủ động bấm Hủy thanh toán hoặc giao dịch thất bại -> Hủy và hoàn trả tồn kho
+                if (order != null) {
+                    orderDAO.updateStatusAndRestoreStock(order.getId(), "CANCELLED");
+                    orderDAO.update("UPDATE orders SET payment_status = 'UNPAID' WHERE id = ?", order.getId());
+                } else {
+                    orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'CANCELLED' WHERE order_code = ?", orderCode);
+                }
                 session.setAttribute("orderSuccess", "Đã hủy thanh toán đơn hàng " + orderCode + ".");
             }
         }

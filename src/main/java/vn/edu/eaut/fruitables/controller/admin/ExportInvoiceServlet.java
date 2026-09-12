@@ -43,7 +43,13 @@ public class ExportInvoiceServlet extends HttpServlet {
                 Locale localeVN = new Locale("vi", "VN");
                 NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(localeVN);
 
-                String customerName = rsOrder.getString("full_name") != null ? rsOrder.getString("full_name") : "Khach vang lai";
+                String customerName = rsOrder.getString("recipient_name");
+                if (customerName == null || customerName.trim().isEmpty()) {
+                    customerName = rsOrder.getString("full_name");
+                }
+                if (customerName == null || customerName.trim().isEmpty()) {
+                    customerName = "Khach vang lai";
+                }
                 double totalAmount = rsOrder.getDouble("total_amount");
                 String address = rsOrder.getString("shipping_address");
                 String phone = rsOrder.getString("phone");
@@ -57,14 +63,14 @@ public class ExportInvoiceServlet extends HttpServlet {
                 document.add(new Paragraph("-------------------------------------------------"));
 
                 // Lấy chi tiết sản phẩm thuộc đơn hàng và tính thuế
-                String sqlDetail = "SELECT od.*, p.name FROM order_details od JOIN products p ON od.product_id = p.id WHERE od.order_id = ?";
+                String sqlDetail = "SELECT od.*, COALESCE(p.name, 'San pham') AS product_name FROM order_details od LEFT JOIN products p ON od.product_id = p.id WHERE od.order_id = ?";
                 PreparedStatement psDetail = conn.prepareStatement(sqlDetail);
                 psDetail.setLong(1, rsOrder.getLong("id"));
                 ResultSet rsDetail = psDetail.executeQuery();
 
                 double totalTax = 0;
                 while (rsDetail.next()) {
-                    String pName = rsDetail.getString("name");
+                    String pName = rsDetail.getString("product_name");
                     int qty = rsDetail.getInt("quantity");
                     double price = rsDetail.getDouble("price");
                     double subTotal = rsDetail.getDouble("sub_total");

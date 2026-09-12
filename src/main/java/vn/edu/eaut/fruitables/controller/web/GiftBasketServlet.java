@@ -84,6 +84,14 @@ public class GiftBasketServlet extends HttpServlet {
                 basketName += " - Thiệp: " + cardMessage.trim();
             }
 
+            // Đảm bảo sản phẩm Master ID 99 tồn tại trong DB để tránh vi phạm khóa ngoại khi đặt hàng
+            ProductModel masterBasket = productDAO.findById(99L);
+            if (masterBasket == null) {
+                try {
+                    ((ProductDAOImpl) productDAO).update("INSERT INTO products (id, category_id, name, slug, description, detailed_description, price, cost_price, weight_gram, storage_type, is_free_shipping, tax_rate, discount_price, stock, image_url, status) VALUES (99, 8, 'Giỏ Quà Trái Cây Thiết Kế Riêng', 'gio-qua-thiet-ke-rieng-master-99', 'Sản phẩm Master cho giỏ quà khách hàng tự chọn', '<p>Master Gift Basket</p>', 0.00, 0.00, 1000, 'FRAGILE_GIFT', 1, 5.00, NULL, 99999, '/assets/uploads/products/gio_qua_thietke.jpg', 1) ON DUPLICATE KEY UPDATE id=id");
+                } catch (Exception ignored) {}
+            }
+
             // Đóng gói vào CartItemDTO (sản phẩm Master ID 99)
             CartItemDTO basketItem = new CartItemDTO(
                     99L,

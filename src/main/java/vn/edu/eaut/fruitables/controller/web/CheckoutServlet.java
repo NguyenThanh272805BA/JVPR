@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,7 +50,32 @@ public class CheckoutServlet extends HttpServlet {
                 user = freshUser;
             }
             vn.edu.eaut.fruitables.dao.IUserAddressDAO userAddressDAO = new vn.edu.eaut.fruitables.dao.impl.UserAddressDAOImpl();
-            request.setAttribute("savedAddresses", userAddressDAO.findByUserId(user.getId()));
+            List<vn.edu.eaut.fruitables.model.entity.UserAddressModel> addrs = userAddressDAO.findByUserId(user.getId());
+            if (addrs == null || addrs.isEmpty()) {
+                // Tự động đồng bộ từ lịch sử các đơn hàng trước đây nếu sổ địa chỉ còn trống
+                try {
+                    vn.edu.eaut.fruitables.dao.IOrderDAO orderDAO = new vn.edu.eaut.fruitables.dao.impl.OrderDAOImpl();
+                    List<vn.edu.eaut.fruitables.model.entity.OrderModel> pastOrders = orderDAO.findByUserId(user.getId());
+                    if (pastOrders != null && !pastOrders.isEmpty()) {
+                        java.util.Set<String> seenAddrs = new java.util.HashSet<>();
+                        for (vn.edu.eaut.fruitables.model.entity.OrderModel pastOrder : pastOrders) {
+                            String shipAddr = pastOrder.getShippingAddress();
+                            if (shipAddr != null && !shipAddr.trim().isEmpty() && seenAddrs.add(shipAddr.trim().toLowerCase())) {
+                                vn.edu.eaut.fruitables.model.entity.UserAddressModel autoAddr = new vn.edu.eaut.fruitables.model.entity.UserAddressModel();
+                                autoAddr.setUserId(user.getId());
+                                autoAddr.setRecipientName(pastOrder.getRecipientName() != null ? pastOrder.getRecipientName() : user.getFullName());
+                                autoAddr.setPhone(pastOrder.getPhone() != null ? pastOrder.getPhone() : user.getPhone());
+                                autoAddr.setFullAddress(shipAddr.trim());
+                                autoAddr.setStreetAddress(shipAddr.trim());
+                                autoAddr.setIsDefault(addrs == null || addrs.isEmpty());
+                                userAddressDAO.save(autoAddr);
+                            }
+                        }
+                        addrs = userAddressDAO.findByUserId(user.getId());
+                    }
+                } catch (Exception ignored) {}
+            }
+            request.setAttribute("savedAddresses", addrs);
         }
 
         // Nếu hợp lệ, hiển thị trang checkout
@@ -114,22 +140,33 @@ public class CheckoutServlet extends HttpServlet {
 
         double finalShippingFee = Math.max(0.0, shippingFee - shippingDiscount);
 
-        // Lưu địa chỉ vào sổ nếu người dùng tick chọn
-        String saveAddressParam = request.getParameter("saveAddress");
-        if (("1".equals(saveAddressParam) || "true".equalsIgnoreCase(saveAddressParam)) && user != null && address != null && !address.trim().isEmpty()) {
+        // TỰ ĐỘNG LƯU ĐỊA CHỈ VÀO SỔ ĐỊA CHỈ CHO KHÁCH ĐÃ CÓ TÀI KHOẢN
+        if (user != null && address != null && !address.trim().isEmpty()) {
             try {
                 vn.edu.eaut.fruitables.dao.IUserAddressDAO userAddressDAO = new vn.edu.eaut.fruitables.dao.impl.UserAddressDAOImpl();
-                vn.edu.eaut.fruitables.model.entity.UserAddressModel newAddr = new vn.edu.eaut.fruitables.model.entity.UserAddressModel();
-                newAddr.setUserId(user.getId());
-                newAddr.setRecipientName(fullName);
-                newAddr.setPhone(phone);
-                newAddr.setProvince(request.getParameter("provinceName") != null ? request.getParameter("provinceName") : "");
-                newAddr.setDistrict(request.getParameter("districtName") != null ? request.getParameter("districtName") : "");
-                newAddr.setWard(request.getParameter("wardName") != null ? request.getParameter("wardName") : "");
-                newAddr.setStreetAddress(request.getParameter("street") != null ? request.getParameter("street") : address);
-                newAddr.setFullAddress(address);
-                newAddr.setIsDefault(false);
-                userAddressDAO.save(newAddr);
+                List<vn.edu.eaut.fruitables.model.entity.UserAddressModel> existingAddrs = userAddressDAO.findByUserId(user.getId());
+                boolean exists = false;
+                if (existingAddrs != null) {
+                    for (vn.edu.eaut.fruitables.model.entity.UserAddressModel ea : existingAddrs) {
+                        if (ea.getFullAddress() != null && ea.getFullAddress().trim().equalsIgnoreCase(address.trim())) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+                if (!exists) {
+                    vn.edu.eaut.fruitables.model.entity.UserAddressModel newAddr = new vn.edu.eaut.fruitables.model.entity.UserAddressModel();
+                    newAddr.setUserId(user.getId());
+                    newAddr.setRecipientName(fullName != null && !fullName.trim().isEmpty() ? fullName.trim() : user.getFullName());
+                    newAddr.setPhone(phone != null && !phone.trim().isEmpty() ? phone.trim() : user.getPhone());
+                    newAddr.setProvince(request.getParameter("provinceName") != null ? request.getParameter("provinceName") : "");
+                    newAddr.setDistrict(request.getParameter("districtName") != null ? request.getParameter("districtName") : "");
+                    newAddr.setWard(request.getParameter("wardName") != null ? request.getParameter("wardName") : "");
+                    newAddr.setStreetAddress(request.getParameter("street") != null && !request.getParameter("street").trim().isEmpty() ? request.getParameter("street").trim() : address.trim());
+                    newAddr.setFullAddress(address.trim());
+                    newAddr.setIsDefault(existingAddrs == null || existingAddrs.isEmpty());
+                    userAddressDAO.save(newAddr);
+                }
             } catch (Exception ignored) {}
         }
 

@@ -48,7 +48,6 @@ public class ProfileServlet extends HttpServlet {
             String fullName = request.getParameter("fullName");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
-
             // Xử lý Upload Avatar
             Part filePart = request.getPart("avatarFile");
             String fileName = extractFileName(filePart);

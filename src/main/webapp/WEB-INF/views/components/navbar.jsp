@@ -33,9 +33,40 @@
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 text-emerald-700 font-semibold" href="${pageContext.request.contextPath}/gift-basket-builder">
                 <span class="material-symbols-outlined text-[18px] text-amber-500">featured_seasonal_and_gifts</span> Tự mix giỏ quà
             </a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/promotions">
-                <span class="material-symbols-outlined text-[18px]">redeem</span> Khuyến mãi
-            </a>
+            <!-- Khuyến mãi Dropdown trượt mượt mà khi hover -->
+            <div class="relative group py-2">
+                <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 cursor-pointer py-1" href="${pageContext.request.contextPath}/promotions">
+                    <span class="material-symbols-outlined text-[18px]">redeem</span>
+                    <span>Khuyến mãi</span>
+                    <span class="material-symbols-outlined text-[16px] transition-transform duration-200 group-hover:rotate-180 text-on-surface-variant/70">expand_more</span>
+                </a>
+
+                <!-- Submenu Slide-down -->
+                <div class="absolute left-0 top-full pt-1.5 z-[110] opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 w-64">
+                    <div class="bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/80 p-2 space-y-1 backdrop-blur-lg">
+                        <a href="${pageContext.request.contextPath}/promotions#coupons-section"
+                           class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-container transition-all group/item">
+                            <div class="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 group-hover/item:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-bold text-on-surface group-hover/item:text-primary transition-colors">Mã Khuyến Mãi & Voucher</span>
+                                <span class="text-[10px] text-on-surface-variant truncate">Sưu tầm mã giảm giá đến 50k</span>
+                            </div>
+                        </a>
+                        <a href="${pageContext.request.contextPath}/promotions#flash-sale-section"
+                           class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-container transition-all group/item">
+                            <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0 group-hover/item:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-bold text-on-surface group-hover/item:text-rose-600 transition-colors">Sản Phẩm Flash Sale</span>
+                                <span class="text-[10px] text-on-surface-variant truncate">Hoa quả tươi giảm giá sốc</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
             <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/guest-tracking">
                 <span class="material-symbols-outlined text-[18px]">local_shipping</span> Tra cứu đơn hàng
             </a>

@@ -51,9 +51,13 @@ public class CouponManageServlet extends HttpServlet {
             Integer usageLimit = Integer.parseInt(request.getParameter("usageLimit"));
             String productIdStr = request.getParameter("productId");
 
-            // Parse datetime-local string (YYYY-MM-DDTHH:MM) sang SQL Timestamp
-            Timestamp startDate = Timestamp.valueOf(startDateStr.replace("T", " ") + ":00");
-            Timestamp endDate = Timestamp.valueOf(endDateStr.replace("T", " ") + ":00");
+            // Parse datetime-local string (YYYY-MM-DDTHH:MM) sang SQL Timestamp an toàn
+            String sDate = startDateStr.replace("T", " ").trim();
+            String eDate = endDateStr.replace("T", " ").trim();
+            if (sDate.length() == 16) sDate += ":00";
+            if (eDate.length() == 16) eDate += ":00";
+            Timestamp startDate = Timestamp.valueOf(sDate);
+            Timestamp endDate = Timestamp.valueOf(eDate);
 
             // Đóng gói Model
             CouponModel coupon = new CouponModel();

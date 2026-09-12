@@ -132,6 +132,41 @@
                             </div>
                         </div>
 
+                        <!-- Banner thông báo chi tiết khi GIAO THẤT BẠI hoặc HOÀN HÀNG -->
+                        <c:if test="${order.status == 'FAILED'}">
+                            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-2">
+                                <div class="flex items-center gap-2 font-bold text-sm text-rose-700">
+                                    <span class="material-symbols-outlined text-rose-600 text-xl">error</span>
+                                    <span>Giao hàng chưa thành công (Lần ${order.deliveryAttempts > 0 ? order.deliveryAttempts : 1})</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-rose-900/80 bg-white/70 p-3 rounded-lg border border-rose-100">
+                                    <div>
+                                        <span class="text-slate-500 block">Lý do ghi nhận từ Shipper:</span>
+                                        <strong class="text-rose-800"><c:out value="${not empty order.failedReason ? order.failedReason : 'Chưa liên lạc được với khách hàng'}"/></strong>
+                                    </div>
+                                    <c:if test="${not empty order.failedNotes}">
+                                        <div>
+                                            <span class="text-slate-500 block">Ghi chú chi tiết:</span>
+                                            <span class="text-slate-700"><c:out value="${order.failedNotes}"/></span>
+                                        </div>
+                                    </c:if>
+                                </div>
+                                <p class="text-[11px] text-rose-700 mt-1 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">support_agent</span>
+                                    Shipper hoặc CSKH Fruitables sẽ liên hệ lại với bạn qua số điện thoại để hẹn lịch giao lại hoa quả tươi.
+                                </p>
+                            </div>
+                        </c:if>
+                        <c:if test="${order.status == 'RETURNED'}">
+                            <div class="p-4 rounded-xl bg-purple-50 border border-purple-200 text-purple-800 text-xs flex items-center gap-3">
+                                <span class="material-symbols-outlined text-2xl text-purple-600 flex-shrink-0">assignment_return</span>
+                                <div>
+                                    <div class="font-bold text-sm text-purple-900">Đơn hàng đã hoàn hàng về kho</div>
+                                    <p class="text-[11px] text-purple-700 mt-0.5">Hoa quả đã được hoàn trả lại về kho bảo quản lạnh của Fruitables. Số điểm tích lũy (nếu có dùng) đã được hoàn trả đầy đủ vào tài khoản của bạn.</p>
+                                </div>
+                            </div>
+                        </c:if>
+
                         <!-- Stepper tiến độ đơn hàng -->
                         <c:if test="${order.status != 'CANCELLED' && order.status != 'RETURNED' && order.status != 'FAILED'}">
                             <c:set var="uStep" value="1"/>

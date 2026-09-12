@@ -47,3 +47,14 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Uploaded Media / User Assets ###
+src/main/webapp/assets/uploads/**
+!src/main/webapp/assets/uploads/
+!src/main/webapp/assets/uploads/**/
+!src/main/webapp/assets/uploads/no-image.svg
+!src/main/webapp/assets/uploads/**/.gitkeep
+
+### Secrets & AI Config ###
+src/main/resources/gemini.properties
+gemini.properties

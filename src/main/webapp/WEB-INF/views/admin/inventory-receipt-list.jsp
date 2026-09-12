@@ -216,7 +216,7 @@
               <tr class="hover:bg-slate-50/60 transition-colors">
                 <td class="py-3.5 px-5">
                   <div class="flex items-center gap-3">
-                    <img src="${not empty p.imageUrl ? p.imageUrl : 'https://placehold.co/100x100/f1f5f9/94a3b8?text=Fruit'}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/f1f5f9/94a3b8?text=Fruit';" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover border border-slate-200 flex-shrink-0">
+                    <img src="${not empty p.imageUrl ? p.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/products/tao_envy_nz.jpg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/products/tao_envy_nz.jpg';" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover border border-slate-200 flex-shrink-0">
                     <div>
                       <div class="font-bold text-slate-900">${p.name}</div>
                       <span class="text-[10px] text-slate-400 font-mono">#PRD-${p.id}</span>

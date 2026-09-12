@@ -27,8 +27,18 @@ public class AbstractDAO<T> implements GenericDAO<T> {
                 statement.setBoolean(index, (Boolean) parameter);
             } else if (parameter instanceof Timestamp) {
                 statement.setTimestamp(index, (Timestamp) parameter);
+            } else if (parameter instanceof Date) {
+                statement.setDate(index, (Date) parameter);
+            } else if (parameter instanceof java.util.Date) {
+                statement.setTimestamp(index, new Timestamp(((java.util.Date) parameter).getTime()));
+            } else if (parameter instanceof java.math.BigDecimal) {
+                statement.setBigDecimal(index, (java.math.BigDecimal) parameter);
+            } else if (parameter instanceof Float) {
+                statement.setFloat(index, (Float) parameter);
             } else if (parameter == null) {
                 statement.setNull(index, Types.NULL);
+            } else {
+                statement.setObject(index, parameter);
             }
         }
     }

@@ -1,5 +1,8 @@
 package vn.edu.eaut.fruitables.controller.web;
 
+import vn.edu.eaut.fruitables.dao.impl.NotificationDAOImpl;
+import vn.edu.eaut.fruitables.dao.impl.OrderDAOImpl;
+import vn.edu.eaut.fruitables.model.entity.OrderModel;
 import vn.edu.eaut.fruitables.util.DBConnectionUtil;
 import vn.edu.eaut.fruitables.util.VnPayConfigUtil;
 
@@ -53,19 +56,51 @@ public class VnPayReturnServlet extends HttpServlet {
 
             String signValue = VnPayConfigUtil.hmacSHA512(VnPayConfigUtil.secretKey, hashData.toString());
 
-            // BẢO MẬT: Bắt buộc xác thực chữ ký điện tử HMAC-SHA512 từ VNPay
+            // BẢO MẬT: Xác thực chữ ký điện tử HMAC-SHA512 từ VNPay
             if (signValue != null && signValue.equalsIgnoreCase(vnp_SecureHash)) {
                 String responseCode = request.getParameter("vnp_ResponseCode");
                 String orderCode = request.getParameter("vnp_TxnRef");
 
                 if (orderCode != null && !orderCode.isEmpty()) {
+                    OrderDAOImpl orderDAO = new OrderDAOImpl();
+                    OrderModel order = orderDAO.findByOrderCode(orderCode);
+
                     if ("00".equals(responseCode)) {
                         // Thanh toán hợp lệ và thành công -> Cập nhật payment_status = 'PAID', status = 'PACKING'
                         updateOrderPaymentSuccess(orderCode);
+
+                        // Gửi thông báo cho tài khoản người dùng
+                        if (order != null && order.getUserId() != null) {
+                            try {
+                                NotificationDAOImpl notificationDAO = new NotificationDAOImpl();
+                                notificationDAO.createNotification(
+                                        order.getUserId(),
+                                        order.getId(),
+                                        orderCode,
+                                        "Thanh toán VNPay thành công: " + orderCode,
+                                        "Đơn hàng " + orderCode + " đã được thanh toán thành công qua VNPay. Cửa hàng đang chuẩn bị giao đến bạn!",
+                                        "ORDER_PAID"
+                                );
+                            } catch (Exception ignored) {}
+                        }
+
+                        // Dọn dẹp giỏ hàng trong session
+                        session.removeAttribute("CART");
+                        session.removeAttribute("CART_TOTAL_ITEMS");
+                        session.removeAttribute("DISCOUNT_AMOUNT");
+                        session.removeAttribute("APPLIED_COUPON_CODE");
+                        session.removeAttribute("COUPON_MESSAGE");
+
                         session.setAttribute("orderSuccess", "Thanh toán thành công qua VNPay! Mã đơn: " + orderCode + " đã được xác nhận.");
                     } else {
-                        // Khách hủy hoặc thanh toán không thành công
-                        session.setAttribute("orderSuccess", "Giao dịch thanh toán chưa hoàn tất hoặc bị hủy đối với đơn: " + orderCode);
+                        // Khách hủy hoặc thanh toán không thành công -> Hủy đơn và hoàn trả tồn kho an toàn
+                        if (order != null) {
+                            orderDAO.updateStatusAndRestoreStock(order.getId(), "CANCELLED");
+                            orderDAO.update("UPDATE orders SET payment_status = 'UNPAID' WHERE id = ?", order.getId());
+                        } else {
+                            orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'CANCELLED' WHERE order_code = ?", orderCode);
+                        }
+                        session.setAttribute("orderSuccess", "Giao dịch thanh toán chưa hoàn tất hoặc đã bị hủy. Đơn hàng " + orderCode + " đã được hủy.");
                     }
                 }
             } else {

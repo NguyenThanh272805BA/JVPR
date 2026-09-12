@@ -235,7 +235,7 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Định lượng (gram):</label>
-          <input type="number" name="weightGram" value="500" min="10" step="50" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:border-primary">
+          <input type="number" name="weightGram" value="500" min="1" step="1" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:border-primary">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Cách bảo quản:</label>
@@ -382,7 +382,7 @@
         stock: ${p.stock != null ? p.stock : 0},
         costPrice: ${p.costPrice != null ? p.costPrice : 0.0},
         price: ${p.price != null ? p.price : 0.0},
-        imageUrl: "${p.imageUrl != null ? p.imageUrl : 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&auto=format&fit=crop'}"
+        imageUrl: "${p.imageUrl != null ? p.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/products/tao_envy_nz.jpg')}"
       }${!st.last ? ',' : ''}
     </c:forEach>
   ];

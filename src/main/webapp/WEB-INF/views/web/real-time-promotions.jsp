@@ -169,15 +169,36 @@
       </div>
     </c:if>
 
-    <!-- TIÊU ĐỀ PHẦN VOUCHER -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h2 class="font-headline-md text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2.5">
-          <span class="material-symbols-outlined text-primary text-3xl">redeem</span> Mã Giảm Giá Đang Có Sẵn
-        </h2>
-        <p class="text-xs md:text-sm text-gray-500 mt-1">Lưu hoặc sao chép mã voucher và dán vào bước thanh toán đơn hàng</p>
-      </div>
+    <!-- TAB BỘ LỌC CHUYỂN ĐỔI NHANH MỤC KHUYẾN MÃI -->
+    <div class="flex items-center justify-center gap-3 mb-10 overflow-x-auto py-1 scrollbar-none" id="promo-tab-container">
+      <button type="button" onclick="switchPromoTab('all')" id="tab-btn-all"
+              class="promo-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-sm bg-primary text-white">
+        <span class="material-symbols-outlined text-[18px]">apps</span>
+        Tất cả ưu đãi
+      </button>
+      <button type="button" onclick="switchPromoTab('coupons')" id="tab-btn-coupons"
+              class="promo-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-sm bg-white text-slate-700 hover:bg-slate-50 border border-slate-200">
+        <span class="material-symbols-outlined text-[18px] text-primary">confirmation_number</span>
+        Mã khuyến mãi & Voucher
+      </button>
+      <button type="button" onclick="switchPromoTab('flash-sale')" id="tab-btn-flash-sale"
+              class="promo-tab-btn px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 shadow-sm bg-white text-slate-700 hover:bg-slate-50 border border-slate-200">
+        <span class="material-symbols-outlined text-[18px] text-rose-500">local_fire_department</span>
+        Sản phẩm Flash Sale
+      </button>
     </div>
+
+    <!-- PHẦN 1: DANH SÁCH MÃ GIẢM GIÁ / VOUCHER -->
+    <section id="coupons-section" class="scroll-mt-28 transition-all duration-300">
+      <!-- TIÊU ĐỀ PHẦN VOUCHER -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="font-headline-md text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-3xl">redeem</span> Mã Giảm Giá Đang Có Sẵn
+          </h2>
+          <p class="text-xs md:text-sm text-gray-500 mt-1">Lưu hoặc sao chép mã voucher và dán vào bước thanh toán đơn hàng</p>
+        </div>
+      </div>
 
     <!-- DANH SÁCH VOUCHER DẠNG TICKET NGHỆ THUẬT -->
     <jsp:useBean id="nowDate" class="java.util.Date" />
@@ -310,10 +331,11 @@
         </div>
       </c:forEach>
     </div>
+    </section>
 
-    <!-- FLASH SALE SECTION -->
+    <!-- PHẦN 2: FLASH SALE SECTION -->
     <c:if test="${not empty flashSaleProducts}">
-      <div class="mt-20 border-t border-slate-200/80 pt-12">
+      <section id="flash-sale-section" class="scroll-mt-28 transition-all duration-300 mt-20 border-t border-slate-200/80 pt-12">
         <div class="flex items-center justify-between mb-8">
           <div>
             <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-rose-500 mb-1">
@@ -370,7 +392,7 @@
             </div>
           </c:forEach>
         </div>
-      </div>
+      </section>
     </c:if>
 
   </div>
@@ -389,6 +411,58 @@
       }, 1500);
     });
   }
+
+  function switchPromoTab(tab) {
+    const couponsSec = document.getElementById('coupons-section');
+    const flashSaleSec = document.getElementById('flash-sale-section');
+    const btnAll = document.getElementById('tab-btn-all');
+    const btnCoupons = document.getElementById('tab-btn-coupons');
+    const btnFlash = document.getElementById('tab-btn-flash-sale');
+
+    const activeCls = ['bg-primary', 'text-white', 'shadow-md'];
+    const inactiveCls = ['bg-white', 'text-slate-700', 'hover:bg-slate-50', 'border', 'border-slate-200'];
+
+    [btnAll, btnCoupons, btnFlash].forEach(btn => {
+      if (!btn) return;
+      btn.classList.remove(...activeCls);
+      btn.classList.add(...inactiveCls);
+    });
+
+    if (tab === 'all') {
+      if (couponsSec) couponsSec.classList.remove('hidden');
+      if (flashSaleSec) flashSaleSec.classList.remove('hidden');
+      btnAll?.classList.add(...activeCls);
+      btnAll?.classList.remove(...inactiveCls);
+    } else if (tab === 'coupons') {
+      if (couponsSec) {
+        couponsSec.classList.remove('hidden');
+        couponsSec.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (flashSaleSec) flashSaleSec.classList.add('hidden');
+      btnCoupons?.classList.add(...activeCls);
+      btnCoupons?.classList.remove(...inactiveCls);
+    } else if (tab === 'flash-sale') {
+      if (couponsSec) couponsSec.classList.add('hidden');
+      if (flashSaleSec) {
+        flashSaleSec.classList.remove('hidden');
+        flashSaleSec.scrollIntoView({ behavior: 'smooth' });
+      }
+      btnFlash?.classList.add(...activeCls);
+      btnFlash?.classList.remove(...inactiveCls);
+    }
+  }
+
+  function handleUrlHash() {
+    const hash = window.location.hash;
+    if (hash === '#coupons-section') {
+      switchPromoTab('coupons');
+    } else if (hash === '#flash-sale-section') {
+      switchPromoTab('flash-sale');
+    }
+  }
+
+  window.addEventListener('load', handleUrlHash);
+  window.addEventListener('hashchange', handleUrlHash);
 </script>
 <script src="${pageContext.request.contextPath}/assets/web/js/banner-3d.js"></script>
 </body>

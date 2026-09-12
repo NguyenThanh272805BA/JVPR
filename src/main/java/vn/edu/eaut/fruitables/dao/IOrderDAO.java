@@ -8,6 +8,7 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     Long saveOrder(OrderModel order);
     void saveOrderDetail(Long orderId, Long productId, Double price, Integer quantity, Double subTotal);
     void saveOrderDetail(Long orderId, Long productId, Double price, Double costPrice, Integer quantity, Double subTotal);
+    void saveOrderDetail(Long orderId, Long productId, Double price, Double costPrice, Integer quantity, Double subTotal, Double taxRate);
     List<OrderModel> findAll();
     OrderModel findById(Long id);
     OrderModel findByOrderCode(String orderCode);
@@ -18,6 +19,7 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     List<OrderDetailModel> findOrderDetailsByOrderId(Long orderId);
     boolean cancelOrderAndRestoreStock(Long orderId);
     List<OrderModel> searchAndFilterOrders(String keyword, String status, String startDate, String endDate);
+    List<OrderModel> findRecentOrdersByPhone(String phone, int limit);
     boolean assignShipper(Long orderId, Long shipperId, String trackingNumber, String estimatedDeliveryTime);
     void populateShipper(OrderModel order);
 }

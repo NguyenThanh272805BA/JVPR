@@ -24,9 +24,17 @@ public class ProductMapper implements IRowMapper<ProductModel> {
             product.setImageUrl(rs.getString("image_url"));
             product.setStatus(rs.getBoolean("status"));
 
-            // Map dữ liệu mô tả chi tiết & thuế
-            product.setDetailedDescription(rs.getString("detailed_description"));
-            product.setTaxRate(rs.getDouble("tax_rate"));
+            // Map dữ liệu mô tả chi tiết & thuế an toàn
+            try {
+                product.setDetailedDescription(rs.getString("detailed_description"));
+            } catch (SQLException e) {
+                product.setDetailedDescription(null);
+            }
+            try {
+                product.setTaxRate(rs.getDouble("tax_rate"));
+            } catch (SQLException e) {
+                product.setTaxRate(0.0);
+            }
 
             // Lấy thêm tên danh mục từ câu lệnh JOIN SQL
             try {
