@@ -79,16 +79,31 @@ public class GeminiServiceImpl implements IGeminiService {
         // 3. Xây dựng System Instruction siêu súc tích
         String systemInstructionText = """
                 Bạn là Trợ lý Tư vấn Sản phẩm & Chuyên gia Dinh dưỡng của cửa hàng hoa quả tươi Fruitables.
-                Nhiệm vụ:
-                1. Tư vấn chọn hoa quả phù hợp nhu cầu (sức khỏe, ăn kiêng, tiểu đường, biếu tặng, giải nhiệt...). Ưu tiên gợi ý sản phẩm hiện có tại Fruitables:
+                Danh mục hoa quả hiện có tại cửa hàng Fruitables:
                 """ + compactCatalog + """
+
+                Nhiệm vụ:
+                1. Tư vấn chọn hoa quả theo nhu cầu (sức khỏe, ăn kiêng, tiểu đường, biếu tặng, giải nhiệt...). Ưu tiên gợi ý các sản phẩm trong danh mục trên.
                 2. Hướng dẫn cách bảo quản hoa quả tươi lâu (nhiệt độ mát, nhiệt độ phòng, ủ chín, mẹo giữ tươi...).
-                3. Gợi ý công thức nước ép, sinh tố detox, salad hoa quả thanh mát từ các loại quả có sẵn.
-                4. Nếu khách hỏi về tiến độ đơn hàng, hướng dẫn khách cung cấp Số điện thoại đặt hàng để hệ thống tự động kiểm tra ngay.
-                Quy tắc trả lời:
-                - Ngắn gọn, súc tích (dưới 130 từ), chia gạch đầu dòng rõ ràng, dễ đọc trên di động.
-                - Giọng điệu thân thiện, nhiệt tình, có biểu tượng cảm xúc hoa quả tươi mát (🍎, 🥑, 🍇, 🍊).
-                - Tuyệt đối từ chối lịch sự nếu khách hỏi các chủ đề không liên quan đến hoa quả, thực phẩm hoặc cửa hàng Fruitables.
+                3. Gợi ý công thức nước ép, sinh tố detox thanh mát từ các loại quả có sẵn.
+                4. Hướng dẫn tra cứu đơn hàng: Nhắc khách nhập Số điện thoại vào chat để hệ thống kiểm tra tiến độ ngay.
+
+                QUY TẮC BẮT BUỘC KHI KHÁCH HÀNG MUỐN MUA HÀNG (ĐẶC BIỆT QUAN TRỌNG):
+                - TUYỆT ĐỐI KHÔNG xin thông tin cá nhân của khách (KHÔNG hỏi số điện thoại, KHÔNG hỏi địa chỉ nhận hàng, KHÔNG xin tên hay thông tin giao hàng).
+                - Khi khách thể hiện ý định muốn mua (ví dụ: 'có', 'mua', 'muốn mua', 'đặt hàng', 'cho 1kg', 'lấy hộp này', 'ok', 'được', 'mua thế nào', 'tôi muốn lấy',...):
+                  Hãy lập tức gửi TRỰC TIẾP liên kết sản phẩm dạng markdown để khách bấm vào đặt mua ngay trên website:
+                  Cú pháp: [👉 Đặt mua ngay Tên Sản Phẩm](/product-detail?id=ID)
+                  Ví dụ: "Tuyệt vời quá ạ! 🍊 Bạn hãy bấm vào liên kết bên dưới để xem chi tiết và đặt mua ngay trên website nhé:
+                  [👉 Đặt mua ngay Cam Sành Hàm Yên Mọng Nước](/product-detail?id=3)
+                  Fruitables cam kết trái cây luôn tươi mới và giao nhanh tận nơi ạ! 🌿"
+                - Nếu khách muốn tham khảo thêm các loại quả khác:
+                  Gửi link: [👉 Khám phá tất cả sản phẩm tại Cửa Hàng](/shop)
+                - Bất cứ khi nào nhắc đến một sản phẩm cụ thể có trong danh mục, luôn tạo link dạng [Tên Sản Phẩm](/product-detail?id=ID).
+
+                Quy tắc trả lời chung:
+                - Ngắn gọn, súc tích (dưới 120 từ), chia gạch đầu dòng rõ ràng, dễ đọc trên di động.
+                - Giọng điệu thân thiện, nhiệt tình, sử dụng biểu tượng cảm xúc hoa quả tươi mát (🍎, 🥑, 🍇, 🍊).
+                - Tuyệt đối từ chối lịch sự nếu khách hỏi các chủ đề không liên quan đến hoa quả, thực phẩm hoặc cửa hàng.
                 """;
 
         try {
@@ -227,7 +242,7 @@ public class GeminiServiceImpl implements IGeminiService {
                     String priceStr = String.format("%,.0fđ", price);
                     String storage = "COLD_CHAIN".equalsIgnoreCase(p.getStorageType()) ? " (Tủ mát)" : "";
 
-                    sb.append("[").append(name).append(": ").append(priceStr).append(storage).append("] ");
+                    sb.append("[ID:").append(p.getId()).append(" - ").append(name).append(": ").append(priceStr).append(storage).append(" -> Link: /product-detail?id=").append(p.getId()).append("] ");
                     count++;
                 }
                 cachedCompactCatalog = sb.toString().trim();
@@ -238,7 +253,7 @@ public class GeminiServiceImpl implements IGeminiService {
             System.err.println("[GeminiService] Failed to load catalog: " + e.getMessage());
         }
 
-        return "[Táo Envy Mỹ: 120,000đ (Tủ mát)] [Bơ Sáp 034: 65,000đ] [Cam Sành: 35,000đ] [Nho Đen Không Hạt: 180,000đ (Tủ mát)] [Bưởi Da Xanh: 55,000đ]";
+        return "[ID:1 - Táo Envy New Zealand Size L: 165,000đ (Tủ mát) -> Link: /product-detail?id=1] [ID:3 - Cam Sành Hàm Yên Mọng Nước: 45,000đ -> Link: /product-detail?id=3] [ID:2 - Nho Đen Không Hạt Mỹ: 199,000đ (Tủ mát) -> Link: /product-detail?id=2]";
     }
 
     private String normalizeForCache(String query) {
@@ -246,6 +261,80 @@ public class GeminiServiceImpl implements IGeminiService {
         return query.trim().toLowerCase()
                 .replaceAll("[?,.!;:\"'()]", "")
                 .replaceAll("\\s+", " ");
+    }
+
+    @Override
+    public String generateExecutiveAnalysis(String systemRole, String contextData, String userQuery) {
+        String rolePrompt = (systemRole != null && !systemRole.trim().isEmpty())
+                ? systemRole
+                : "Bạn là Chuyên gia Cố vấn Kinh doanh & Phân tích Dữ liệu cao cấp (Chief Business Intelligence Analyst) của hệ thống siêu thị hoa quả tươi Fruitables.";
+
+        String systemInstructionText = rolePrompt + """
+                
+                Nhiệm vụ của bạn:
+                - Phân tích số liệu kinh doanh thực tế từ hệ thống (Doanh thu, Chi phí vốn, Lợi nhuận gộp, Tỷ suất lợi nhuận, Đơn hàng, Tồn kho, Phân phối danh mục, Hiệu suất giao hàng).
+                - Phát hiện các điểm nghẽn, cảnh báo rủi ro (hoa quả sắp hết hàng, đơn hủy/giao thất bại, mặt hàng ứ đọng...).
+                - Đưa ra các khuyến nghị hành động chiến lược cụ thể, thực tế (chiến dịch khuyến mãi, bổ sung nhập kho, tối ưu giá bán, thúc đẩy bán chéo hoa quả tươi...).
+                - Trình bày dạng Markdown chuyên nghiệp: dùng tiêu đề rõ ràng (h3, h4), gạch đầu dòng, highlight các con số quan trọng, sử dụng emoji phù hợp (📈, 💰, ⚠️, 🚀, 💡).
+                - Phản hồi bằng Tiếng Việt, văn phong súc tích, sắc bén, mang tính quyết định điều hành cao, đi thẳng vào trọng tâm số liệu.
+                """;
+
+        String userPrompt = "DỮ LIỆU HOẠT ĐỘNG KINH DOANH HIỆN TẠI TỪ HỆ THỐNG:\n"
+                + contextData
+                + "\n\nYÊU CẦU PHÂN TÍCH CỦA QUẢN TRỊ VIÊN:\n"
+                + (userQuery != null && !userQuery.trim().isEmpty() ? userQuery : "Hãy lập báo cáo tóm tắt tình hình tài chính - kinh doanh toàn diện, chỉ ra các cảnh báo rủi ro về tồn kho/đơn hàng và đề xuất 3-5 giải pháp thúc đẩy doanh số ngay trong tuần này.");
+
+        try {
+            JsonObject root = new JsonObject();
+
+            JsonObject sysInstruction = new JsonObject();
+            JsonArray sysParts = new JsonArray();
+            JsonObject sysPart = new JsonObject();
+            sysPart.addProperty("text", systemInstructionText);
+            sysParts.add(sysPart);
+            sysInstruction.add("parts", sysParts);
+            root.add("system_instruction", sysInstruction);
+
+            JsonArray contents = new JsonArray();
+            JsonObject currentMsg = new JsonObject();
+            currentMsg.addProperty("role", "user");
+            JsonArray currentParts = new JsonArray();
+            JsonObject currentPart = new JsonObject();
+            currentPart.addProperty("text", userPrompt);
+            currentParts.add(currentPart);
+            currentMsg.add("parts", currentParts);
+            contents.add(currentMsg);
+            root.add("contents", contents);
+
+            JsonObject genConfig = new JsonObject();
+            genConfig.addProperty("maxOutputTokens", 1500);
+            genConfig.addProperty("temperature", 0.4);
+            root.add("generationConfig", genConfig);
+
+            String requestBody = gson.toJson(root);
+            String apiUrl = GeminiConfigUtil.getApiUrl();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json; charset=UTF-8")
+                    .timeout(Duration.ofSeconds(30))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() == 200) {
+                String aiText = parseGeminiText(response.body());
+                if (aiText != null && !aiText.trim().isEmpty()) {
+                    return aiText;
+                }
+            } else {
+                System.err.println("[GeminiService-Executive] API Error: " + response.statusCode() + " - " + response.body());
+            }
+        } catch (Exception e) {
+            System.err.println("[GeminiService-Executive] Exception: " + e.getMessage());
+        }
+
+        return "Hiện tại hệ thống phân tích AI đang xử lý lượng dữ liệu lớn. Xin vui lòng thử lại sau giây lát hoặc làm mới kết nối.";
     }
 
     @Override

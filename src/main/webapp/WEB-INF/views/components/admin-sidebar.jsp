@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%-- Tự động nạp bộ Vector SVG thuần vẽ bằng Code --%>
+<jsp:include page="/WEB-INF/views/components/svg-icons.jsp" />
+
 <%-- Xác định URI hiện tại để highlight menu tương ứng chính xác 100% --%>
 <c:set var="reqURI" value="${not empty requestScope['javax.servlet.forward.request_uri'] ? requestScope['javax.servlet.forward.request_uri'] : pageContext.request.requestURI}" />
 
@@ -21,7 +24,7 @@
         </a>
     </div>
 
-    <!-- NAVIGATION LINKS -->
+    <!-- NAVIGATION LINKS (100% PURE CODE-DRAWN SVG ICONS) -->
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 text-sm font-medium">
         
         <!-- NHÓM 1: TỔNG QUAN -->
@@ -30,7 +33,7 @@
         </div>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/dashboard') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/dashboard">
-            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-dashboard"/></svg>
             <span>Tổng quan</span>
         </a>
 
@@ -40,22 +43,22 @@
         </div>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/products') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/products">
-            <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-inventory"/></svg>
             <span>Sản phẩm</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/categories') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/categories">
-            <span class="material-symbols-outlined text-[20px]">category</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-category"/></svg>
             <span>Danh mục</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/inventory') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/inventory">
-            <span class="material-symbols-outlined text-[20px]">warehouse</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-warehouse"/></svg>
             <span>Kho nhập hàng</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/suppliers') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/suppliers">
-            <span class="material-symbols-outlined text-[20px]">storefront</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-storefront"/></svg>
             <span>Nhà cung cấp</span>
         </a>
 
@@ -65,27 +68,27 @@
         </div>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/orders') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/orders">
-            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-order"/></svg>
             <span>Đơn hàng</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/claims') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/claims">
-            <span class="material-symbols-outlined text-[20px]">verified_user</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-claim"/></svg>
             <span>Bảo hành hoa quả</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/coupons') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/coupons">
-            <span class="material-symbols-outlined text-[20px]">redeem</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-coupon"/></svg>
             <span>Mã khuyến mãi</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/delivery-failures') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/delivery-failures">
-            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-delivery"/></svg>
             <span>Giao Hàng</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/shipper/portal') ? 'bg-amber-600 text-white shadow-md font-bold' : 'text-amber-800 bg-amber-50/70 hover:bg-amber-100 font-semibold'}" 
            href="${pageContext.request.contextPath}/shipper/portal">
-            <span class="material-symbols-outlined text-[20px] text-amber-600">two_wheeler</span>
+            <svg class="w-5 h-5 flex-shrink-0 text-amber-600"><use href="#icon-shipper"/></svg>
             <span>Cổng Tài Xế (Portal)</span>
         </a>
 
@@ -95,12 +98,12 @@
         </div>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${(reqURI.contains('/customers') || (reqURI.contains('/users') && !reqURI.contains('/employees'))) ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/customers">
-            <span class="material-symbols-outlined text-[20px]">people</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-customer"/></svg>
             <span>Tài khoản Khách hàng</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/employees') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/employees">
-            <span class="material-symbols-outlined text-[20px]">badge</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-employee"/></svg>
             <span>Tài khoản Nhân viên</span>
         </a>
 
@@ -111,7 +114,7 @@
         <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/chat') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/chat">
             <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-[20px]">support_agent</span>
+                <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-chat"/></svg>
                 <span>Live Chat CSKH</span>
             </div>
             <c:if test="${totalUnread > 0}">
@@ -119,19 +122,18 @@
             </c:if>
         </a>
 
-
     </nav>
 
     <!-- FOOTER CHUYỂN TRANG / ĐĂNG XUẤT -->
     <div class="p-3 border-t border-surface-variant flex-shrink-0 space-y-1 bg-surface-container-lowest">
         <a class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-surface-container-low hover:text-primary transition-colors" 
            href="${pageContext.request.contextPath}/" target="_blank" title="Mở trang mua sắm khách hàng">
-            <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+            <svg class="w-4 h-4 flex-shrink-0"><use href="#icon-arrow-right"/></svg>
             <span>Xem Cửa hàng Web</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-error hover:bg-error-container hover:text-on-error-container transition-colors" 
            href="${pageContext.request.contextPath}/logout" title="Đăng xuất khỏi hệ thống">
-            <span class="material-symbols-outlined text-[18px]">logout</span>
+            <svg class="w-4 h-4 flex-shrink-0"><use href="#icon-logout"/></svg>
             <span>Đăng xuất</span>
         </a>
     </div>

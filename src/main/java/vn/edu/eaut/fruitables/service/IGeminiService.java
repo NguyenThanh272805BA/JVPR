@@ -15,6 +15,16 @@ public interface IGeminiService {
     String askProductAssistant(String userMessage, List<Map<String, String>> conversationHistory);
 
     /**
+     * Phân tích số liệu kinh doanh, doanh số, tồn kho, đơn hàng dành cho Quản trị viên (Admin Executive BI)
+     *
+     * @param systemRole    Vai trò AI (Giám đốc Phân tích Kinh doanh & Chiến lược Fruitables)
+     * @param contextData   Dữ liệu kinh doanh dạng JSON/Text tổng hợp
+     * @param userQuery     Yêu cầu phân tích cụ thể từ Admin
+     * @return Báo cáo phân tích kinh doanh, dự báo xu hướng và đề xuất hành động cụ thể
+     */
+    String generateExecutiveAnalysis(String systemRole, String contextData, String userQuery);
+
+    /**
      * Làm mới hoặc xóa bộ nhớ đệm câu trả lời
      */
     void clearCache();

@@ -23,6 +23,34 @@ public class OrderManageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        // AJAX: Lấy chi tiết đơn hàng (Sản phẩm, người nhận, shipper, giá tiền)
+        if ("getDetail".equals(action)) {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            try {
+                String idParam = request.getParameter("orderId");
+                if (idParam != null && !idParam.trim().isEmpty()) {
+                    Long orderId = Long.parseLong(idParam.trim());
+                    OrderModel order = orderService.findById(orderId);
+                    if (order != null) {
+                        com.google.gson.Gson gson = new com.google.gson.GsonBuilder()
+                                .setDateFormat("dd/MM/yyyy HH:mm:ss")
+                                .create();
+                        response.getWriter().write(gson.toJson(order));
+                        return;
+                    }
+                }
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"error\":\"Không tìm thấy đơn hàng\"}");
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+            }
+            return;
+        }
+
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
         String startDate = request.getParameter("startDate");

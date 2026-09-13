@@ -112,21 +112,21 @@
 
                 <!-- Prompt Suggestions Chips -->
                 <div class="space-y-1.5 pt-1">
-                    <p class="text-[10px] text-on-surface-variant font-medium px-1">💡 Gợi ý câu hỏi nhanh (Không tốn phí):</p>
+                    <p class="text-[10px] text-on-surface-variant font-medium px-1">💡 Gợi ý câu hỏi:</p>
                     <div class="flex flex-wrap gap-1.5">
-                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_discount">
+                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_discount" data-prompt="Hàng giảm giá">
                             🔥 Hàng giảm giá
                         </button>
-                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_featured">
+                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_featured" data-prompt="Bán chạy nhất">
                             ⭐ Bán chạy nhất
                         </button>
-                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="open_tracker">
+                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="open_tracker" data-prompt="Tra cứu tiến độ đơn">
                             📦 Tra cứu tiến độ đơn
                         </button>
-                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-prompt="Cách bảo quản hoa quả tươi lâu trong tủ mát đúng cách?">
+                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_preservation" data-prompt="Mẹo bảo quản hoa quả">
                             🥑 Mẹo bảo quản hoa quả
                         </button>
-                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-prompt="Gợi ý công thức nước ép detox thanh nhiệt từ hoa quả thanh mát?">
+                        <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_recipes" data-prompt="Công thức nước ép">
                             🥤 Công thức nước ép
                         </button>
                     </div>
@@ -135,9 +135,9 @@
 
             <!-- Form gửi tin nhắn cho AI -->
             <form id="ai-send-form" class="mt-2.5 flex items-center gap-1.5 pt-2 border-t border-surface-variant flex-shrink-0">
-                <input type="text" id="ai-chat-input" placeholder="Hỏi AI về bảo quản, món ngon, dinh dưỡng..." autocomplete="off"
+                <input type="text" id="ai-chat-input" placeholder="Hỏi về giảm giá, bán chạy, bảo quản, nước ép..." autocomplete="off"
                        class="flex-1 px-3.5 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
-                <button type="submit" id="ai-submit-btn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-primary text-white flex items-center justify-center hover:opacity-90 transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer">
+                <button type="submit" id="ai-submit-btn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-primary text-white flex items-center justify-center hover:opacity-90 transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer" title="Gửi câu hỏi">
                     <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
                 </button>
             </form>
@@ -236,10 +236,10 @@
         let activeTab = 'ai'; // 'ai' or 'live'
         let pollInterval = null;
         let lastMessageCount = 0;
-        let aiHistory = []; // Lưu tối đa 2 lượt hỏi-đáp gần nhất
+        let aiHistory = [];
 
         // ----------------------------------------------------
-        // CÁC HÀM ĐIỀU KHIỂN ĐÓNG / MỞ CHAT
+        // ĐÓNG / MỞ CHAT
         // ----------------------------------------------------
         function openChat() {
             if (isOpen) return;
@@ -311,7 +311,7 @@
         });
 
         // ----------------------------------------------------
-        // TAB SWITCHING (TRỢ LÝ AI <-> CSKH TRỰC TIẾP)
+        // CHUYỂN TAB (TRỢ LÝ AI <-> CSKH TRỰC TIẾP)
         // ----------------------------------------------------
         function switchTab(tab) {
             activeTab = tab;
@@ -348,7 +348,7 @@
         tabBtnLive.addEventListener('click', () => switchTab('live'));
 
         // ----------------------------------------------------
-        // FORMAT TIỆN ÍCH
+        // TIỆN ÍCH ĐỊNH DẠNG
         // ----------------------------------------------------
         function formatTime(ts) {
             if (!ts) return '';
@@ -368,14 +368,23 @@
         function formatMarkdown(text) {
             if (!text) return '';
             let html = escapeHtml(text);
-            // **bold**
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // *italic*
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            // - list item
             html = html.replace(/(?:^|\n)[-*]\s+(.+)/g, '<br/>• $1');
-            // newlines
+            html = html.replace(/\n\n/g, '<br/><br/>');
             html = html.replace(/\n/g, '<br/>');
+
+            // Chuyển link Markdown [Tên](/link) thành Nút bấm Mua hàng / Xem sản phẩm nổi bật
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(match, label, href) {
+                let cleanHref = href.trim();
+                if (cleanHref.startsWith('/') && !cleanHref.startsWith(contextPath + '/')) {
+                    cleanHref = contextPath + cleanHref;
+                }
+                const isProductDetail = cleanHref.includes('/product-detail');
+                const icon = isProductDetail ? 'shopping_cart' : 'storefront';
+                return `<span class="block my-2"><a href="\${cleanHref}" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-primary text-white hover:opacity-95 text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 no-underline cursor-pointer"><span class="material-symbols-outlined text-sm pointer-events-none">\${icon}</span>\${label}<span class="material-symbols-outlined text-xs pointer-events-none ml-0.5">arrow_forward</span></a></span>`;
+            });
+
             return html;
         }
 
@@ -385,14 +394,14 @@
         }
 
         // ----------------------------------------------------
-        // AI CHATBOT LOGIC (ZERO-TOKEN + GEMINI SERVICE)
+        // HIỂN THỊ TIN NHẮN (ĐỢI RENDER XONG MỚI ĐẨY LÊN CHAT)
         // ----------------------------------------------------
         function appendAiUserMessage(msg) {
             if (!aiMessagesBox) return;
             const html = `
                 <div class="flex justify-end items-end gap-1.5 my-2">
                     <div class="max-w-[80%]">
-                        <div class="bg-gradient-to-r from-emerald-600 to-primary text-white p-3 rounded-2xl rounded-br-sm shadow-sm leading-relaxed text-xs break-words">
+                        <div class="bg-gradient-to-r from-emerald-600 to-primary text-white p-2.5 px-3.5 rounded-2xl rounded-br-sm shadow-sm leading-relaxed text-xs break-words">
                             \${escapeHtml(msg)}
                         </div>
                     </div>
@@ -409,13 +418,16 @@
                     <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-600 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm mt-0.5">
                         <span class="material-symbols-outlined text-sm">smart_toy</span>
                     </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant p-3 rounded-2xl rounded-tl-sm max-w-[85%] shadow-sm text-on-surface leading-relaxed text-xs break-words">
+                    <div class="bg-surface-container-lowest border border-outline-variant p-3 rounded-2xl rounded-tl-sm max-w-[88%] shadow-sm text-on-surface leading-relaxed text-xs break-words">
                         \${contentHtml}
                     </div>
                 </div>
             `;
             aiMessagesBox.insertAdjacentHTML('beforeend', html);
             aiMessagesBox.scrollTop = aiMessagesBox.scrollHeight;
+            setTimeout(() => {
+                if (aiMessagesBox) aiMessagesBox.scrollTop = aiMessagesBox.scrollHeight;
+            }, 100);
         }
 
         function showAiTypingIndicator() {
@@ -429,7 +441,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce"></span>
                         <span class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></span>
                         <span class="w-1.5 h-1.5 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></span>
-                        <span class="text-[11px] ml-1 text-on-surface-variant">AI đang chuẩn bị câu trả lời...</span>
+                        <span class="text-[11px] ml-1 text-on-surface-variant">Đang xử lý thông tin...</span>
                     </div>
                 </div>
             `;
@@ -443,8 +455,140 @@
             if (el) el.remove();
         }
 
-        // Gửi câu hỏi tự do lên /api/ai-chat
-        function sendAiPrompt(text) {
+        // ----------------------------------------------------
+        // BỘ RENDER PHẢN HỒI HOÀN CHỈNH (TRUY VẤN DB + AI)
+        // ----------------------------------------------------
+        function renderServerResponse(data, typingId) {
+            // Xóa loading sau khi toàn bộ dữ liệu đã được nhận và sẵn sàng render
+            removeAiTypingIndicator(typingId);
+            if (aiSubmitBtn) aiSubmitBtn.disabled = false;
+
+            // 1. Trường hợp trả về danh sách sản phẩm (Có đầy đủ ảnh, giá, link chi tiết)
+            if (data.type === 'products' && data.products && data.products.length > 0) {
+                let cardsHtml = `
+                    <div class="font-bold text-primary mb-2">\${escapeHtml(data.title)}</div>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                `;
+                data.products.forEach(p => {
+                    let img = p.imageUrl || '/assets/web/img/fruit-item-1.jpg';
+                    if (!img.startsWith('http') && !img.startsWith(contextPath)) {
+                        img = contextPath + img;
+                    }
+                    const hasDiscount = (p.discountPrice && p.discountPrice < p.price);
+                    cardsHtml += `
+                        <div class="bg-surface-container border border-outline-variant/80 rounded-xl p-2 flex flex-col justify-between hover:shadow-md transition-shadow group">
+                            <a href="\${contextPath}/product-detail?id=\${p.id}" class="block overflow-hidden rounded-lg mb-1.5">
+                                <img src="\${img}" alt="\${escapeHtml(p.name)}" class="w-full h-20 object-cover group-hover:scale-105 transition-transform" onerror="this.src='\${contextPath}/assets/uploads/no-image.svg'">
+                            </a>
+                            <a href="\${contextPath}/product-detail?id=\${p.id}" class="font-bold text-[11px] line-clamp-1 text-on-surface hover:text-primary transition-colors" title="\${escapeHtml(p.name)}">
+                                \${escapeHtml(p.name)}
+                            </a>
+                            <div class="mt-1 flex items-baseline gap-1">
+                                <span class="text-primary font-bold text-xs">\${formatCurrency(p.discountPrice || p.price)}</span>
+                                \${hasDiscount ? `<span class="line-through text-[9px] text-on-surface-variant/70">\${formatCurrency(p.price)}</span>` : ''}
+                            </div>
+                            <a href="\${contextPath}/product-detail?id=\${p.id}" class="mt-2 block text-center py-1.5 px-2 bg-gradient-to-r from-emerald-600 to-primary text-white hover:opacity-90 text-[10px] font-bold rounded-lg transition-all shadow-2xs">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    `;
+                });
+                cardsHtml += `</div>`;
+                cardsHtml += `
+                    <div class="mt-2.5 pt-2 border-t border-outline-variant/60 text-center">
+                        <a href="\${contextPath}/shop" class="text-primary hover:underline font-bold text-[11px] inline-flex items-center gap-1">
+                            Xem tất cả sản phẩm tại Cửa hàng <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                        </a>
+                    </div>
+                `;
+                appendAiBotBubble(cardsHtml);
+                return;
+            }
+
+            // 2. Trường hợp hiển thị Form tra cứu đơn hàng
+            if (data.type === 'prompt_tracking_form') {
+                renderOrderTrackerForm(data.message);
+                return;
+            }
+
+            // 3. Trường hợp hiển thị kết quả tra cứu tiến độ đơn hàng (4 bước)
+            if (data.type === 'order_tracking') {
+                const step = data.stepProgress || 1;
+                let stepsHtml = `
+                    <div class="relative flex items-center justify-between my-3 px-2">
+                        <div class="absolute left-4 right-4 top-1/2 -translate-y-1/2 h-0.5 bg-outline-variant -z-0"></div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 1 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">1</span>
+                            <span class="text-[9px] mt-1 text-on-surface-variant">Tiếp nhận</span>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 2 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">2</span>
+                            <span class="text-[9px] mt-1 text-on-surface-variant">Đóng gói</span>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 3 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">3</span>
+                            <span class="text-[9px] mt-1 text-on-surface-variant">Đang giao</span>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 4 ? 'bg-emerald-600 text-white' : 'bg-surface-container-high text-on-surface-variant'}">4</span>
+                            <span class="text-[9px] mt-1 text-on-surface-variant">Hoàn tất</span>
+                        </div>
+                    </div>
+                `;
+
+                let resHtml = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between border-b border-outline-variant/60 pb-1.5">
+                            <span class="font-bold text-primary text-xs">Mã đơn: \${escapeHtml(data.orderCode)}</span>
+                            <span class="text-[10px] text-on-surface-variant">\${escapeHtml(data.orderDate)}</span>
+                        </div>
+                        \${stepsHtml}
+                        <div class="bg-primary/5 p-2.5 rounded-xl border border-primary/20 space-y-1">
+                            <div class="font-bold text-xs text-primary flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">local_shipping</span> \${escapeHtml(data.statusText)}
+                            </div>
+                            <p class="text-[11px] text-on-surface leading-relaxed">\${escapeHtml(data.statusDesc)}</p>
+                        </div>
+                        <div class="text-[11px] space-y-0.5 text-on-surface-variant pt-1">
+                            <div>• <strong>Sản phẩm:</strong> \${escapeHtml(data.itemsSummary)}</div>
+                            <div>• <strong>Khung giờ:</strong> \${escapeHtml(data.deliverySlot)}</div>
+                            <div>• <strong>Tổng tiền:</strong> <span class="font-bold text-primary">\${formatCurrency(data.totalAmount)}</span></div>
+                        </div>
+                        <div class="pt-1.5 border-t border-outline-variant/60">
+                            <a href="\${contextPath}\${data.trackingUrl}" class="text-[11px] text-primary hover:underline font-bold inline-flex items-center gap-1">
+                                Xem hành trình chi tiết shipper <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                appendAiBotBubble(resHtml);
+                return;
+            }
+
+            // 4. Trường hợp trả về cẩm nang bảo quản hoặc công thức nước ép
+            if (data.type === 'preservation_guide' || data.type === 'recipe_guide') {
+                let guideHtml = `
+                    <div class="space-y-2">
+                        <div class="font-bold text-primary text-xs">\${escapeHtml(data.title)}</div>
+                        <div class="leading-relaxed text-[11.5px]">\${formatMarkdown(data.message)}</div>
+                        <div class="mt-2 pt-2 border-t border-outline-variant/60 text-center">
+                            <a href="\${contextPath}/shop" class="text-primary hover:underline font-bold text-[11px] inline-flex items-center gap-1">
+                                Khám phá hoa quả tươi tại Cửa hàng <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                appendAiBotBubble(guideHtml);
+                return;
+            }
+
+            // 5. Trường hợp text thông thường (từ Gemini AI)
+            const reply = data.message || 'Dạ em chưa rõ câu hỏi, bạn thử chọn các gợi ý bên dưới nhé! 🍎';
+            appendAiBotBubble(formatMarkdown(reply));
+        }
+
+        // Gửi câu hỏi lên Servlet
+        function sendAiPrompt(text, actionName) {
             if (!text || !text.trim()) return;
             const query = text.trim();
 
@@ -455,7 +599,7 @@
             if (aiSubmitBtn) aiSubmitBtn.disabled = true;
 
             const payload = new URLSearchParams();
-            payload.append('action', 'chat');
+            payload.append('action', actionName || 'chat');
             payload.append('message', query);
             payload.append('history', JSON.stringify(aiHistory));
 
@@ -466,17 +610,12 @@
             })
             .then(res => res.json())
             .then(data => {
-                removeAiTypingIndicator(typingId);
-                if (aiSubmitBtn) aiSubmitBtn.disabled = false;
-
-                const reply = data.message || 'Dạ em chưa rõ ý bạn, bạn có thể nói rõ hơn không ạ? 🍎';
-                appendAiBotBubble(formatMarkdown(reply));
-
-                // Cập nhật lịch sử sliding window (tối đa 4 item = 2 lượt)
-                aiHistory.push({ role: 'user', text: query });
-                aiHistory.push({ role: 'model', text: reply });
-                if (aiHistory.length > 4) {
-                    aiHistory = aiHistory.slice(aiHistory.length - 4);
+                renderServerResponse(data, typingId);
+                // Lưu context ngắn
+                if (data.type === 'text' && data.message) {
+                    aiHistory.push({ role: 'user', text: query });
+                    aiHistory.push({ role: 'model', text: data.message });
+                    if (aiHistory.length > 4) aiHistory = aiHistory.slice(aiHistory.length - 4);
                 }
             })
             .catch(err => {
@@ -486,69 +625,16 @@
             });
         }
 
-        // Gọi action Zero-Token: Hàng giảm giá / Sản phẩm bán chạy
-        function triggerZeroTokenAction(actionName) {
-            const typingId = showAiTypingIndicator();
-
-            const payload = new URLSearchParams();
-            payload.append('action', actionName);
-
-            fetch(contextPath + '/api/ai-chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-                body: payload.toString()
-            })
-            .then(res => res.json())
-            .then(data => {
-                removeAiTypingIndicator(typingId);
-                if (data.type === 'products' && data.products && data.products.length > 0) {
-                    let cardsHtml = `
-                        <div class="font-bold text-primary mb-2">\${escapeHtml(data.title)}</div>
-                        <div class="grid grid-cols-2 gap-2 mt-1">
-                    `;
-                    data.products.forEach(p => {
-                        let img = p.imageUrl || '/assets/web/img/fruit-item-1.jpg';
-                        if (!img.startsWith('http') && !img.startsWith(contextPath)) {
-                            img = contextPath + img;
-                        }
-                        const hasDiscount = (p.discountPrice && p.discountPrice < p.price);
-                        cardsHtml += `
-                            <div class="bg-surface-container border border-outline-variant rounded-xl p-2 flex flex-col justify-between hover:shadow-md transition-shadow">
-                                <img src="\${img}" alt="\${escapeHtml(p.name)}" class="w-full h-20 object-cover rounded-lg mb-1.5" onerror="this.src='\${contextPath}/assets/uploads/no-image.svg'">
-                                <div class="font-bold text-[11px] line-clamp-1 text-on-surface" title="\${escapeHtml(p.name)}">\${escapeHtml(p.name)}</div>
-                                <div class="mt-1 flex items-baseline gap-1">
-                                    <span class="text-primary font-bold text-xs">\${formatCurrency(p.discountPrice || p.price)}</span>
-                                    \${hasDiscount ? `<span class="line-through text-[9px] text-on-surface-variant/70">\${formatCurrency(p.price)}</span>` : ''}
-                                </div>
-                                <a href="\${contextPath}/product-detail?id=\${p.id}" class="mt-2 block text-center py-1 px-2 bg-primary text-white hover:bg-primary-container text-[10px] font-bold rounded-lg transition-colors shadow-2xs">
-                                    Xem ngay
-                                </a>
-                            </div>
-                        `;
-                    });
-                    cardsHtml += `</div>`;
-                    appendAiBotBubble(cardsHtml);
-                } else {
-                    appendAiBotBubble(data.message || 'Hiện tại chưa có sản phẩm nào phù hợp.');
-                }
-            })
-            .catch(err => {
-                removeAiTypingIndicator(typingId);
-                appendAiBotBubble('Dạ tạm thời không thể tải danh sách sản phẩm. Bạn vui lòng thử lại sau nhé!');
-            });
-        }
-
-        // Mở Form Tra Cứu Đơn Hàng linh hoạt ngay trong Chatbot
-        function renderOrderTrackerForm() {
+        // Form Tra Cứu Đơn Hàng trực tiếp trong chat
+        function renderOrderTrackerForm(customPrompt) {
             const formId = 'order-track-form-' + Date.now();
+            const promptText = customPrompt ? escapeHtml(customPrompt) : 'Bạn không cần nhớ mã đơn hàng! Chỉ cần nhập <strong>Số điện thoại</strong> và có thể kèm <strong>Tên sản phẩm</strong> đã đặt:';
             const html = `
                 <div class="space-y-2">
                     <div class="font-bold text-primary flex items-center gap-1">
                         <span class="material-symbols-outlined text-base">package_2</span> Tra cứu tiến độ đơn hàng
                     </div>
-                    <p class="text-[11px] text-on-surface-variant leading-relaxed">
-                        Bạn không cần nhớ mã đơn hàng! Chỉ cần nhập <strong>Số điện thoại</strong> và có thể kèm <strong>Tên sản phẩm</strong> bạn đã đặt:
-                    </p>
+                    <p class="text-[11px] text-on-surface-variant leading-relaxed">\${promptText}</p>
                     <form id="\${formId}" class="space-y-2 pt-1">
                         <div>
                             <input type="tel" name="trackPhone" placeholder="Nhập số điện thoại đặt hàng (*)" required
@@ -597,62 +683,7 @@
             })
             .then(res => res.json())
             .then(data => {
-                removeAiTypingIndicator(typingId);
-                if (data.type === 'order_tracking') {
-                    const step = data.stepProgress || 1;
-                    
-                    // Stepper HTML
-                    let stepsHtml = `
-                        <div class="relative flex items-center justify-between my-3 px-2">
-                            <div class="absolute left-4 right-4 top-1/2 -translate-y-1/2 h-0.5 bg-outline-variant -z-0"></div>
-                            <div class="relative z-10 flex flex-col items-center">
-                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 1 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">1</span>
-                                <span class="text-[9px] mt-1 text-on-surface-variant">Tiếp nhận</span>
-                            </div>
-                            <div class="relative z-10 flex flex-col items-center">
-                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 2 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">2</span>
-                                <span class="text-[9px] mt-1 text-on-surface-variant">Đóng gói</span>
-                            </div>
-                            <div class="relative z-10 flex flex-col items-center">
-                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 3 ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}">3</span>
-                                <span class="text-[9px] mt-1 text-on-surface-variant">Đang giao</span>
-                            </div>
-                            <div class="relative z-10 flex flex-col items-center">
-                                <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold \${step >= 4 ? 'bg-emerald-600 text-white' : 'bg-surface-container-high text-on-surface-variant'}">4</span>
-                                <span class="text-[9px] mt-1 text-on-surface-variant">Hoàn tất</span>
-                            </div>
-                        </div>
-                    `;
-
-                    let resHtml = `
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between border-b border-outline-variant/60 pb-1.5">
-                                <span class="font-bold text-primary text-xs">Mã đơn: \${escapeHtml(data.orderCode)}</span>
-                                <span class="text-[10px] text-on-surface-variant">\${escapeHtml(data.orderDate)}</span>
-                            </div>
-                            \${stepsHtml}
-                            <div class="bg-primary/5 p-2.5 rounded-xl border border-primary/20 space-y-1">
-                                <div class="font-bold text-xs text-primary flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-sm">local_shipping</span> \${escapeHtml(data.statusText)}
-                                </div>
-                                <p class="text-[11px] text-on-surface leading-relaxed">\${escapeHtml(data.statusDesc)}</p>
-                            </div>
-                            <div class="text-[11px] space-y-0.5 text-on-surface-variant pt-1">
-                                <div>• <strong>Sản phẩm:</strong> \${escapeHtml(data.itemsSummary)}</div>
-                                <div>• <strong>Khung giờ:</strong> \${escapeHtml(data.deliverySlot)}</div>
-                                <div>• <strong>Tổng tiền:</strong> <span class="font-bold text-primary">\${formatCurrency(data.totalAmount)}</span></div>
-                            </div>
-                            <div class="pt-1.5 border-t border-outline-variant/60">
-                                <a href="\${contextPath}\${data.trackingUrl}" class="text-[11px] text-primary hover:underline font-bold inline-flex items-center gap-1">
-                                    Xem hành trình chi tiết shipper <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                    appendAiBotBubble(resHtml);
-                } else {
-                    appendAiBotBubble(formatMarkdown(data.message || 'Không tìm thấy thông tin đơn hàng.'));
-                }
+                renderServerResponse(data, typingId);
             })
             .catch(err => {
                 removeAiTypingIndicator(typingId);
@@ -666,23 +697,27 @@
             if (!btn) return;
 
             const action = btn.getAttribute('data-action');
-            const prompt = btn.getAttribute('data-prompt');
+            const prompt = btn.getAttribute('data-prompt') || btn.innerText.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 
-            if (action === 'quick_discount') {
-                appendAiUserMessage('🔥 Xem các mặt hàng hoa quả đang giảm giá hôm nay');
-                triggerZeroTokenAction('quick_discount');
-            } else if (action === 'quick_featured') {
-                appendAiUserMessage('⭐ Xem các loại hoa quả bán chạy nhất');
-                triggerZeroTokenAction('quick_featured');
-            } else if (action === 'open_tracker') {
-                appendAiUserMessage('📦 Tra cứu tiến độ đơn hàng');
-                renderOrderTrackerForm();
-            } else if (prompt) {
-                sendAiPrompt(prompt);
+            // 1. Điền nội dung vào thanh chat và focus để người dùng thấy rõ câu hỏi
+            if (aiChatInput) {
+                aiChatInput.value = prompt;
+                aiChatInput.focus();
             }
+
+            // 2. Tra cứu tiến độ đơn -> hiển thị form nhập SĐT
+            if (action === 'open_tracker') {
+                appendAiUserMessage('📦 ' + prompt);
+                if (aiChatInput) aiChatInput.value = '';
+                renderOrderTrackerForm();
+                return;
+            }
+
+            // 3. Tự động gửi truy vấn để trả lời ngay lập tức
+            sendAiPrompt(prompt, action);
         });
 
-        // Bắt sự kiện submit form AI chat
+        // Bắt sự kiện submit form AI chat (gõ vào ô chat và nhấn Enter hoặc nút gửi)
         if (aiSendForm) {
             aiSendForm.addEventListener('submit', function(e) {
                 e.preventDefault();

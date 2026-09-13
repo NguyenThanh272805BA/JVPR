@@ -14,9 +14,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
         .chart-card {
             background-color: #ffffff;
             border-radius: 1rem;
@@ -42,7 +39,7 @@
     <header class="h-20 bg-surface-container-lowest border-b border-surface-variant flex items-center justify-between px-6 flex-shrink-0 z-10 shadow-[0px_4px_20px_rgba(0,0,0,0.02)]">
         <div class="flex items-center w-full max-w-md">
             <div class="relative w-full">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline"><use href="#icon-search"/></svg>
                 <input class="w-full pl-10 pr-4 py-2 bg-surface-container rounded-md border-transparent focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md transition-shadow text-xs" placeholder="Tìm kiếm nhanh đơn hàng, sản phẩm..." type="text"/>
             </div>
         </div>
@@ -52,10 +49,12 @@
                     <span class="font-bold text-xs text-on-surface truncate max-w-[160px]">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Admin'}</span>
                     <span class="text-[10px] text-slate-400">Quản trị viên</span>
                 </div>
-                <span class="material-symbols-outlined text-4xl text-primary flex-shrink-0">account_circle</span>
+                <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold flex-shrink-0">
+                    <svg class="w-5 h-5"><use href="#icon-customer"/></svg>
+                </div>
             </div>
-            <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-1 text-xs text-error hover:underline font-semibold">
-                <span class="material-symbols-outlined text-base">logout</span>
+            <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-1 text-xs text-error hover:underline font-semibold" title="Đăng xuất">
+                <svg class="w-4 h-4"><use href="#icon-logout"/></svg>
                 <span>Đăng xuất</span>
             </a>
         </div>
@@ -72,7 +71,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <a href="${pageContext.request.contextPath}/admin/dashboard/export-excel" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all">
-                    <span class="material-symbols-outlined text-base">download</span>
+                    <svg class="w-4 h-4 text-white"><use href="#icon-receipt"/></svg>
                     <span>Xuất Excel</span>
                 </a>
             </div>
@@ -82,7 +81,7 @@
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-xl">date_range</span>
+                    <svg class="w-5 h-5 text-primary"><use href="#icon-calendar"/></svg>
                     <span class="font-bold text-xs text-slate-700 uppercase tracking-wider">Thời gian theo dõi:</span>
                     <span id="activeFilterBadge" class="px-2.5 py-0.5 bg-primary/10 text-primary font-bold text-xs rounded-full">
                         Tháng này (Toàn diện)
@@ -100,10 +99,10 @@
                         <input type="date" id="dashboardEndDate" class="bg-transparent text-xs text-slate-700 outline-none border-none p-0 focus:ring-0">
                     </div>
                     <button type="button" onclick="applyCustomDateRange()" class="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-white font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">filter_alt</span> Áp dụng
+                        <svg class="w-3.5 h-3.5"><use href="#icon-filter"/></svg> Áp dụng
                     </button>
                     <button type="button" onclick="resetDashboardFilter()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors" title="Đặt lại về mặc định">
-                        <span class="material-symbols-outlined text-sm">restart_alt</span>
+                        <svg class="w-3.5 h-3.5"><use href="#icon-refresh"/></svg>
                     </button>
                 </div>
             </div>
@@ -128,7 +127,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Doanh thu thuần</span>
                     <div class="w-10 h-10 rounded-xl bg-lime-50 text-primary flex items-center justify-center">
-                        <span class="material-symbols-outlined">payments</span>
+                        <svg class="w-5 h-5"><use href="#icon-money"/></svg>
                     </div>
                 </div>
                 <div id="kpiTotalRevenue" class="text-2xl font-black text-primary">
@@ -145,7 +144,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Giá vốn hàng bán (COGS)</span>
                     <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                        <span class="material-symbols-outlined">inventory_2</span>
+                        <svg class="w-5 h-5"><use href="#icon-inventory"/></svg>
                     </div>
                 </div>
                 <div id="kpiTotalCost" class="text-2xl font-black text-amber-600">
@@ -161,7 +160,7 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lợi nhuận gộp</span>
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                        <span class="material-symbols-outlined">trending_up</span>
+                        <svg class="w-5 h-5"><use href="#icon-trend-up"/></svg>
                     </div>
                 </div>
                 <div id="kpiGrossProfit" class="text-2xl font-black text-emerald-600">
@@ -178,13 +177,111 @@
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tổng đơn hàng</span>
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <svg class="w-5 h-5"><use href="#icon-cart"/></svg>
                     </div>
                 </div>
                 <div id="kpiTotalOrders" class="text-2xl font-black text-slate-800">${totalOrders}</div>
                 <div class="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
                     <span id="kpiSuccessRate" class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold text-[11px]">${kpiMetrics.completionRate}%</span>
                     <span>Tỷ lệ giao hàng thành công</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- FRUITABLES AI BUSINESS INTELLIGENCE ANALYST (EXECUTIVE COPILOT) -->
+        <!-- ================================================================ -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-2xl p-6 text-white shadow-xl border border-indigo-900/50 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-emerald-400 p-0.5 shadow-lg shadow-primary/30 flex items-center justify-center">
+                            <div class="w-full h-full bg-slate-900/90 rounded-[14px] flex items-center justify-center">
+                                <svg class="w-6 h-6 text-emerald-400"><use href="#icon-ai"/></svg>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-black tracking-tight text-white flex items-center gap-2">
+                                    Trợ lí AI
+                                </h2>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> LLM
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-0.5">Phân tích chuyên sâu doanh thu, biên lợi nhuận, cơ cấu đơn hàng & đề xuất chiến lược phát triển theo thời gian thực</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <button type="button" id="btnGenerateAIReport" onclick="requestAIExecutiveReport(false)" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-primary hover:from-emerald-600 hover:to-primary-container text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/40 transition-all flex items-center gap-2 active:scale-95">
+                            <svg class="w-4 h-4"><use href="#icon-ai"/></svg>
+                            <span>Phân tích Doanh số & Chiến lược</span>
+                        </button>
+                        <button type="button" onclick="requestAIExecutiveReport(true)" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 transition-colors" title="Bắt buộc làm mới báo cáo">
+                            <svg class="w-4 h-4"><use href="#icon-refresh"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Copilot Prompt Chips -->
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-700/60 text-xs flex-wrap">
+                    <span class="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-primary"><use href="#icon-robot"/></svg> Hỏi nhanh Trợ lí AI:
+                    </span>
+                    <button type="button" onclick="askAICopilot('Đánh giá cơ cấu lợi nhuận gộp và cảnh báo các khoản chi phí giá vốn hiện nay')" class="px-3 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] font-medium border border-slate-700/80 hover:border-emerald-500/50 transition-all">
+                        💰 Phân tích biên lợi nhuận & Giá vốn
+                    </button>
+                    <button type="button" onclick="askAICopilot('Kiểm tra các mặt hàng hoa quả sắp hết kho hoặc ứ đọng và đề xuất kế hoạch nhập xuất hàng')" class="px-3 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] font-medium border border-slate-700/80 hover:border-emerald-500/50 transition-all">
+                        ⚠️ Cảnh báo tồn kho hoa quả
+                    </button>
+                    <button type="button" onclick="askAICopilot('Đề xuất chương trình Flash Sale hoặc gói combo trái cây cuối tuần để tăng doanh thu 20%')" class="px-3 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] font-medium border border-slate-700/80 hover:border-emerald-500/50 transition-all">
+                        🚀 Chiến dịch kích cầu cuối tuần
+                    </button>
+                    <button type="button" onclick="askAICopilot('Đánh giá tỷ lệ giao hàng thành công và cách tối ưu điều phối shipper nội bộ')" class="px-3 py-1 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] font-medium border border-slate-700/80 hover:border-emerald-500/50 transition-all">
+                        🛵 Tối ưu hiệu suất Shipper
+                    </button>
+                </div>
+
+                <!-- Custom Admin Query Input -->
+                <div class="flex items-center gap-2 pt-1">
+                    <div class="relative flex-1">
+                        <input type="text" id="adminAICustomQuery" placeholder="Nhập câu hỏi phân tích kinh doanh cụ thể cho Trợ lí AI (VD: Tại sao tỷ lệ hủy đơn cao, nên nhập thêm loại nho nào?...)"
+                               class="w-full bg-slate-950/60 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition-colors"
+                               onkeydown="if(event.key==='Enter') submitCustomAIQuery()">
+                    </div>
+                    <button type="button" onclick="submitCustomAIQuery()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs rounded-xl border border-slate-700 flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3.5 h-3.5"><use href="#icon-send"/></svg> Gửi
+                    </button>
+                </div>
+
+                <!-- AI Analysis Result Panel -->
+                <div id="aiReportCard" class="hidden bg-slate-950/70 rounded-xl p-5 border border-indigo-900/60 space-y-3 transition-all">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+                                <svg class="w-4 h-4"><use href="#icon-chart-bar"/></svg>
+                                Báo cáo Phân tích Chiến lược Điều hành
+                            </span>
+                            <span id="aiReportUpdatedTime" class="text-[10px] text-slate-400"></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="copyAIReport()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors" title="Sao chép báo cáo">
+                                <svg class="w-4 h-4"><use href="#icon-receipt"/></svg>
+                            </button>
+                            <button type="button" onclick="document.getElementById('aiReportCard').classList.add('hidden')" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors" title="Thu gọn">
+                                <svg class="w-4 h-4"><use href="#icon-close"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div id="aiReportContent" class="text-xs text-slate-200 leading-relaxed space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <!-- Rendered AI Markdown -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -200,7 +297,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary text-base">bar_chart</span>
+                            <svg class="w-4 h-4 text-primary"><use href="#icon-chart-bar"/></svg>
                             Biểu đồ 1: Doanh thu thuần & Lợi nhuận gộp theo mốc thời gian
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Biểu diễn cột song song Doanh thu (Xanh lá) và Lợi nhuận (Xanh ngọc), đường viền COGS</p>
@@ -216,10 +313,10 @@
                             <input type="date" id="chart1EndDate" class="bg-transparent text-[11px] text-slate-700 outline-none border-none p-0 focus:ring-0">
                         </div>
                         <button type="button" onclick="queryChart1DateRange()" class="px-2.5 py-1 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1" title="Tra cứu doanh thu theo khoảng ngày">
-                            <span class="material-symbols-outlined text-[13px]">search</span> Tra cứu
+                            <svg class="w-3.5 h-3.5"><use href="#icon-search"/></svg> Tra cứu
                         </button>
                         <button type="button" onclick="resetChart1DateRange()" class="p-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" title="Đặt lại mốc thời gian">
-                            <span class="material-symbols-outlined text-sm">restart_alt</span>
+                            <svg class="w-3.5 h-3.5"><use href="#icon-refresh"/></svg>
                         </button>
 
                         <select id="revenueGroupingFilter" onchange="changeRevenueGrouping(this.value)" class="border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-slate-700 outline-none focus:border-primary bg-slate-50">
@@ -239,7 +336,7 @@
             <div class="lg:col-span-4 chart-card flex flex-col justify-between">
                 <div class="mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span class="material-symbols-outlined text-amber-500 text-base">pie_chart</span>
+                        <svg class="w-4 h-4 text-amber-500"><use href="#icon-category"/></svg>
                         Biểu đồ 2: Cơ cấu Phương thức Thanh toán
                     </h3>
                     <p class="text-[11px] text-slate-400 mt-0.5">Tỷ trọng doanh thu theo Tiền mặt COD vs VNPay vs Ví MoMo</p>
@@ -259,7 +356,7 @@
             <div class="lg:col-span-5 chart-card flex flex-col justify-between">
                 <div class="mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span class="material-symbols-outlined text-blue-500 text-base">donut_large</span>
+                        <svg class="w-4 h-4 text-blue-500"><use href="#icon-category"/></svg>
                         Biểu đồ 3: Phân bổ Trạng thái Đơn hàng
                     </h3>
                     <p class="text-[11px] text-slate-400 mt-0.5">Tỷ lệ đơn thành công, đang giao, chờ xử lý và giao thất bại/hủy</p>
@@ -277,7 +374,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-emerald-600 text-base">local_fire_department</span>
+                            <svg class="w-4 h-4 text-emerald-600"><use href="#icon-trend-up"/></svg>
                             Biểu đồ 4: Top 5 Sản phẩm Hoa quả Bán chạy nhất
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Xếp hạng theo sản lượng đã bán và doanh thu đóng góp</p>
@@ -296,7 +393,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-purple-600 text-base">pie_chart</span>
+                            <svg class="w-4 h-4 text-purple-600"><use href="#icon-category"/></svg>
                             Biểu đồ 5: Cơ cấu Danh mục Sản phẩm
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Mỗi màu biểu thị 1 danh mục hoa quả (Nhấp lát cắt để xem chi tiết)</p>
@@ -308,7 +405,7 @@
                             </c:forEach>
                         </select>
                         <button type="button" onclick="openCategoryDrilldown()" class="px-2.5 py-1 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary-container transition-colors flex items-center gap-1 shadow-sm">
-                            <span class="material-symbols-outlined text-[13px]">visibility</span> Xem
+                            <svg class="w-3.5 h-3.5"><use href="#icon-eye"/></svg> Xem
                         </button>
                     </div>
                 </div>
@@ -327,7 +424,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sky-600 text-base">timeline</span>
+                            <svg class="w-4 h-4 text-sky-600"><use href="#icon-trend-up"/></svg>
                             Biểu đồ 6: Xu hướng Phát sinh Đơn hàng theo Thời gian
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Biểu đồ miền diện tích thể hiện nhịp độ đặt hàng và tỷ lệ giao thành công</p>
@@ -343,10 +440,10 @@
                             <input type="date" id="chart6EndDate" class="bg-transparent text-[11px] text-slate-700 outline-none border-none p-0 focus:ring-0">
                         </div>
                         <button type="button" onclick="queryChart6DateRange()" class="px-2.5 py-1 bg-primary hover:bg-primary-container text-white text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1" title="Tra cứu xu hướng đơn hàng theo khoảng ngày">
-                            <span class="material-symbols-outlined text-[13px]">search</span> Tra cứu
+                            <svg class="w-3.5 h-3.5"><use href="#icon-search"/></svg> Tra cứu
                         </button>
                         <button type="button" onclick="resetChart6DateRange()" class="p-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" title="Đặt lại mốc thời gian">
-                            <span class="material-symbols-outlined text-sm">restart_alt</span>
+                            <svg class="w-3.5 h-3.5"><use href="#icon-refresh"/></svg>
                         </button>
 
                         <select id="orderTrendsGroupingFilter" onchange="changeOrderTrendsGrouping(this.value)" class="border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-slate-700 outline-none focus:border-primary bg-slate-50">
@@ -370,7 +467,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined text-indigo-600 text-base">two_wheeler</span>
+                            <svg class="w-4 h-4 text-indigo-600"><use href="#icon-shipper"/></svg>
                             Biểu đồ 7: Hiệu suất Giao hàng của Đội ngũ Shipper
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Đối sánh đơn hoàn thành thành công vs Đơn giao thất bại của từng tài xế</p>
@@ -388,7 +485,7 @@
             <div class="lg:col-span-5 chart-card flex flex-col justify-between">
                 <div class="mb-4">
                     <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                        <span class="material-symbols-outlined text-teal-600 text-base">schedule</span>
+                        <svg class="w-4 h-4 text-teal-600"><use href="#icon-calendar"/></svg>
                         Biểu đồ 8: Tỷ trọng Khung giờ Giao hàng
                     </h3>
                     <p class="text-[11px] text-slate-400 mt-0.5">Thói quen lựa chọn thời gian nhận hàng của khách (Hỏa tốc 1-2h, Sáng, Chiều, Tối)</p>
@@ -409,14 +506,14 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-xl">group_add</span>
+                        <svg class="w-5 h-5 text-primary"><use href="#icon-customer"/></svg>
                         <span>Thống kê Khách hàng & Mức độ Sử dụng Web</span>
                     </h2>
                     <p class="text-xs text-slate-400 mt-0.5">Giám sát lượng khách hàng đăng ký mới, phương thức đăng nhập và tỷ lệ khách hàng mua sắm trên hệ thống</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <a href="${pageContext.request.contextPath}/admin/customers" class="px-3.5 py-1.5 bg-white border border-slate-200 hover:border-primary hover:text-primary text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
-                        <span class="material-symbols-outlined text-base text-primary">people</span>
+                        <svg class="w-4 h-4 text-primary"><use href="#icon-customer"/></svg>
                         <span>Chi tiết Khách hàng &rarr;</span>
                     </a>
                 </div>
@@ -432,12 +529,12 @@
                             ${customerEngagement.totalCustomers != null ? customerEngagement.totalCustomers : 0}
                         </div>
                         <div class="text-[11px] text-emerald-600 font-semibold mt-0.5 flex items-center gap-0.5">
-                            <span class="material-symbols-outlined text-xs">how_to_reg</span>
+                            <svg class="w-3 h-3 text-emerald-600"><use href="#icon-check"/></svg>
                             <span>Đang hoạt động: <strong id="kpiCustomerActive">${customerEngagement.activeCount != null ? customerEngagement.activeCount : 0}</strong></span>
                         </div>
                     </div>
                     <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-xl">people</span>
+                        <svg class="w-5 h-5"><use href="#icon-customer"/></svg>
                     </div>
                 </div>
 
@@ -449,12 +546,12 @@
                             ${customerEngagement.totalBuyers != null ? customerEngagement.totalBuyers : 0}
                         </div>
                         <div class="text-[11px] text-blue-600 font-semibold mt-0.5 flex items-center gap-0.5">
-                            <span class="material-symbols-outlined text-xs">shopping_bag</span>
+                            <svg class="w-3 h-3 text-blue-600"><use href="#icon-cart"/></svg>
                             <span>Tỷ lệ mua: <strong id="kpiConversionRate">${customerEngagement.conversionRate != null ? customerEngagement.conversionRate : 0}%</strong></span>
                         </div>
                     </div>
                     <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-xl">shopping_cart_checkout</span>
+                        <svg class="w-5 h-5"><use href="#icon-order"/></svg>
                     </div>
                 </div>
 
@@ -466,12 +563,12 @@
                             ${customerEngagement.loyalBuyers != null ? customerEngagement.loyalBuyers : 0}
                         </div>
                         <div class="text-[11px] text-purple-600 font-semibold mt-0.5 flex items-center gap-0.5">
-                            <span class="material-symbols-outlined text-xs">sync</span>
+                            <svg class="w-3 h-3 text-purple-600"><use href="#icon-refresh"/></svg>
                             <span>Tỷ lệ quay lại: <strong id="kpiRetentionRate">${customerEngagement.retentionRate != null ? customerEngagement.retentionRate : 0}%</strong></span>
                         </div>
                     </div>
                     <div class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-xl">loyalty</span>
+                        <svg class="w-5 h-5"><use href="#icon-coupon"/></svg>
                     </div>
                 </div>
 
@@ -483,12 +580,12 @@
                             <fmt:formatNumber value="${customerEngagement.totalPoints != null ? customerEngagement.totalPoints : 0}" type="number"/> pts
                         </div>
                         <div class="text-[11px] text-amber-700 font-semibold mt-0.5 flex items-center gap-0.5">
-                            <span class="material-symbols-outlined text-xs">workspace_premium</span>
+                            <svg class="w-3 h-3 text-amber-600"><use href="#icon-claim"/></svg>
                             <span>Đăng ký Google: <strong id="kpiGoogleUsers">${customerEngagement.googleCount != null ? customerEngagement.googleCount : 0}</strong></span>
                         </div>
                     </div>
                     <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-xl">stars</span>
+                        <svg class="w-5 h-5"><use href="#icon-ai"/></svg>
                     </div>
                 </div>
             </div>
@@ -498,7 +595,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-                            <span class="material-symbols-outlined text-purple-600 text-lg">donut_large</span>
+                            <svg class="w-5 h-5 text-purple-600"><use href="#icon-category"/></svg>
                             <span>Biểu đồ 9: Phân khúc Khách hàng & Mức độ Sử dụng Web</span>
                         </h3>
                         <p class="text-xs text-slate-400 mt-0.5">Cơ cấu khách trung thành (≥ 2 đơn), khách mua lần đầu, khách tiềm năng và tài khoản tạm khóa</p>
@@ -529,14 +626,14 @@
         <!-- Header -->
         <div class="bg-gradient-to-r from-primary to-primary-container px-6 py-4 flex items-center justify-between text-white flex-shrink-0">
             <div class="flex items-center gap-2.5">
-                <span class="material-symbols-outlined text-2xl">category</span>
+                <svg class="w-6 h-6 text-white"><use href="#icon-category"/></svg>
                 <div>
                     <h3 id="drilldownCategoryTitle" class="font-bold text-lg leading-tight">Danh sách sản phẩm danh mục</h3>
                     <p id="drilldownCategorySubtitle" class="text-xs text-white/80">Chi tiết các mặt hàng hoa quả hiện có</p>
                 </div>
             </div>
             <button type="button" onclick="closeCategoryDrilldown()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                <span class="material-symbols-outlined text-sm">close</span>
+                <svg class="w-4 h-4 text-white"><use href="#icon-close"/></svg>
             </button>
         </div>
 
@@ -1344,7 +1441,7 @@
         let html = '';
         products.forEach(p => {
             const formattedPrice = currencyFmt.format(p.price);
-            const imgHtml = p.imageUrl ? '<img src="' + p.imageUrl + '" class="w-9 h-9 object-cover rounded-lg border">' : '<span class="material-symbols-outlined text-gray-300">image</span>';
+            const imgHtml = p.imageUrl ? '<img src="' + p.imageUrl + '" class="w-9 h-9 object-cover rounded-lg border">' : '<svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>';
             const stockBadge = p.stock > 5 ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-bold">' + p.stock + '</span>' : (p.stock > 0 ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-bold">' + p.stock + ' (Sắp hết)</span>' : '<span class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-bold">Hết hàng</span>');
             const statusBadge = p.status ? '<span class="text-green-600 font-bold">Đang bán</span>' : '<span class="text-slate-400">Ẩn</span>';
 
@@ -1467,6 +1564,139 @@
             });
             legendEl.innerHTML = html;
         }
+    }
+
+    // =========================================================================
+    // TRỢ LÝ CỐ VẤN KINH DOANH AI (FRUITABLES BI COPILOT)
+    // =========================================================================
+    let rawLastAIReport = '';
+
+    function renderMarkdownToHtml(md) {
+        if (!md) return '';
+        let html = md
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/^### (.*$)/gim, '<h4 class="text-emerald-400 font-bold text-sm mt-3 mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>$1</h4>')
+            .replace(/^## (.*$)/gim, '<h3 class="text-white font-black text-base mt-4 mb-2 pb-1 border-b border-slate-700/60">$1</h3>')
+            .replace(/^# (.*$)/gim, '<h2 class="text-emerald-300 font-black text-lg mt-4 mb-2">$1</h2>')
+            .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-bold">$1</strong>')
+            .replace(/\*(.*?)\*/gim, '<em class="text-slate-300 italic">$1</em>')
+            .replace(/^\s*[-*+]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-200 py-0.5">$1</li>')
+            .replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-200 py-0.5"><span class="font-semibold text-emerald-300">$1.</span> $2</li>')
+            .replace(/\n\n+/g, '<div class="h-2"></div>')
+            .replace(/\n/g, '<br>');
+        return html;
+    }
+
+    function requestAIExecutiveReport(forceRefresh) {
+        const reportCard = document.getElementById('aiReportCard');
+        const reportContent = document.getElementById('aiReportContent');
+        const updatedTimeEl = document.getElementById('aiReportUpdatedTime');
+        const btn = document.getElementById('btnGenerateAIReport');
+
+        if (!reportCard || !reportContent) return;
+
+        reportCard.classList.remove('hidden');
+        reportContent.innerHTML = `
+            <div class="py-8 flex flex-col items-center justify-center gap-3 text-emerald-400">
+                <svg class="w-8 h-8 animate-spin"><use href="#icon-spinner"/></svg>
+                <span class="text-xs font-medium text-slate-300 animate-pulse">Gemini AI đang tổng hợp các chỉ số KPI, đối soát doanh thu & lập báo cáo cố vấn...</span>
+            </div>
+        `;
+        if (btn) btn.disabled = true;
+
+        const url = '${pageContext.request.contextPath}/api/admin/ai-assistant?action=executive_report' + (forceRefresh ? '&refresh=true' : '');
+
+        fetch(url, { method: 'GET' })
+            .then(res => res.json())
+            .then(data => {
+                if (btn) btn.disabled = false;
+                if (data.status === 'success' || data.success) {
+                    rawLastAIReport = data.report || data.response || '';
+                    reportContent.innerHTML = renderMarkdownToHtml(rawLastAIReport);
+                    if (updatedTimeEl) {
+                        const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        updatedTimeEl.innerText = (data.cached ? 'Bộ nhớ đệm (' : 'Mới nhất lúc (') + nowStr + ')';
+                    }
+                } else {
+                    reportContent.innerHTML = '<div class="p-3 bg-red-950/40 border border-red-800 rounded-xl text-red-400 text-xs">⚠️ Lỗi: ' + (data.message || 'Không thể tạo báo cáo') + '</div>';
+                }
+            })
+            .catch(err => {
+                if (btn) btn.disabled = false;
+                reportContent.innerHTML = '<div class="p-3 bg-red-950/40 border border-red-800 rounded-xl text-red-400 text-xs">⚠️ Không thể kết nối tới máy chủ AI: ' + err.message + '</div>';
+            });
+    }
+
+    function askAICopilot(query) {
+        const inputEl = document.getElementById('adminAICustomQuery');
+        if (inputEl) inputEl.value = query;
+        submitCustomAIQuery();
+    }
+
+    function submitCustomAIQuery() {
+        const inputEl = document.getElementById('adminAICustomQuery');
+        if (!inputEl) return;
+        const query = inputEl.value.trim();
+        if (!query) return;
+
+        const reportCard = document.getElementById('aiReportCard');
+        const reportContent = document.getElementById('aiReportContent');
+        const updatedTimeEl = document.getElementById('aiReportUpdatedTime');
+
+        if (!reportCard || !reportContent) return;
+        reportCard.classList.remove('hidden');
+        reportContent.innerHTML = `
+            <div class="py-6 flex flex-col items-center justify-center gap-3 text-emerald-400">
+                <svg class="w-8 h-8 animate-spin"><use href="#icon-spinner"/></svg>
+                <div class="text-center">
+                    <p class="text-xs font-bold text-white mb-1">"` + query + `" - Đang phân tích...</p>
+                    <span class="text-[11px] text-slate-400">Gemini BI Copilot đang tính toán phương án và đề xuất giải pháp...</span>
+                </div>
+            </div>
+        `;
+
+        fetch('${pageContext.request.contextPath}/api/admin/ai-assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: 'action=admin_copilot&query=' + encodeURIComponent(query)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success' || data.success) {
+                rawLastAIReport = data.response || data.report || '';
+                reportContent.innerHTML = `
+                    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs flex items-start gap-2">
+                        <svg class="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-robot"/></svg>
+                        <div>
+                            <span class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Câu hỏi quản trị:</span>
+                            <p class="text-slate-100 font-semibold">` + query + `</p>
+                        </div>
+                    </div>
+                ` + renderMarkdownToHtml(rawLastAIReport);
+                if (updatedTimeEl) {
+                    updatedTimeEl.innerText = 'Phản hồi lúc ' + new Date().toLocaleTimeString('vi-VN');
+                }
+            } else {
+                reportContent.innerHTML = '<div class="p-3 bg-red-950/40 border border-red-800 rounded-xl text-red-400 text-xs">⚠️ Lỗi: ' + (data.message || 'Không thể xử lý câu hỏi') + '</div>';
+            }
+        })
+        .catch(err => {
+            reportContent.innerHTML = '<div class="p-3 bg-red-950/40 border border-red-800 rounded-xl text-red-400 text-xs">⚠️ Lỗi kết nối: ' + err.message + '</div>';
+        });
+    }
+
+    function copyAIReport() {
+        if (!rawLastAIReport) {
+            alert('Chưa có nội dung báo cáo để sao chép!');
+            return;
+        }
+        navigator.clipboard.writeText(rawLastAIReport).then(() => {
+            alert('Đã sao chép nội dung báo cáo AI vào bộ nhớ tạm!');
+        }).catch(() => {
+            alert('Không thể sao chép tự động, vui lòng chọn văn bản thủ công.');
+        });
     }
 
     // TẢI BAN ĐẦU KHI VÀO TRANG

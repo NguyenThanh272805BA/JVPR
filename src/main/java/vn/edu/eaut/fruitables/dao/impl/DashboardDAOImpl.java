@@ -245,10 +245,14 @@ public class DashboardDAOImpl implements IDashboardDAO {
         result.put("previousTotal", prevTotal);
         result.put("growthRate", growthRate);
 
+        double totRev = getTotalRevenue();
+        double totCost = getTotalCost();
+        double realCostRatio = (totRev > 0) ? (totCost / totRev) : 0.464;
+
         List<Double> costData = new ArrayList<>();
         List<Double> profitData = new ArrayList<>();
         for (Double rev : currentData) {
-            double c = Math.round(rev * 0.65 * 100.0) / 100.0;
+            double c = Math.round(rev * realCostRatio * 100.0) / 100.0;
             costData.add(c);
             profitData.add(Math.round((rev - c) * 100.0) / 100.0);
         }
@@ -605,15 +609,46 @@ public class DashboardDAOImpl implements IDashboardDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     labels.add(rs.getString("dt_label"));
-                    double rev = rs.getDouble("rev");
-                    currentData.add(rev);
-                    double c = Math.round(rev * 0.65 * 100.0) / 100.0;
-                    costData.add(c);
-                    profitData.add(Math.round((rev - c) * 100.0) / 100.0);
+                    currentData.add(rs.getDouble("rev"));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // Truy vấn giá vốn thực tế theo từng ngày
+        Map<String, Double> costMap = new HashMap<>();
+        List<Object> costParams = new ArrayList<>();
+        String costDateCond = buildDateFilter("o", startDate, endDate, costParams);
+        String costSql = "SELECT DATE_FORMAT(o.created_at, '%d/%m/%Y') as dt_label, " +
+                "COALESCE(SUM(od.cost_price * od.quantity), 0) as day_cogs " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE (o.payment_status = 'PAID' OR o.status = 'COMPLETED') " +
+                "AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') " +
+                "AND o.payment_status != 'REFUNDED' " + costDateCond + " " +
+                "GROUP BY DATE_FORMAT(o.created_at, '%d/%m/%Y')";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(costSql)) {
+            for (int i = 0; i < costParams.size(); i++) {
+                ps.setObject(i + 1, costParams.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    costMap.put(rs.getString("dt_label"), rs.getDouble("day_cogs"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < labels.size(); i++) {
+            String lbl = labels.get(i);
+            double rev = currentData.get(i);
+            double c = costMap.containsKey(lbl) ? costMap.get(lbl) : Math.round(rev * 0.464 * 100.0) / 100.0;
+            costData.add(Math.round(c * 100.0) / 100.0);
+            profitData.add(Math.round((rev - c) * 100.0) / 100.0);
         }
 
         // Nếu khoảng lọc ít dữ liệu, đảm bảo có tối thiểu 1 mốc trực quan
@@ -1059,6 +1094,12 @@ public class DashboardDAOImpl implements IDashboardDAO {
                 "COALESCE(SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END), 0) as pending_orders " +
                 "FROM orders WHERE 1=1 " + dateFilter;
 
+        double revenue = 0.0;
+        int totalOrders = 0;
+        int completedOrders = 0;
+        int failedOrders = 0;
+        int pendingOrders = 0;
+
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
@@ -1066,33 +1107,58 @@ public class DashboardDAOImpl implements IDashboardDAO {
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    double revenue = rs.getDouble("total_revenue");
-                    int totalOrders = rs.getInt("total_orders");
-                    int completedOrders = rs.getInt("completed_orders");
-                    int failedOrders = rs.getInt("failed_orders");
-                    int pendingOrders = rs.getInt("pending_orders");
-
-                    double cogs = Math.round(revenue * 0.65 * 100.0) / 100.0;
-                    double grossProfit = Math.round((revenue - cogs) * 100.0) / 100.0;
-                    double profitMargin = revenue > 0 ? Math.round((grossProfit / revenue * 100.0) * 10.0) / 10.0 : 35.0;
-                    double completionRate = totalOrders > 0 ? Math.round(((double) completedOrders / totalOrders * 100.0) * 10.0) / 10.0 : 0.0;
-                    double aov = totalOrders > 0 ? Math.round(revenue / totalOrders) : 0.0;
-
-                    metrics.put("totalRevenue", revenue);
-                    metrics.put("totalCost", cogs);
-                    metrics.put("grossProfit", grossProfit);
-                    metrics.put("profitMargin", profitMargin);
-                    metrics.put("totalOrders", totalOrders);
-                    metrics.put("completedOrders", completedOrders);
-                    metrics.put("failedOrders", failedOrders);
-                    metrics.put("pendingOrders", pendingOrders);
-                    metrics.put("completionRate", completionRate);
-                    metrics.put("aov", aov);
+                    revenue = rs.getDouble("total_revenue");
+                    totalOrders = rs.getInt("total_orders");
+                    completedOrders = rs.getInt("completed_orders");
+                    failedOrders = rs.getInt("failed_orders");
+                    pendingOrders = rs.getInt("pending_orders");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Tính Giá Vốn Hàng Bán (COGS) thực tế từ bảng order_details cho các đơn hợp lệ theo khoảng thời gian
+        List<Object> costParams = new ArrayList<>();
+        String costDateFilter = buildDateFilter("o", startDate, endDate, costParams);
+        String costSql = "SELECT COALESCE(SUM(od.cost_price * od.quantity), 0) as total_cogs " +
+                "FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.id " +
+                "WHERE (o.payment_status = 'PAID' OR o.status = 'COMPLETED') " +
+                "AND o.status NOT IN ('CANCELLED', 'RETURNED', 'FAILED') " +
+                "AND o.payment_status != 'REFUNDED' " + costDateFilter;
+
+        double realCogs = 0.0;
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(costSql)) {
+            for (int i = 0; i < costParams.size(); i++) {
+                ps.setObject(i + 1, costParams.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    realCogs = rs.getDouble("total_cogs");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double cogs = Math.round(realCogs * 100.0) / 100.0;
+        double grossProfit = Math.round((revenue - cogs) * 100.0) / 100.0;
+        double profitMargin = revenue > 0 ? Math.round((grossProfit / revenue * 100.0) * 10.0) / 10.0 : 0.0;
+        double completionRate = totalOrders > 0 ? Math.round(((double) completedOrders / totalOrders * 100.0) * 10.0) / 10.0 : 0.0;
+        double aov = totalOrders > 0 ? Math.round(revenue / totalOrders) : 0.0;
+
+        metrics.put("totalRevenue", revenue);
+        metrics.put("totalCost", cogs);
+        metrics.put("grossProfit", grossProfit);
+        metrics.put("profitMargin", profitMargin);
+        metrics.put("totalOrders", totalOrders);
+        metrics.put("completedOrders", completedOrders);
+        metrics.put("failedOrders", failedOrders);
+        metrics.put("pendingOrders", pendingOrders);
+        metrics.put("completionRate", completionRate);
+        metrics.put("aov", aov);
 
         return metrics;
     }
