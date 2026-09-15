@@ -36,6 +36,14 @@ public class OrderClaimServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        UserModel user = (UserModel) session.getAttribute("USERMODEL");
+
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login?message=PleaseLoginToClaim");
+            return;
+        }
+
         String orderIdStr = request.getParameter("orderId");
         if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/order-history");
@@ -47,6 +55,14 @@ public class OrderClaimServlet extends HttpServlet {
             OrderModel order = orderDAO.findById(orderId);
             if (order == null) {
                 response.sendRedirect(request.getContextPath() + "/order-history");
+                return;
+            }
+
+            // BẢO MẬT & IDOR: Người dùng chỉ được xem/khiếu nại đơn của chính mình (hoặc Admin)
+            boolean isOwner = (order.getUserId() != null && order.getUserId().equals(user.getId()));
+            boolean isAdmin = (user.getRoleId() != null && (user.getRoleId() == 1 || user.getRoleId() == 2));
+            if (!isOwner && !isAdmin) {
+                response.sendRedirect(request.getContextPath() + "/order-history?message=AccessDenied");
                 return;
             }
 
@@ -71,8 +87,21 @@ public class OrderClaimServlet extends HttpServlet {
         HttpSession session = request.getSession();
         UserModel user = (UserModel) session.getAttribute("USERMODEL");
 
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login?message=PleaseLoginToClaim");
+            return;
+        }
+
         try {
             long orderId = Long.parseLong(request.getParameter("orderId"));
+            OrderModel order = orderDAO.findById(orderId);
+
+            // BẢO MẬT: Bắt buộc đơn hàng phải thuộc về user đang đăng nhập
+            if (order == null || order.getUserId() == null || !order.getUserId().equals(user.getId())) {
+                response.sendRedirect(request.getContextPath() + "/order-history?message=PermissionDenied");
+                return;
+            }
+
             long productId = Long.parseLong(request.getParameter("productId"));
             String reason = request.getParameter("reason");
             String customerNote = request.getParameter("customerNote");

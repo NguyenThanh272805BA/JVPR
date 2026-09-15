@@ -83,19 +83,24 @@ public class ProductEditServlet extends HttpServlet {
             boolean status = request.getParameter("status") != null;
 
             Part filePart = request.getPart("imageFile");
-            String fileName = extractFileName(filePart);
+            String rawFileName = extractFileName(filePart);
             String dbImageUrl = "";
 
             // Chỉ xử lý lưu file nếu người dùng có chọn file ảnh mới
-            if (fileName != null && !fileName.isEmpty()) {
+            if (rawFileName != null && !rawFileName.trim().isEmpty()) {
                 String applicationPath = request.getServletContext().getRealPath("");
                 String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
                 File fileSaveDir = new File(uploadFilePath);
                 if (!fileSaveDir.exists()) {
                     fileSaveDir.mkdirs();
                 }
-                filePart.write(uploadFilePath + File.separator + fileName);
-                dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + fileName;
+
+                // Chuẩn hóa tên file và sinh tiền tố độc nhất tránh ghi đè
+                String cleanName = new File(rawFileName).getName().replaceAll("[^a-zA-Z0-9._-]", "_");
+                String uniqueFileName = System.currentTimeMillis() + "_" + java.util.UUID.randomUUID().toString().substring(0, 6) + "_" + cleanName;
+
+                filePart.write(uploadFilePath + File.separator + uniqueFileName);
+                dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + uniqueFileName;
             }
 
             // Bind dữ liệu vào Model

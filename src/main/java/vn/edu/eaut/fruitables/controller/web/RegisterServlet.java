@@ -93,6 +93,7 @@ public class RegisterServlet extends HttpServlet {
         // Nhập email -> Gửi OTP xác thực
         String otpCode = String.format("%06d", new Random().nextInt(999999));
         request.getSession().setAttribute("REGISTER_OTP", otpCode);
+        request.getSession().setAttribute("REGISTER_OTP_TIME", System.currentTimeMillis());
         request.getSession().setAttribute("PENDING_USER", user);
 
         EmailServiceImpl emailService = new EmailServiceImpl();

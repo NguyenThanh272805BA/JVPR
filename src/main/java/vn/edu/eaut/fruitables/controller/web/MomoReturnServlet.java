@@ -18,7 +18,8 @@ public class MomoReturnServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processPayment(request, response);
+        // Chống giả mạo URL GET: Chỉ cho phép xử lý qua form POST từ trang thanh toán
+        response.sendRedirect(request.getContextPath() + "/home");
     }
 
     @Override
@@ -31,34 +32,34 @@ public class MomoReturnServlet extends HttpServlet {
 
         String status = request.getParameter("status"); // SUCCESS hoặc CANCEL
         String orderCode = request.getParameter("orderCode");
+        String pendingOrderCode = (String) session.getAttribute("PENDING_ORDER_CODE");
 
-        if (orderCode == null || orderCode.trim().isEmpty()) {
-            orderCode = (String) session.getAttribute("PENDING_ORDER_CODE");
+        // BẢO MẬT: Bắt buộc orderCode phải khớp chính xác với đơn hàng đang chờ trong phiên đăng nhập hiện tại
+        if (orderCode == null || pendingOrderCode == null || !orderCode.trim().equalsIgnoreCase(pendingOrderCode.trim())) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Yêu cầu thanh toán không hợp lệ hoặc phiên giao dịch đã hết hạn.");
+            return;
         }
 
-        if (orderCode != null && !orderCode.trim().isEmpty()) {
-            OrderDAOImpl orderDAO = new OrderDAOImpl();
-            OrderModel order = orderDAO.findByOrderCode(orderCode);
+        OrderDAOImpl orderDAO = new OrderDAOImpl();
+        OrderModel order = orderDAO.findByOrderCode(orderCode);
 
+        if (order != null) {
             if ("SUCCESS".equalsIgnoreCase(status)) {
-                // 1. Cập nhật trạng thái đơn hàng sang PAID và ĐANG ĐÓNG GÓI (PACKING)
-                orderDAO.update("UPDATE orders SET payment_status = 'PAID', status = 'PACKING' WHERE order_code = ?", orderCode);
+                // Khách xác nhận đã chuyển khoản qua QR MoMo -> Ghi nhận trạng thái PENDING chờ Admin đối soát
+                orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'PENDING' WHERE order_code = ?", orderCode);
 
-                if (order != null) {
-                    // Tạo thông báo cho tài khoản người dùng
-                    if (order.getUserId() != null) {
-                        try {
-                            NotificationDAOImpl notificationDAO = new NotificationDAOImpl();
-                            notificationDAO.createNotification(
-                                    order.getUserId(),
-                                    order.getId(),
-                                    orderCode,
-                                    "Thanh toán MoMo thành công: " + orderCode,
-                                    "Đơn hàng " + orderCode + " đã được thanh toán thành công qua Ví MoMo. Cửa hàng đang chuẩn bị giao đến bạn!",
-                                    "ORDER_PAID"
-                            );
-                        } catch (Exception ignored) {}
-                    }
+                if (order.getUserId() != null) {
+                    try {
+                        NotificationDAOImpl notificationDAO = new NotificationDAOImpl();
+                        notificationDAO.createNotification(
+                                order.getUserId(),
+                                order.getId(),
+                                orderCode,
+                                "Xác nhận chuyển khoản MoMo: " + orderCode,
+                                "Fruitables đã tiếp nhận thông tin chuyển khoản của đơn hàng " + orderCode + ". Cửa hàng sẽ đối soát và sớm liên hệ giao hàng!",
+                                "ORDER_PENDING"
+                        );
+                    } catch (Exception ignored) {}
                 }
 
                 // Dọn dẹp giỏ hàng trong session
@@ -68,15 +69,11 @@ public class MomoReturnServlet extends HttpServlet {
                 session.removeAttribute("APPLIED_COUPON_CODE");
                 session.removeAttribute("COUPON_MESSAGE");
 
-                session.setAttribute("orderSuccess", "Thanh toán MoMo thành công! Đơn hàng " + orderCode + " đã được ghi nhận.");
+                session.setAttribute("orderSuccess", "Đã gửi thông tin thanh toán MoMo cho đơn hàng " + orderCode + ". Cửa hàng sẽ liên hệ xác nhận trong thời gian sớm nhất!");
             } else {
-                // Khách hàng chủ động bấm Hủy thanh toán hoặc giao dịch thất bại -> Hủy và hoàn trả tồn kho
-                if (order != null) {
-                    orderDAO.updateStatusAndRestoreStock(order.getId(), "CANCELLED");
-                    orderDAO.update("UPDATE orders SET payment_status = 'UNPAID' WHERE id = ?", order.getId());
-                } else {
-                    orderDAO.update("UPDATE orders SET payment_status = 'UNPAID', status = 'CANCELLED' WHERE order_code = ?", orderCode);
-                }
+                // Khách hàng chủ động bấm Hủy thanh toán hoặc giao dịch thất bại -> Hủy và hoàn trả tồn kho + voucher
+                orderDAO.updateStatusAndRestoreStock(order.getId(), "CANCELLED");
+                orderDAO.update("UPDATE orders SET payment_status = 'UNPAID' WHERE id = ?", order.getId());
                 session.setAttribute("orderSuccess", "Đã hủy thanh toán đơn hàng " + orderCode + ".");
             }
         }

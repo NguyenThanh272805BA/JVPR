@@ -66,7 +66,13 @@ public class OrderHistoryServlet extends HttpServlet {
 
                 // Kiểm tra bảo mật: Đúng đơn hàng của user đăng nhập
                 if (order != null && order.getUserId().equals(user.getId())) {
-                    orderDAO.updateOrderStatus(orderId, "COMPLETED");
+                    // CHỐNG TRỤC LỢI ĐIỂM THƯỞNG: Chỉ cho phép xác nhận khi đơn hàng đã giao (DELIVERED) hoặc đang giao (SHIPPING)
+                    if ("DELIVERED".equalsIgnoreCase(order.getStatus()) || "SHIPPING".equalsIgnoreCase(order.getStatus())) {
+                        orderDAO.updateOrderStatus(orderId, "COMPLETED");
+                        session.setAttribute("ORDER_MESSAGE_SUCCESS", "Xác nhận đã nhận hàng thành công! Cảm ơn bạn đã tin dùng Fruitables.");
+                    } else {
+                        session.setAttribute("ORDER_MESSAGE_ERROR", "Chỉ có thể xác nhận nhận hàng khi đơn hàng đang trên đường giao hoặc đã được giao tới bạn.");
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

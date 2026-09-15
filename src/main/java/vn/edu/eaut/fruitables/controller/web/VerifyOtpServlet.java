@@ -32,7 +32,20 @@ public class VerifyOtpServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         String sessionOtp = (String) session.getAttribute("REGISTER_OTP");
+        Long otpTime = (Long) session.getAttribute("REGISTER_OTP_TIME");
         UserModel pendingUser = (UserModel) session.getAttribute("PENDING_USER");
+
+        long currentTime = System.currentTimeMillis();
+
+        // KIỂM TRA THỜI HẠN OTP: 5 phút = 300,000 ms
+        if (otpTime == null || (currentTime - otpTime) > 5 * 60 * 1000L) {
+            session.removeAttribute("REGISTER_OTP");
+            session.removeAttribute("REGISTER_OTP_TIME");
+            session.removeAttribute("PENDING_USER");
+            request.setAttribute("message", "Mã OTP đã hết hạn (chỉ có hiệu lực trong 5 phút). Vui lòng đăng ký lại!");
+            request.getRequestDispatcher("/WEB-INF/views/web/verify-otp.jsp").forward(request, response);
+            return;
+        }
 
         boolean otpMatches = (sessionOtp != null && userOtp != null && sessionOtp.trim().equalsIgnoreCase(userOtp.trim()));
 
@@ -43,6 +56,7 @@ public class VerifyOtpServlet extends HttpServlet {
             if (newUser != null) {
                 // Xóa rác trong session
                 session.removeAttribute("REGISTER_OTP");
+                session.removeAttribute("REGISTER_OTP_TIME");
                 session.removeAttribute("PENDING_USER");
 
                 session.setAttribute("successMsg", "Xác thực email thành công! Chào mừng bạn gia nhập.");
@@ -52,7 +66,7 @@ public class VerifyOtpServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/views/web/verify-otp.jsp").forward(request, response);
             }
         } else {
-            request.setAttribute("message", "Mã OTP không chính xác hoặc đã hết hạn!");
+            request.setAttribute("message", "Mã OTP không chính xác!");
             request.getRequestDispatcher("/WEB-INF/views/web/verify-otp.jsp").forward(request, response);
         }
     }

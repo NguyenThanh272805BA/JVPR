@@ -50,6 +50,13 @@ public class LoginServlet extends HttpServlet {
         UserModel user = userService.login(identifier, password);
 
         if (user != null) {
+            // KIỂM TRA TRẠNG THÁI TÀI KHOẢN: Chặn tài khoản bị khóa hoặc cấm
+            if ("BANNED".equalsIgnoreCase(user.getStatus()) || "LOCKED".equalsIgnoreCase(user.getStatus()) || "INACTIVE".equalsIgnoreCase(user.getStatus())) {
+                request.setAttribute("message", "Tài khoản của bạn đang bị khóa hoặc ngừng hoạt động. Vui lòng liên hệ bộ phận hỗ trợ!");
+                request.getRequestDispatcher("/WEB-INF/views/web/login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("USERMODEL", user);
 
@@ -63,6 +70,9 @@ public class LoginServlet extends HttpServlet {
             Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
             if (cart != null && !cart.isEmpty()) {
                 syncCartToDB(user.getId(), cart);
+            } else {
+                // ĐỒNG BỘ 2 CHIỀU: Nếu session chưa có giỏ, nạp giỏ hàng đã lưu trong database vào session
+                loadCartFromDB(user.getId(), session);
             }
 
             if (user.getRoleId() == 4) {
@@ -78,6 +88,50 @@ public class LoginServlet extends HttpServlet {
         } else {
             request.setAttribute("message", "Tài khoản hoặc mật khẩu không chính xác.");
             request.getRequestDispatcher("/WEB-INF/views/web/login.jsp").forward(request, response);
+        }
+    }
+
+    private void loadCartFromDB(Long userId, HttpSession session) {
+        String sql = "SELECT ci.product_id, ci.quantity, p.name, p.image_url, p.price, p.discount_price, p.tax_rate, p.weight_gram, p.storage_type, p.is_free_shipping, p.stock " +
+                     "FROM cart_items ci JOIN products p ON ci.product_id = p.id " +
+                     "WHERE ci.user_id = ? AND p.status = 1 AND p.stock > 0";
+        Map<Long, CartItemDTO> cart = new java.util.HashMap<>();
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    long productId = rs.getLong("product_id");
+                    int qty = rs.getInt("quantity");
+                    int stock = rs.getInt("stock");
+                    int finalQty = Math.min(qty, stock);
+                    if (finalQty <= 0) continue;
+
+                    Double price = rs.getDouble("price");
+                    Double discountPrice = rs.getDouble("discount_price");
+                    Double actualPrice = (discountPrice != null && discountPrice > 0) ? discountPrice : price;
+
+                    CartItemDTO item = new CartItemDTO(
+                            productId,
+                            rs.getString("name"),
+                            rs.getString("image_url"),
+                            actualPrice,
+                            finalQty,
+                            rs.getDouble("tax_rate"),
+                            rs.getInt("weight_gram"),
+                            rs.getString("storage_type"),
+                            rs.getBoolean("is_free_shipping")
+                    );
+                    cart.put(productId, item);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (!cart.isEmpty()) {
+            session.setAttribute("CART", cart);
+            int totalItems = cart.values().stream().mapToInt(CartItemDTO::getQuantity).sum();
+            session.setAttribute("CART_TOTAL_ITEMS", totalItems);
         }
     }
 

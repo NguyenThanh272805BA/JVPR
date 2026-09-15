@@ -25,6 +25,26 @@ public interface IGeminiService {
     String generateExecutiveAnalysis(String systemRole, String contextData, String userQuery);
 
     /**
+     * Sinh đoạn mô tả ngắn gọn, súc tích và hấp dẫn cho sản phẩm
+     */
+    String generateProductShortDescription(String productName, String categoryName, String toneStyle);
+
+    /**
+     * Sinh bài viết giới thiệu sản phẩm chi tiết theo mẫu và phong cách, định dạng HTML chuẩn CKEditor
+     */
+    String generateProductArticle(String productName, String categoryName, String templateType, String toneStyle);
+
+    /**
+     * Sinh phần câu hỏi thường gặp (FAQ) cho sản phẩm, định dạng HTML
+     */
+    String generateProductFaq(String productName, String categoryName);
+
+    /**
+     * Gợi ý thông số vận chuyển và bảo quản (trọng lượng gram, quy cách bảo quản) dạng JSON
+     */
+    String suggestProductSpecs(String productName, String categoryName);
+
+    /**
      * Làm mới hoặc xóa bộ nhớ đệm câu trả lời
      */
     void clearCache();

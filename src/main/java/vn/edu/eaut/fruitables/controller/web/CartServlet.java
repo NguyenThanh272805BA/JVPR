@@ -128,11 +128,40 @@ public class CartServlet extends HttpServlet {
             int totalItems = cart.values().stream().mapToInt(CartItemDTO::getQuantity).sum();
             session.setAttribute("CART_TOTAL_ITEMS", totalItems);
 
+            // ĐỒNG BỘ GIỎ HÀNG VÀO DATABASE CHO USER ĐÃ ĐĂNG NHẬP
+            vn.edu.eaut.fruitables.model.entity.UserModel user = (vn.edu.eaut.fruitables.model.entity.UserModel) session.getAttribute("USERMODEL");
+            if (user != null && productId != null) {
+                syncCartItemToDB(user.getId(), productId, action, cart);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         // Sau khi xử lý POST, dùng sendRedirect để tránh lỗi "Submit lại form" khi F5
         response.sendRedirect(request.getContextPath() + "/cart");
+    }
+
+    private void syncCartItemToDB(Long userId, Long productId, String action, Map<Long, CartItemDTO> cart) {
+        try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection()) {
+            String delSql = "DELETE FROM cart_items WHERE user_id = ? AND product_id = ?";
+            try (java.sql.PreparedStatement psDel = conn.prepareStatement(delSql)) {
+                psDel.setLong(1, userId);
+                psDel.setLong(2, productId);
+                psDel.executeUpdate();
+            }
+            if (!"remove".equals(action) && cart.containsKey(productId)) {
+                CartItemDTO item = cart.get(productId);
+                if (item != null && item.getQuantity() > 0) {
+                    String insertSql = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)";
+                    try (java.sql.PreparedStatement psIns = conn.prepareStatement(insertSql)) {
+                        psIns.setLong(1, userId);
+                        psIns.setLong(2, productId);
+                        psIns.setInt(3, item.getQuantity());
+                        psIns.executeUpdate();
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
     }
 }

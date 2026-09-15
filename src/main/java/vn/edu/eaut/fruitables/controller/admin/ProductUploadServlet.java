@@ -73,10 +73,10 @@ public class ProductUploadServlet extends HttpServlet {
 
             // Xử lý File Upload
             Part filePart = request.getPart("imageFile");
-            String fileName = extractFileName(filePart);
+            String rawFileName = extractFileName(filePart);
             String dbImageUrl = "";
 
-            if (fileName != null && !fileName.isEmpty()) {
+            if (rawFileName != null && !rawFileName.trim().isEmpty()) {
                 // Đường dẫn thực tế trên server (Tomcat)
                 String applicationPath = request.getServletContext().getRealPath("");
                 String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
@@ -87,11 +87,15 @@ public class ProductUploadServlet extends HttpServlet {
                     fileSaveDir.mkdirs();
                 }
 
+                // Chuẩn hóa tên file và sinh tiền tố độc nhất tránh ghi đè
+                String cleanName = new File(rawFileName).getName().replaceAll("[^a-zA-Z0-9._-]", "_");
+                String uniqueFileName = System.currentTimeMillis() + "_" + java.util.UUID.randomUUID().toString().substring(0, 6) + "_" + cleanName;
+
                 // Ghi file vật lý
-                filePart.write(uploadFilePath + File.separator + fileName);
+                filePart.write(uploadFilePath + File.separator + uniqueFileName);
 
                 // Đường dẫn lưu vào Database để hiển thị trên web
-                dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + fileName;
+                dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + uniqueFileName;
             }
 
             // Bind dữ liệu vào Model

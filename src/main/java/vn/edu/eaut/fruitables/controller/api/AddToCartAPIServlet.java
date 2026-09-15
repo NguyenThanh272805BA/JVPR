@@ -66,6 +66,18 @@ public class AddToCartAPIServlet extends HttpServlet {
                     } catch (Exception ignored) {}
                 }
 
+                // KIỂM TRA GIỚI HẠN TỒN KHO THỰC TẾ TRONG GIỎ HÀNG
+                int currentQtyInCart = cart.containsKey(productId) ? cart.get(productId).getQuantity() : 0;
+                int maxStock = (product.getStock() != null) ? product.getStock() : 0;
+
+                if (currentQtyInCart + qtyToAdd > maxStock) {
+                    jsonResponse.addProperty("status", "limit_reached");
+                    jsonResponse.addProperty("message", "Kho chỉ còn " + maxStock + " sản phẩm. Bạn đã có " + currentQtyInCart + " sản phẩm trong giỏ hàng.");
+                    out.print(jsonResponse.toString());
+                    out.flush();
+                    return;
+                }
+
                 Double actualPrice = (product.getDiscountPrice() != null && product.getDiscountPrice() > 0)
                         ? product.getDiscountPrice() : product.getPrice();
 
@@ -89,10 +101,40 @@ public class AddToCartAPIServlet extends HttpServlet {
                     cart.put(productId, newItem);
                 }
 
+                // CHỐNG GIAN LẬN VOUCHER (Session Bleed): Hủy voucher cũ khi giỏ hàng có thay đổi
+                if (session.getAttribute("APPLIED_COUPON_CODE") != null) {
+                    session.removeAttribute("DISCOUNT_AMOUNT");
+                    session.removeAttribute("APPLIED_COUPON_CODE");
+                    session.removeAttribute("APPLIED_COUPON_TYPE");
+                    session.removeAttribute("COUPON_MESSAGE");
+                    session.removeAttribute("SHIPPING_DISCOUNT");
+                }
+
                 // Lưu lại vào Session
                 session.setAttribute("CART", cart);
                 int totalItems = cart.values().stream().mapToInt(CartItemDTO::getQuantity).sum();
                 session.setAttribute("CART_TOTAL_ITEMS", totalItems);
+
+                // ĐỒNG BỘ GIỎ HÀNG VÀO DATABASE CHO USER ĐÃ ĐĂNG NHẬP
+                vn.edu.eaut.fruitables.model.entity.UserModel user = (vn.edu.eaut.fruitables.model.entity.UserModel) session.getAttribute("USERMODEL");
+                if (user != null) {
+                    int finalQty = cart.get(productId).getQuantity();
+                    try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection()) {
+                        String delSql = "DELETE FROM cart_items WHERE user_id = ? AND product_id = ?";
+                        try (java.sql.PreparedStatement psD = conn.prepareStatement(delSql)) {
+                            psD.setLong(1, user.getId());
+                            psD.setLong(2, productId);
+                            psD.executeUpdate();
+                        }
+                        String insSql = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)";
+                        try (java.sql.PreparedStatement psI = conn.prepareStatement(insSql)) {
+                            psI.setLong(1, user.getId());
+                            psI.setLong(2, productId);
+                            psI.setInt(3, finalQty);
+                            psI.executeUpdate();
+                        }
+                    } catch (Exception ignored) {}
+                }
 
                 // Trả về JSON thành công
                 jsonResponse.addProperty("status", "success");

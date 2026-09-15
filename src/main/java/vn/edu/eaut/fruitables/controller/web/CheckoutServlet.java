@@ -3,6 +3,7 @@ package vn.edu.eaut.fruitables.controller.web;
 import vn.edu.eaut.fruitables.dao.impl.ProductDAOImpl;
 import vn.edu.eaut.fruitables.model.dto.CartItemDTO;
 import vn.edu.eaut.fruitables.model.entity.OrderModel;
+import vn.edu.eaut.fruitables.model.entity.ProductModel;
 import vn.edu.eaut.fruitables.model.entity.UserModel;
 import vn.edu.eaut.fruitables.service.IOrderService;
 import vn.edu.eaut.fruitables.service.impl.OrderServiceImpl;
@@ -175,6 +176,17 @@ public class CheckoutServlet extends HttpServlet {
         Map<Long, CartItemDTO> cart = (Map<Long, CartItemDTO>) session.getAttribute("CART");
 
         if (cart != null && !cart.isEmpty()) {
+            // 0. KIỂM TRA TỒN KHO THỰC TẾ (Ngăn chặn Overselling / Bán âm kho)
+            ProductDAOImpl productDAO = new ProductDAOImpl();
+            for (CartItemDTO item : cart.values()) {
+                ProductModel p = productDAO.findById(item.getProductId());
+                if (p == null || p.getStock() == null || p.getStock() < item.getQuantity()) {
+                    session.setAttribute("orderError", "Sản phẩm \"" + item.getName() + "\" không đủ số lượng trong kho (chỉ còn " + (p != null && p.getStock() != null ? p.getStock() : 0) + "). Vui lòng điều chỉnh lại giỏ hàng!");
+                    response.sendRedirect(request.getContextPath() + "/cart");
+                    return;
+                }
+            }
+
             // 1. Tính tổng tiền hàng và tổng thuế VAT thực tế từ giỏ
             double subtotalGoods = 0;
             double totalTax = 0;
@@ -298,13 +310,19 @@ public class CheckoutServlet extends HttpServlet {
             // Sinh mã đơn hàng (VD: FRUIT-A1B2)
             String orderCode = "FRUIT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
+            // GẮN MÃ VOUCHER VÀO GHI CHÚ ĐƠN HÀNG ĐỂ PHỤC VỤ HOÀN VOUCHER KHI HỦY ĐƠN
+            String finalNotes = notes != null ? notes.trim() : "";
+            if (couponValid && appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
+                finalNotes = finalNotes.isEmpty() ? "[VOUCHER:" + appliedCoupon.trim() + "]" : finalNotes + " [VOUCHER:" + appliedCoupon.trim() + "]";
+            }
+
             // ĐÓNG GÓI MODEL ĐỂ GỌI SERVICE LƯU DB
             OrderModel newOrder = new OrderModel();
             newOrder.setOrderCode(orderCode);
             newOrder.setUserId(userId);
             newOrder.setRecipientName(fullName);
             newOrder.setCustomerEmail(email);
-            newOrder.setOrderNotes(notes);
+            newOrder.setOrderNotes(finalNotes);
             newOrder.setTotalAmount(totalAmount);
             newOrder.setShippingFee(shippingFee);
             newOrder.setDistanceKm(distanceKm);
@@ -348,16 +366,23 @@ public class CheckoutServlet extends HttpServlet {
                     } catch (Exception ignored) {}
                 }
 
-                // TRỪ TỒN KHO ĐỒNG NHẤT CHO MỌI PHƯƠNG THỨC THANH TOÁN (COD, VNPAY, MOMO)
-                // Giữ hàng ngay tại thời điểm tạo đơn, ngăn chặn hoàn toàn tình trạng bán âm kho (Overselling)
-                ProductDAOImpl productDAO = new ProductDAOImpl();
+                // TRỪ TỒN KHO AN TOÀN (GREATEST 0 ĐỂ CHỐNG ÂM KHO)
                 for (CartItemDTO item : cart.values()) {
-                    productDAO.update("UPDATE products SET stock = stock - ? WHERE id = ?", item.getQuantity(), item.getProductId());
+                    productDAO.update("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?", item.getQuantity(), item.getProductId());
                 }
 
                 // TĂNG SỐ LƯỢT ĐÃ DÙNG CHO VOUCHER (NẾU HỢP LỆ)
                 if (couponValid && appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
                     productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
+                }
+
+                // DỌN DẸP BẢNG CART_ITEMS TRONG DATABASE CHO USER
+                if (userId != null) {
+                    try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection();
+                         java.sql.PreparedStatement psDelCart = conn.prepareStatement("DELETE FROM cart_items WHERE user_id = ?")) {
+                        psDelCart.setLong(1, userId);
+                        psDelCart.executeUpdate();
+                    } catch (Exception ignored) {}
                 }
 
                 // XÓA GIỎ HÀNG VÀ DỌN DẸP DỮ LIỆU SESSION

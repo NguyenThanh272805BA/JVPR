@@ -152,7 +152,7 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
             conn.setAutoCommit(false);
 
             // 1. Khóa và kiểm tra trạng thái hiện tại của đơn hàng
-            String checkSql = "SELECT status, payment_status, user_id, used_points, order_code FROM orders WHERE id = ? FOR UPDATE";
+            String checkSql = "SELECT status, payment_status, user_id, used_points, order_code, order_notes FROM orders WHERE id = ? FOR UPDATE";
             psCheck = conn.prepareStatement(checkSql);
             psCheck.setLong(1, orderId);
             rsCheck = psCheck.executeQuery();
@@ -165,9 +165,10 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
             boolean hasUserId = !rsCheck.wasNull() && userId > 0;
             int usedPoints = rsCheck.getInt("used_points");
             String orderCode = rsCheck.getString("order_code");
+            String orderNotes = rsCheck.getString("order_notes");
 
             // 2. Nếu chuyển sang CANCELLED hoặc RETURNED mà đơn trước đó CHƯA bị hủy/hoàn:
-            // -> Hoàn trả tồn kho cho tất cả sản phẩm và hoàn lại điểm tích lũy đã dùng
+            // -> Hoàn trả tồn kho cho tất cả sản phẩm, hoàn lại điểm tích lũy và hoàn lượt dùng voucher
             boolean isCancellingOrReturning = "CANCELLED".equalsIgnoreCase(newStatus) || "RETURNED".equalsIgnoreCase(newStatus);
             boolean wasAlreadyCancelledOrReturned = "CANCELLED".equalsIgnoreCase(currentStatus) || "RETURNED".equalsIgnoreCase(currentStatus);
 
@@ -200,6 +201,24 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                         psLog.setInt(3, usedPoints);
                         psLog.setString(4, "Hoàn trả " + usedPoints + " điểm do hủy/hoàn đơn #" + (orderCode != null ? orderCode : orderId));
                         psLog.executeUpdate();
+                    } catch (Exception ignored) {}
+                }
+
+                // Hoàn lại lượt sử dụng voucher nếu đơn hàng có áp dụng
+                if (orderNotes != null && orderNotes.contains("[VOUCHER:")) {
+                    try {
+                        int vStart = orderNotes.indexOf("[VOUCHER:") + 9;
+                        int vEnd = orderNotes.indexOf("]", vStart);
+                        if (vEnd > vStart) {
+                            String voucherCode = orderNotes.substring(vStart, vEnd).trim();
+                            if (!voucherCode.isEmpty()) {
+                                String restoreVoucherSql = "UPDATE coupons SET used_count = GREATEST(0, used_count - 1) WHERE code = ?";
+                                try (PreparedStatement psV = conn.prepareStatement(restoreVoucherSql)) {
+                                    psV.setString(1, voucherCode);
+                                    psV.executeUpdate();
+                                }
+                            }
+                        }
                     } catch (Exception ignored) {}
                 }
             }

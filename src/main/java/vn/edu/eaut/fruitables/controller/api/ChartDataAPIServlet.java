@@ -7,11 +7,14 @@ import vn.edu.eaut.fruitables.dao.impl.DashboardDAOImpl;
 import vn.edu.eaut.fruitables.dao.impl.ShipperDeliveryDAOImpl;
 import vn.edu.eaut.fruitables.model.entity.ProductModel;
 
+import vn.edu.eaut.fruitables.model.entity.UserModel;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +44,18 @@ public class ChartDataAPIServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
+
+        // BẢO MẬT & PHÂN QUYỀN: Chỉ cho phép Super Admin (1) hoặc Sale/Employee (2) truy cập dữ liệu tài chính
+        HttpSession session = request.getSession(false);
+        UserModel currentUser = (session != null) ? (UserModel) session.getAttribute("USERMODEL") : null;
+        if (currentUser == null || currentUser.getRoleId() == null || (currentUser.getRoleId() != 1 && currentUser.getRoleId() != 2)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            Map<String, Object> err = new HashMap<>();
+            err.put("success", false);
+            err.put("message", "Từ chối truy cập: Yêu cầu quyền Quản trị viên.");
+            response.getWriter().print(gson.toJson(err));
+            return;
+        }
 
         String servletPath = request.getServletPath();
         String startDate = request.getParameter("startDate");

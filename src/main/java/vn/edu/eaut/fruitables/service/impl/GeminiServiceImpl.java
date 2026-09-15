@@ -338,6 +338,218 @@ public class GeminiServiceImpl implements IGeminiService {
     }
 
     @Override
+    public String generateProductShortDescription(String productName, String categoryName, String toneStyle) {
+        String systemInstructionText = """
+                Bạn là chuyên gia cố vấn tiếp thị sản phẩm của siêu thị thực phẩm và hoa quả Fruitables.
+                Nhiệm vụ của bạn là viết một đoạn mô tả ngắn (khoảng 35 đến 55 từ) cho sản phẩm mới. Đoạn mô tả này được dùng để hiển thị trên danh sách sản phẩm và thẻ giới thiệu nhanh.
+
+                Quy tắc bắt buộc:
+                1. Nêu bật nguồn gốc, hương vị đặc trưng, độ tươi ngon hoặc giá trị dinh dưỡng của loại quả này.
+                2. Văn phong phù hợp với phong cách được yêu cầu.
+                3. TUYỆT ĐỐI KHÔNG sử dụng ký tự biểu tượng cảm xúc (emoji) hoặc ký tự icon trong nội dung.
+                4. Trả về đoạn văn bản thuần túy tiếng Việt, không để trong dấu ngoặc kép, không thêm lời chào hay chú thích.
+                """;
+
+        String userPrompt = "Tên sản phẩm: " + (productName != null ? productName : "")
+                + "\nDanh mục: " + (categoryName != null ? categoryName : "Trái cây tươi")
+                + "\nPhong cách: " + (toneStyle != null && !toneStyle.trim().isEmpty() ? toneStyle : "Hấp dẫn, kích thích vị giác và nêu bật sự tươi ngon");
+
+        String result = executeGeminiRequest(systemInstructionText, userPrompt, 300, 0.6, 15);
+        if (result != null && !result.trim().isEmpty()) {
+            return result.trim().replaceAll("^\"|\"$", "");
+        }
+        return "Sản phẩm tươi ngon thượng hạng, được tuyển chọn nghiêm ngặt theo tiêu chuẩn an toàn, giữ trọn hương vị tự nhiên và giá trị dinh dưỡng quý giá.";
+    }
+
+    @Override
+    public String generateProductArticle(String productName, String categoryName, String templateType, String toneStyle) {
+        String templateGuideline;
+        if ("HEALTHY".equalsIgnoreCase(templateType)) {
+            templateGuideline = """
+                    Mẫu bài viết: Dinh dưỡng & Chăm sóc sức khỏe.
+                    Cấu trúc HTML bắt buộc:
+                    - <h2>Nguồn gốc và Tiêu chuẩn Dinh dưỡng</h2>
+                    - <h3>Hàm lượng Vitamin và Khoáng chất nổi bật</h3> (dùng danh sách <ul><li><strong>Thành phần:</strong> Công dụng...</li></ul>)
+                    - <h3>Lợi ích cho Sức khỏe, Vóc dáng và Làn da</h3>
+                    - <h3>Gợi ý Thưởng thức & Thực đơn Detox Thanh lọc</h3>
+                    - <blockquote>Cam kết từ Fruitables: Trái cây sạch, nguồn gốc rõ ràng, giữ trọn vi chất tự nhiên.</blockquote>
+                    """;
+        } else if ("GIFT".equalsIgnoreCase(templateType)) {
+            templateGuideline = """
+                    Mẫu bài viết: Giỏ quà biếu sang trọng.
+                    Cấu trúc HTML bắt buộc:
+                    - <h2>Trái cây Tuyển chọn Thượng hạng</h2>
+                    - <h3>Tiêu chuẩn Chọn lọc Ngoại hình và Chất lượng</h3>
+                    - <h3>Ý nghĩa Tặng phẩm và Lời chúc Bình an, Sung túc</h3>
+                    - <h3>Quy cách Đóng gói và Bảo quản</h3>
+                    - <blockquote>Fruitables cam kết: Từng quả được kiểm tra thủ công kỹ lưỡng, đóng gói trang nhã, hoàn hảo cho mọi dịp biếu tặng.</blockquote>
+                    """;
+        } else {
+            // Chuẩn bán lẻ cao cấp
+            templateGuideline = """
+                    Mẫu bài viết: Chuẩn bán lẻ cao cấp.
+                    Cấu trúc HTML bắt buộc:
+                    - <h2>Giới thiệu Xuất xứ và Giống quả</h2>
+                    - <h3>Đặc điểm Hương vị và Trải nghiệm Thưởng thức</h3>
+                    - <h3>Giá trị Dinh dưỡng đối với Sức khỏe</h3> (dùng danh sách <ul><li><strong>Dưỡng chất:</strong> Lợi ích...</li></ul>)
+                    - <h3>Mẹo Bảo quản tại Nhà giúp Quả luôn Tươi ngon</h3>
+                    - <blockquote>Cam kết từ Fruitables: Hàng loại một tươi mới mỗi ngày, bao đổi trả trong 24 giờ nếu không đạt chất lượng.</blockquote>
+                    """;
+        }
+
+        String systemInstructionText = """
+                Bạn là biên tập viên nội dung cao cấp chuyên về nông sản và hoa quả tươi tại Fruitables.
+                Nhiệm vụ của bạn là soạn thảo một bài viết giới thiệu chi tiết, hấp dẫn và chuyên nghiệp cho sản phẩm.
+
+                """ + templateGuideline + """
+
+                Quy tắc định dạng HTML nghiêm ngặt:
+                1. Trả về DUY NHẤT MÃ HTML THUẦN TÚY với các thẻ ngữ nghĩa: <h2>, <h3>, <p>, <ul>, <li>, <strong>, <blockquote>.
+                2. TUYỆT ĐỐI KHÔNG bọc trong khối markdown ```html ... ```.
+                3. TUYỆT ĐỐI KHÔNG sử dụng ký tự biểu tượng cảm xúc (emoji) hay icon trong toàn bộ bài viết.
+                4. Câu từ tiếng Việt trau chuốt, mạch lạc, hấp dẫn, độ dài vừa phải (khoảng 350 đến 550 từ).
+                """;
+
+        String userPrompt = "Tên sản phẩm: " + (productName != null ? productName : "")
+                + "\nDanh mục: " + (categoryName != null ? categoryName : "Trái cây tươi")
+                + "\nGiọng văn mong muốn: " + (toneStyle != null && !toneStyle.trim().isEmpty() ? toneStyle : "Chuyên nghiệp, kích thích vị giác và uy tín");
+
+        String result = executeGeminiRequest(systemInstructionText, userPrompt, 1500, 0.5, 25);
+        if (result != null && !result.trim().isEmpty()) {
+            return cleanHtmlOutput(result);
+        }
+
+        return "<h2>Giới thiệu sản phẩm " + (productName != null ? productName : "") + "</h2>"
+                + "<p>Sản phẩm tươi ngon được Fruitables tuyển chọn kỹ càng từ những nông trại đạt chuẩn an toàn thực phẩm.</p>"
+                + "<h3>Đặc điểm nổi bật</h3>"
+                + "<ul><li><strong>Chất lượng:</strong> Trái cây tươi mới, độ ngọt tự nhiên.</li><li><strong>Bảo quản:</strong> Khuyên dùng trong ngăn mát tủ lạnh.</li></ul>"
+                + "<blockquote>Fruitables cam kết đem đến nguồn thực phẩm an toàn và chất lượng nhất cho gia đình bạn.</blockquote>";
+    }
+
+    @Override
+    public String generateProductFaq(String productName, String categoryName) {
+        String systemInstructionText = """
+                Bạn là chuyên gia chăm sóc khách hàng tại Fruitables.
+                Nhiệm vụ của bạn là soạn thảo 2 đến 3 câu hỏi thường gặp (FAQ) kèm câu trả lời ngắn gọn, thực tế cho sản phẩm trái cây/thực phẩm được cung cấp.
+
+                Quy tắc:
+                1. Trả về định dạng HTML chuẩn:
+                   <h3>Câu hỏi thường gặp</h3>
+                   <p><strong>Hỏi:</strong> ...?</p>
+                   <p><strong>Trả lời:</strong> ...</p>
+                2. Nội dung tập trung vào cách bảo quản, độ ngọt/giòn hoặc đối tượng sử dụng (trẻ nhỏ, người lớn tuổi, phụ nữ mang thai).
+                3. TUYỆT ĐỐI KHÔNG sử dụng ký tự emoji hoặc icon.
+                4. TUYỆT ĐỐI KHÔNG bọc trong khối code markdown ```html.
+                """;
+
+        String userPrompt = "Tên sản phẩm: " + (productName != null ? productName : "")
+                + "\nDanh mục: " + (categoryName != null ? categoryName : "Trái cây tươi");
+
+        String result = executeGeminiRequest(systemInstructionText, userPrompt, 800, 0.5, 20);
+        if (result != null && !result.trim().isEmpty()) {
+            return cleanHtmlOutput(result);
+        }
+
+        return "<h3>Câu hỏi thường gặp</h3>"
+                + "<p><strong>Hỏi:</strong> Sản phẩm có thể bảo quản được trong bao lâu?</p>"
+                + "<p><strong>Trả lời:</strong> Trong điều kiện ngăn mát tủ lạnh từ 3 đến 7 độ C, sản phẩm giữ được độ tươi ngon tốt nhất từ 5 đến 7 ngày.</p>";
+    }
+
+    @Override
+    public String suggestProductSpecs(String productName, String categoryName) {
+        String systemInstructionText = """
+                Dựa vào tên sản phẩm và danh mục hoa quả, hãy ước lượng trọng lượng đóng gói thông thường (weightGram, đơn vị gram, là số nguyên dương như 500, 1000, 2000...) và quy cách bảo quản tối ưu (storageType, chỉ chọn 1 trong 3 giá trị: NORMAL, COLD_CHAIN, FRAGILE_GIFT).
+                Quy tắc chọn storageType:
+                - COLD_CHAIN: quả mềm, nhạy cảm nhiệt độ, cần tủ mát (dâu tây, nho, cherry, việt quất, kiwi, mận nhập, quả mọng).
+                - FRAGILE_GIFT: giỏ quà biếu, hộp quà cao cấp, trái cây định hình dễ dập nát.
+                - NORMAL: quả vỏ dày để nhiệt độ phòng (cam sành, bưởi, dưa hấu, dừa, chuối, dưa lưới, xoài xanh...).
+
+                Trả về DUY NHẤT một chuỗi JSON hợp lệ không bọc markdown, định dạng:
+                {"weightGram": 500, "storageType": "COLD_CHAIN"}
+                """;
+
+        String userPrompt = "Tên sản phẩm: " + (productName != null ? productName : "")
+                + "\nDanh mục: " + (categoryName != null ? categoryName : "Trái cây tươi");
+
+        String result = executeGeminiRequest(systemInstructionText, userPrompt, 200, 0.2, 10);
+        if (result != null && !result.trim().isEmpty()) {
+            String jsonClean = cleanHtmlOutput(result).replaceAll("^```json|```$", "").trim();
+            try {
+                JsonObject parsed = gson.fromJson(jsonClean, JsonObject.class);
+                if (parsed.has("weightGram") && parsed.has("storageType")) {
+                    return jsonClean;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        return "{\"weightGram\": 500, \"storageType\": \"NORMAL\"}";
+    }
+
+    private String executeGeminiRequest(String systemInstructionText, String userPrompt, int maxTokens, double temperature, int timeoutSeconds) {
+        try {
+            JsonObject root = new JsonObject();
+
+            JsonObject sysInstruction = new JsonObject();
+            JsonArray sysParts = new JsonArray();
+            JsonObject sysPart = new JsonObject();
+            sysPart.addProperty("text", systemInstructionText);
+            sysParts.add(sysPart);
+            sysInstruction.add("parts", sysParts);
+            root.add("system_instruction", sysInstruction);
+
+            JsonArray contents = new JsonArray();
+            JsonObject currentMsg = new JsonObject();
+            currentMsg.addProperty("role", "user");
+            JsonArray currentParts = new JsonArray();
+            JsonObject currentPart = new JsonObject();
+            currentPart.addProperty("text", userPrompt);
+            currentParts.add(currentPart);
+            currentMsg.add("parts", currentParts);
+            contents.add(currentMsg);
+            root.add("contents", contents);
+
+            JsonObject genConfig = new JsonObject();
+            genConfig.addProperty("maxOutputTokens", maxTokens);
+            genConfig.addProperty("temperature", temperature);
+            root.add("generationConfig", genConfig);
+
+            String requestBody = gson.toJson(root);
+            String apiUrl = GeminiConfigUtil.getApiUrl();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json; charset=UTF-8")
+                    .timeout(Duration.ofSeconds(timeoutSeconds))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() == 200) {
+                return parseGeminiText(response.body());
+            } else {
+                System.err.println("[GeminiService-Product] API Error: " + response.statusCode() + " - " + response.body());
+            }
+        } catch (Exception e) {
+            System.err.println("[GeminiService-Product] Exception: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private String cleanHtmlOutput(String rawText) {
+        if (rawText == null) return "";
+        String cleaned = rawText.trim();
+        if (cleaned.startsWith("```html")) {
+            cleaned = cleaned.substring(7);
+        } else if (cleaned.startsWith("```")) {
+            cleaned = cleaned.substring(3);
+        }
+        if (cleaned.endsWith("```")) {
+            cleaned = cleaned.substring(0, cleaned.length() - 3);
+        }
+        return cleaned.trim();
+    }
+
+    @Override
     public void clearCache() {
         RESPONSE_CACHE.clear();
         cachedCompactCatalog = "";
