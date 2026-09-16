@@ -19,10 +19,38 @@ import java.util.Map;
 @WebServlet(urlPatterns = {"/apply-coupon"})
 public class ApplyCouponServlet extends HttpServlet {
 
+    /** Xử lý yêu cầu HỦY voucher đang áp dụng qua GET /apply-coupon?action=remove */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("remove".equals(action)) {
+            removeCouponFromSession(request.getSession());
+        }
+        response.sendRedirect(request.getContextPath() + "/cart");
+    }
+
+    /** Xóa toàn bộ các session attribute liên quan đến coupon */
+    private void removeCouponFromSession(HttpSession session) {
+        session.removeAttribute("APPLIED_COUPON_CODE");
+        session.removeAttribute("APPLIED_COUPON_TYPE");
+        session.removeAttribute("DISCOUNT_AMOUNT");
+        session.removeAttribute("COUPON_MESSAGE");
+        session.removeAttribute("COUPON_ERROR");
+        session.removeAttribute("SHIPPING_DISCOUNT");
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String couponCode = request.getParameter("couponCode");
         HttpSession session = request.getSession();
+
+        // Nếu gửi POST với couponCode rỗng và action=remove → Hủy voucher
+        String action = request.getParameter("action");
+        if ("remove".equals(action) || couponCode == null || couponCode.trim().isEmpty()) {
+            removeCouponFromSession(session);
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        }
 
         // 1. Kiểm tra đăng nhập
         UserModel user = (UserModel) session.getAttribute("USERMODEL");
@@ -32,10 +60,6 @@ public class ApplyCouponServlet extends HttpServlet {
             return;
         }
 
-        if (couponCode == null || couponCode.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/cart");
-            return;
-        }
 
         String sql = "SELECT c.*, p.name AS product_name FROM coupons c LEFT JOIN products p ON c.product_id = p.id WHERE c.code = ?";
 

@@ -127,7 +127,7 @@ public class OrderHistoryServlet extends HttpServlet {
                     session.setAttribute("CART_TOTAL_ITEMS", totalItems);
 
                     if (addedCount > 0) {
-                        session.setAttribute("COUPON_MESSAGE", "Đã thêm các món từ đơn " + order.getOrderCode() + " vào giỏ hàng!");
+                        session.setAttribute("ORDER_MESSAGE_SUCCESS", "Đã thêm " + addedCount + " sản phẩm từ đơn " + order.getOrderCode() + " vào giỏ hàng!");
                     }
                     response.sendRedirect(request.getContextPath() + "/cart");
                     return;
