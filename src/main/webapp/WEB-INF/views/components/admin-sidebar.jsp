@@ -122,6 +122,19 @@
             </c:if>
         </a>
 
+        <!-- NHÓM 6: CÔNG CỤ & KIỂM THỬ -->
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-3 pb-1">
+            Công cụ & Kiểm thử
+        </div>
+        <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/device-preview') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/device-preview">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-device-preview"/></svg>
+                <span>Giả lập Thiết bị</span>
+            </div>
+            <span class="px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${reqURI.contains('/device-preview') ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'} rounded-md">Preview</span>
+        </a>
+
     </nav>
 
     <!-- FOOTER CHUYỂN TRANG / ĐĂNG XUẤT -->
