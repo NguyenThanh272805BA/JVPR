@@ -40,7 +40,7 @@ public class ReviewDAOImpl {
     public Long getValidOrderIdForReview(Long userId, Long productId) {
         // CHỐNG SPAM: Mỗi lần mua thành công 1 sản phẩm trong đơn hàng DELIVERED/COMPLETED chỉ được đánh giá DUY NHẤT 1 LẦN
         String sql = "SELECT o.id FROM orders o JOIN order_details od ON o.id = od.order_id " +
-                "WHERE o.user_id = ? AND od.product_id = ? AND o.status IN ('COMPLETED', 'DELIVERED') " +
+                "WHERE o.user_id = ? AND od.product_id = ? AND UPPER(TRIM(o.status)) IN ('COMPLETED', 'DELIVERED') " +
                 "AND NOT EXISTS (" +
                 "    SELECT 1 FROM reviews r WHERE r.user_id = ? AND r.product_id = ? AND r.order_id = o.id" +
                 ") LIMIT 1";
@@ -55,6 +55,33 @@ public class ReviewDAOImpl {
             }
         } catch (Exception e) { e.printStackTrace(); }
         return null;
+    }
+
+    public boolean hasAlreadyReviewed(Long userId, Long productId) {
+        String sql = "SELECT 1 FROM reviews WHERE user_id = ? AND product_id = ? LIMIT 1";
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setLong(2, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public boolean hasPurchasedProduct(Long userId, Long productId) {
+        String sql = "SELECT 1 FROM orders o JOIN order_details od ON o.id = od.order_id " +
+                "WHERE o.user_id = ? AND od.product_id = ? AND UPPER(TRIM(o.status)) NOT IN ('CANCELLED', 'RETURNED', 'FAILED') LIMIT 1";
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setLong(2, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
     }
 
     public boolean insertReview(ReviewModel review) {

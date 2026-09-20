@@ -38,7 +38,20 @@ public class ProductDetailServlet extends HttpServlet {
                     request.setAttribute("product", product);
                     request.setAttribute("reviews", reviewDAO.findByProductId(productId));
 
-                    // 3. Đẩy dữ liệu sang trang JSP
+                    // 3. Kiểm tra điều kiện đánh giá của user hiện tại để hiển thị UI phù hợp
+                    javax.servlet.http.HttpSession session = request.getSession(false);
+                    vn.edu.eaut.fruitables.model.entity.UserModel currentUser = (session != null) ? (vn.edu.eaut.fruitables.model.entity.UserModel) session.getAttribute("USERMODEL") : null;
+                    if (currentUser != null) {
+                        Long validOrderId = reviewDAO.getValidOrderIdForReview(currentUser.getId(), productId);
+                        boolean alreadyReviewed = reviewDAO.hasAlreadyReviewed(currentUser.getId(), productId);
+                        boolean hasPurchased = reviewDAO.hasPurchasedProduct(currentUser.getId(), productId);
+
+                        request.setAttribute("canReview", validOrderId != null);
+                        request.setAttribute("alreadyReviewed", alreadyReviewed);
+                        request.setAttribute("hasPurchased", hasPurchased);
+                    }
+
+                    // 4. Đẩy dữ liệu sang trang JSP
                     request.getRequestDispatcher("/WEB-INF/views/web/product-detail.jsp").forward(request, response);
                     return;
                 }

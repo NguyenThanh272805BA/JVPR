@@ -208,16 +208,40 @@
       <div id="tab-review" class="hidden">
 
         <!-- Hiển thị thông báo trạng thái -->
+        <c:if test="${param.review == 'success'}">
+          <div class="bg-primary-container text-white p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2 shadow-md">
+            <span class="material-symbols-outlined">check_circle</span>
+            Cảm ơn bạn đã gửi đánh giá sản phẩm!
+          </div>
+        </c:if>
+        <c:if test="${param.review == 'already_reviewed'}">
+          <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-blue-600">info</span>
+            Bạn đã gửi đánh giá cho sản phẩm này rồi! Mỗi đơn hàng thành công chỉ được đánh giá 1 lần.
+          </div>
+        </c:if>
+        <c:if test="${param.review == 'order_processing'}">
+          <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-amber-600">schedule</span>
+            Đơn hàng của bạn đang trong quá trình xử lý hoặc vận chuyển. Bạn vui lòng đánh giá sau khi nhận hàng thành công nhé!
+          </div>
+        </c:if>
         <c:if test="${param.review == 'not_purchased'}">
           <div class="bg-error-container text-error p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2">
             <span class="material-symbols-outlined">error</span>
             Bạn cần mua và hoàn thành nhận hàng sản phẩm này để có thể đánh giá!
           </div>
         </c:if>
-        <c:if test="${param.review == 'success'}">
-          <div class="bg-primary-container text-white p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2 shadow-md">
-            <span class="material-symbols-outlined">check_circle</span>
-            Cảm ơn bạn đã gửi đánh giá!
+        <c:if test="${param.review == 'empty_comment'}">
+          <div class="bg-error-container text-error p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2">
+            <span class="material-symbols-outlined">error</span>
+            Vui lòng nhập nội dung nhận xét trước khi gửi đánh giá!
+          </div>
+        </c:if>
+        <c:if test="${param.review == 'error'}">
+          <div class="bg-error-container text-error p-4 rounded-xl mb-8 font-label-bold flex items-center gap-2">
+            <span class="material-symbols-outlined">error</span>
+            Có lỗi xảy ra khi gửi đánh giá. Vui lòng kiểm tra dung lượng ảnh (tối đa 10MB) và thử lại!
           </div>
         </c:if>
 
@@ -227,7 +251,14 @@
             <div class="bg-surface p-6 rounded-xl border border-outline-variant shadow-sm sticky top-28">
               <h3 class="font-headline-md text-xl mb-6 text-on-surface">Viết đánh giá</h3>
               <c:choose>
-                <c:when test="${not empty sessionScope.USERMODEL}">
+                <c:when test="${empty sessionScope.USERMODEL}">
+                  <div class="text-center text-on-surface-variant font-body-md py-6">
+                    Vui lòng <br>
+                    <a href="${pageContext.request.contextPath}/login" class="inline-block mt-3 px-6 py-2 bg-primary text-white rounded-full font-label-bold hover:bg-primary-container transition-colors shadow-sm">Đăng nhập</a><br>
+                    <span class="block mt-3">để để lại đánh giá.</span>
+                  </div>
+                </c:when>
+                <c:when test="${canReview}">
                   <form action="${pageContext.request.contextPath}/submit-review" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="productId" value="${product.id}">
                     <div class="mb-5">
@@ -270,11 +301,28 @@
                     </button>
                   </form>
                 </c:when>
+                <c:when test="${alreadyReviewed}">
+                  <div class="bg-primary/10 border border-primary/20 rounded-xl p-5 text-center">
+                    <span class="material-symbols-outlined text-primary text-4xl mb-2">verified</span>
+                    <h4 class="font-bold text-on-surface text-base">Bạn đã đánh giá sản phẩm này</h4>
+                    <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Cảm ơn bạn đã đóng góp ý kiến chân thực giúp Fruitables không ngừng hoàn thiện chất lượng phục vụ!</p>
+                  </div>
+                </c:when>
+                <c:when test="${hasPurchased}">
+                  <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-center">
+                    <span class="material-symbols-outlined text-amber-600 text-4xl mb-2">local_shipping</span>
+                    <h4 class="font-bold text-amber-900 text-base">Đơn hàng đang giao</h4>
+                    <p class="text-xs text-amber-700 mt-2 leading-relaxed">Bạn đã đặt mua sản phẩm này. Bạn có thể đánh giá ngay sau khi đơn hàng được giao thành công tới bạn nhé!</p>
+                  </div>
+                </c:when>
                 <c:otherwise>
-                  <div class="text-center text-on-surface-variant font-body-md py-6">
-                    Vui lòng <br>
-                    <a href="${pageContext.request.contextPath}/login" class="inline-block mt-3 px-6 py-2 bg-primary text-white rounded-full font-label-bold hover:bg-primary-container transition-colors shadow-sm">Đăng nhập</a><br>
-                    <span class="block mt-3">để để lại đánh giá.</span>
+                  <div class="bg-surface-container-low border border-outline-variant rounded-xl p-5 text-center">
+                    <span class="material-symbols-outlined text-outline text-4xl mb-2">shopping_bag</span>
+                    <h4 class="font-bold text-on-surface text-base">Chưa mua sản phẩm</h4>
+                    <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Để đảm bảo tính khách quan, chỉ những khách hàng đã mua và nhận hàng thành công mới có thể gửi đánh giá.</p>
+                    <a href="${pageContext.request.contextPath}/shop" class="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-full text-xs font-bold transition-all">
+                      <span class="material-symbols-outlined text-sm">storefront</span> Khám phá cửa hàng
+                    </a>
                   </div>
                 </c:otherwise>
               </c:choose>
@@ -301,7 +349,7 @@
                             </c:when>
                             <c:otherwise>
                               <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold text-lg uppercase">
-                                  ${rv.userName != null ? rv.userName.substring(0,1) : 'U'}
+                                  ${not empty rv.userName ? rv.userName.substring(0,1) : 'U'}
                               </div>
                             </c:otherwise>
                           </c:choose>
@@ -331,7 +379,7 @@
                       <c:if test="${not empty rv.imageUrl}">
                         <div class="mt-3 pl-13 flex items-center gap-2">
                           <div class="relative group cursor-pointer" onclick="openLightbox('${rv.imageUrl}')">
-                            <img src="${rv.imageUrl}" alt="Ảnh thực tế từ khách hàng" class="w-24 h-24 object-cover rounded-lg border border-outline-variant group-hover:opacity-90 group-hover:scale-105 transition-all shadow-sm">
+                            <img src="${rv.imageUrl}" alt="Ảnh thực tế từ khách hàng" onerror="this.onerror=null;this.parentElement.parentElement.style.display='none';" class="w-24 h-24 object-cover rounded-lg border border-outline-variant group-hover:opacity-90 group-hover:scale-105 transition-all shadow-sm">
                             <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-lg flex items-center justify-center text-white transition-opacity">
                               <span class="material-symbols-outlined text-lg">zoom_in</span>
                             </div>
@@ -408,13 +456,24 @@
     const container = document.getElementById('previewContainer');
     const preview = document.getElementById('reviewImagePreview');
     if (input.files && input.files[0]) {
+      const file = input.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Dung lượng ảnh không được vượt quá 10MB!");
+        removeReviewImage();
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        alert("Vui lòng chỉ chọn tệp hình ảnh (JPG, PNG, WEBP)!");
+        removeReviewImage();
+        return;
+      }
       const reader = new FileReader();
       reader.onload = function(e) {
         preview.src = e.target.result;
         prompt.classList.add('hidden');
         container.classList.remove('hidden');
       };
-      reader.readAsDataURL(input.files[0]);
+      reader.readAsDataURL(file);
     }
   }
 
@@ -441,6 +500,20 @@
     modal.classList.add('hidden');
     document.getElementById('lightboxImg').src = '';
   }
+
+  // Tự động mở tab Đánh giá nếu có tham số review trên URL hoặc hash
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('review') || window.location.hash === '#tab-review') {
+      switchTab('review');
+      setTimeout(function() {
+        const reviewTab = document.getElementById('btn-tab-review');
+        if (reviewTab) {
+          reviewTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+    }
+  });
 </script>
 </body>
 </html>

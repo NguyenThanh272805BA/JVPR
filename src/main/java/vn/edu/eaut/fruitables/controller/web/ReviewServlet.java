@@ -43,8 +43,19 @@ public class ReviewServlet extends HttpServlet {
 
         try {
             Long productId = Long.parseLong(productIdStr);
-            int rating = Integer.parseInt(request.getParameter("rating"));
+            String ratingStr = request.getParameter("rating");
+            int rating = 5;
+            try {
+                rating = Integer.parseInt(ratingStr);
+                if (rating < 1) rating = 1;
+                if (rating > 5) rating = 5;
+            } catch (Exception ignored) {}
+
             String comment = request.getParameter("comment");
+            if (comment == null || comment.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=empty_comment");
+                return;
+            }
 
             // Kiểm tra điều kiện: Phải mua hàng và đơn hàng phải ở trạng thái COMPLETED hoặc DELIVERED
             Long orderId = reviewDAO.getValidOrderIdForReview(user.getId(), productId);
@@ -55,25 +66,35 @@ public class ReviewServlet extends HttpServlet {
                 try {
                     Part filePart = request.getPart("reviewImage");
                     if (filePart != null && filePart.getSize() > 0) {
-                        // Dùng API chuẩn Servlet 3.1 thay vì parse header thủ công
-                        String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                        if (submittedFileName != null && !submittedFileName.trim().isEmpty()) {
+                        String rawFileName = filePart.getSubmittedFileName();
+                        if (rawFileName != null && !rawFileName.trim().isEmpty()) {
+                            String submittedFileName = Paths.get(rawFileName).getFileName().toString();
                             String applicationPath = request.getServletContext().getRealPath("");
-                            String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
-
-                            File fileSaveDir = new File(uploadFilePath);
-                            if (!fileSaveDir.exists()) {
-                                fileSaveDir.mkdirs();
+                            if (applicationPath == null) {
+                                applicationPath = System.getProperty("catalina.base") + File.separator + "webapps" + request.getContextPath();
+                            }
+                            File uploadDir = new File(applicationPath, UPLOAD_DIR);
+                            if (!uploadDir.exists()) {
+                                uploadDir.mkdirs();
                             }
 
                             // Tạo tên file ngẫu nhiên/timestamp tránh trùng
                             String fileExt = "";
                             int dotIdx = submittedFileName.lastIndexOf('.');
                             if (dotIdx >= 0) {
-                                fileExt = submittedFileName.substring(dotIdx);
+                                fileExt = submittedFileName.substring(dotIdx).toLowerCase();
                             }
                             String uniqueFileName = "review_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000) + fileExt;
-                            filePart.write(uploadFilePath + File.separator + uniqueFileName);
+                            File targetFile = new File(uploadDir, uniqueFileName);
+                            filePart.write(targetFile.getAbsolutePath());
+
+                            // Sao lưu vào thư mục nguồn nếu tồn tại để tránh mất ảnh khi rebuild
+                            try {
+                                File srcDir = new File("d:/JavaPRJ/Fruitables-Web-App/src/main/webapp/assets/uploads/reviews");
+                                if (srcDir.exists()) {
+                                    java.nio.file.Files.copy(targetFile.toPath(), new File(srcDir, uniqueFileName).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                }
+                            } catch (Exception ignored) {}
 
                             dbImageUrl = request.getContextPath() + "/" + UPLOAD_DIR + "/" + uniqueFileName;
                         }
@@ -90,18 +111,28 @@ public class ReviewServlet extends HttpServlet {
                 review.setProductId(productId);
                 review.setOrderId(orderId);
                 review.setRating(rating);
-                review.setComment(comment);
+                review.setComment(comment.trim());
                 review.setImageUrl(dbImageUrl);
 
                 reviewDAO.insertReview(review);
                 response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=success");
             } else {
-                // Đá về kèm thông báo lỗi chưa đủ điều kiện
-                response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=not_purchased");
+                // Kiểm tra lý do chi tiết để phản hồi chính xác cho người dùng
+                if (reviewDAO.hasAlreadyReviewed(user.getId(), productId)) {
+                    response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=already_reviewed");
+                } else if (reviewDAO.hasPurchasedProduct(user.getId(), productId)) {
+                    response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=order_processing");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=not_purchased");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/shop");
+            if (productIdStr != null && !productIdStr.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productIdStr + "&review=error");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/shop");
+            }
         }
     }
 }
