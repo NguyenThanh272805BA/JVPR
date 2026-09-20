@@ -38,9 +38,9 @@ public class ReviewDAOImpl {
     }
 
     public Long getValidOrderIdForReview(Long userId, Long productId) {
-        // CHỐNG SPAM: Mỗi lần mua thành công 1 sản phẩm trong đơn hàng COMPLETED chỉ được đánh giá DUY NHẤT 1 LẦN
+        // CHỐNG SPAM: Mỗi lần mua thành công 1 sản phẩm trong đơn hàng DELIVERED/COMPLETED chỉ được đánh giá DUY NHẤT 1 LẦN
         String sql = "SELECT o.id FROM orders o JOIN order_details od ON o.id = od.order_id " +
-                "WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'COMPLETED' " +
+                "WHERE o.user_id = ? AND od.product_id = ? AND o.status IN ('COMPLETED', 'DELIVERED') " +
                 "AND NOT EXISTS (" +
                 "    SELECT 1 FROM reviews r WHERE r.user_id = ? AND r.product_id = ? AND r.order_id = o.id" +
                 ") LIMIT 1";

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @WebServlet(urlPatterns = {"/submit-review"})
 @MultipartConfig(
@@ -45,7 +46,7 @@ public class ReviewServlet extends HttpServlet {
             int rating = Integer.parseInt(request.getParameter("rating"));
             String comment = request.getParameter("comment");
 
-            // Kiểm tra điều kiện: Phải mua hàng và đơn hàng phải ở trạng thái COMPLETED
+            // Kiểm tra điều kiện: Phải mua hàng và đơn hàng phải ở trạng thái COMPLETED hoặc DELIVERED
             Long orderId = reviewDAO.getValidOrderIdForReview(user.getId(), productId);
 
             if (orderId != null) {
@@ -54,8 +55,9 @@ public class ReviewServlet extends HttpServlet {
                 try {
                     Part filePart = request.getPart("reviewImage");
                     if (filePart != null && filePart.getSize() > 0) {
-                        String rawFileName = extractFileName(filePart);
-                        if (rawFileName != null && !rawFileName.trim().isEmpty()) {
+                        // Dùng API chuẩn Servlet 3.1 thay vì parse header thủ công
+                        String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                        if (submittedFileName != null && !submittedFileName.trim().isEmpty()) {
                             String applicationPath = request.getServletContext().getRealPath("");
                             String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
 
@@ -66,9 +68,9 @@ public class ReviewServlet extends HttpServlet {
 
                             // Tạo tên file ngẫu nhiên/timestamp tránh trùng
                             String fileExt = "";
-                            int dotIdx = rawFileName.lastIndexOf('.');
+                            int dotIdx = submittedFileName.lastIndexOf('.');
                             if (dotIdx >= 0) {
-                                fileExt = rawFileName.substring(dotIdx);
+                                fileExt = submittedFileName.substring(dotIdx);
                             }
                             String uniqueFileName = "review_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000) + fileExt;
                             filePart.write(uploadFilePath + File.separator + uniqueFileName);
@@ -77,7 +79,10 @@ public class ReviewServlet extends HttpServlet {
                         }
                     }
                 } catch (Exception uploadEx) {
-                    System.err.println("Lỗi xử lý file upload đánh giá: " + uploadEx.getMessage());
+                    // Log chi tiết lỗi upload để dễ debug
+                    System.err.println("=== LỖI UPLOAD ẢNH ĐÁNH GIÁ ===");
+                    System.err.println("User ID: " + user.getId() + ", Product ID: " + productIdStr);
+                    uploadEx.printStackTrace();
                 }
 
                 ReviewModel review = new ReviewModel();
@@ -99,22 +104,4 @@ public class ReviewServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/shop");
         }
     }
-
-    private String extractFileName(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        if (contentDisp == null) return null;
-        String[] items = contentDisp.split(";");
-        for (String s : items) {
-            if (s.trim().startsWith("filename")) {
-                String name = s.substring(s.indexOf("=") + 2, s.length() - 1);
-                // Xử lý trường hợp IE gửi cả đường dẫn đầy đủ
-                int slashIdx = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
-                if (slashIdx >= 0) {
-                    name = name.substring(slashIdx + 1);
-                }
-                return name;
-            }
-        }
-        return null;
-    }
-}
+}
