@@ -31,6 +31,7 @@ public class ChatDAOImpl extends AbstractDAO<ChatMessageModel> implements IChatD
                     msg.setSenderType(rs.getString("sender_type"));
                     msg.setAdminId(rs.getObject("admin_id") != null ? rs.getLong("admin_id") : null);
                     msg.setMessage(rs.getString("message"));
+                    msg.setImageUrl(rs.getString("image_url"));
                     msg.setIsRead(rs.getBoolean("is_read"));
                     msg.setCreatedAt(rs.getTimestamp("created_at"));
                     msg.setUserName(rs.getString("full_name"));
@@ -66,6 +67,7 @@ public class ChatDAOImpl extends AbstractDAO<ChatMessageModel> implements IChatD
                     msg.setSenderType(rs.getString("sender_type"));
                     msg.setAdminId(rs.getObject("admin_id") != null ? rs.getLong("admin_id") : null);
                     msg.setMessage(rs.getString("message"));
+                    msg.setImageUrl(rs.getString("image_url"));
                     msg.setIsRead(rs.getBoolean("is_read"));
                     msg.setCreatedAt(rs.getTimestamp("created_at"));
                     msg.setUserName(rs.getString("full_name"));
@@ -81,17 +83,23 @@ public class ChatDAOImpl extends AbstractDAO<ChatMessageModel> implements IChatD
 
     @Override
     public Long saveMessage(ChatMessageModel msg) {
-        String sql = "INSERT INTO chat_messages (user_id, sender_type, admin_id, message, is_read) VALUES (?, ?, ?, ?, ?)";
-        return insert(sql, msg.getUserId(), msg.getSenderType(), msg.getAdminId(), msg.getMessage(), msg.getIsRead() != null && msg.getIsRead());
+        String sql = "INSERT INTO chat_messages (user_id, sender_type, admin_id, message, image_url, is_read) VALUES (?, ?, ?, ?, ?, ?)";
+        return insert(sql, msg.getUserId(), msg.getSenderType(), msg.getAdminId(), msg.getMessage(), msg.getImageUrl(), msg.getIsRead() != null && msg.getIsRead());
     }
 
     @Override
     public Long sendMessage(Long userId, String senderType, Long adminId, String message) {
+        return sendMessage(userId, senderType, adminId, message, null);
+    }
+
+    @Override
+    public Long sendMessage(Long userId, String senderType, Long adminId, String message, String imageUrl) {
         ChatMessageModel msg = new ChatMessageModel();
         msg.setUserId(userId);
         msg.setSenderType(senderType);
         msg.setAdminId(adminId);
         msg.setMessage(message);
+        msg.setImageUrl(imageUrl);
         msg.setIsRead(false);
         return saveMessage(msg);
     }
@@ -103,7 +111,7 @@ public class ChatDAOImpl extends AbstractDAO<ChatMessageModel> implements IChatD
                      "       COALESCE(unread.unread_count, 0) AS unread_count " +
                      "FROM users u " +
                      "JOIN ( " +
-                     "    SELECT user_id, message AS last_message, created_at AS last_time, sender_type AS last_sender " +
+                     "    SELECT user_id, COALESCE(NULLIF(message, ''), '[Hình ảnh]') AS last_message, created_at AS last_time, sender_type AS last_sender " +
                      "    FROM chat_messages " +
                      "    WHERE id IN (SELECT MAX(id) FROM chat_messages GROUP BY user_id) " +
                      ") m ON u.id = m.user_id " +

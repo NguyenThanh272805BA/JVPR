@@ -8,6 +8,7 @@ public class ChatMessageModel {
     private String senderType; // 'USER' or 'ADMIN'
     private Long adminId;
     private String message;
+    private String imageUrl;
     private Boolean isRead;
     private Timestamp createdAt;
 
@@ -31,6 +32,9 @@ public class ChatMessageModel {
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public Boolean getIsRead() { return isRead; }
     public void setIsRead(Boolean isRead) { this.isRead = isRead; }

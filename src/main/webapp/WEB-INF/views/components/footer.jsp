@@ -177,12 +177,27 @@
                     </div>
 
                     <!-- Input gửi tin Live Chat -->
-                    <form id="chat-send-form" class="mt-2.5 flex items-center gap-1.5 pt-2 border-t border-surface-variant flex-shrink-0">
-                        <input type="text" id="chat-input" placeholder="Nhập tin nhắn gửi nhân viên..." autocomplete="off"
-                               class="flex-1 px-3.5 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
-                        <button type="submit" id="chat-submit-btn" class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer">
-                            <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
-                        </button>
+                    <form id="chat-send-form" class="mt-2.5 flex flex-col gap-1.5 pt-2 border-t border-surface-variant flex-shrink-0">
+                        <!-- Image Preview Box -->
+                        <div id="chat-img-preview-box" class="hidden relative items-center gap-2 p-1.5 bg-surface-container rounded-xl border border-outline-variant w-fit max-w-[200px]">
+                            <img id="chat-img-preview" src="" class="w-12 h-12 object-cover rounded-lg border border-outline-variant">
+                            <span id="chat-img-preview-name" class="text-[10px] text-on-surface truncate max-w-[90px]"></span>
+                            <button type="button" id="chat-img-cancel-btn" class="text-error hover:bg-error/10 p-1 rounded-full transition-colors ml-1 cursor-pointer" title="Hủy ảnh">
+                                <span class="material-symbols-outlined text-sm">close</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <input type="file" id="chat-file-input" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+                            <button type="button" id="chat-attach-btn" class="w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary flex items-center justify-center transition-all flex-shrink-0 border border-outline-variant cursor-pointer" title="Đính kèm hình ảnh">
+                                <span class="material-symbols-outlined text-lg">image</span>
+                            </button>
+                            <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." autocomplete="off"
+                                   class="flex-1 px-3.5 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
+                            <button type="submit" id="chat-submit-btn" class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary-container transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer" title="Gửi tin nhắn">
+                                <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
+                            </button>
+                        </div>
                     </form>
                 </c:otherwise>
             </c:choose>
@@ -748,6 +763,75 @@
                 .catch(err => console.error('Livechat error:', err));
         }
 
+        // ----------------------------------------------------
+        // XỬ LÝ UPLOAD ẢNH LIVE CHAT (KHÁCH HÀNG)
+        // ----------------------------------------------------
+        const chatFileInput = document.getElementById('chat-file-input');
+        const chatAttachBtn = document.getElementById('chat-attach-btn');
+        const chatImgPreviewBox = document.getElementById('chat-img-preview-box');
+        const chatImgPreview = document.getElementById('chat-img-preview');
+        const chatImgPreviewName = document.getElementById('chat-img-preview-name');
+        const chatImgCancelBtn = document.getElementById('chat-img-cancel-btn');
+        let selectedChatFile = null;
+
+        if (chatAttachBtn && chatFileInput) {
+            chatAttachBtn.addEventListener('click', function() {
+                chatFileInput.click();
+            });
+
+            chatFileInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Vui lòng chỉ chọn file hình ảnh (PNG, JPG, WEBP, GIF).');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Kích thước ảnh tối đa là 10MB.');
+                    this.value = '';
+                    return;
+                }
+
+                selectedChatFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (chatImgPreview) chatImgPreview.src = e.target.result;
+                    if (chatImgPreviewName) chatImgPreviewName.innerText = file.name;
+                    if (chatImgPreviewBox) {
+                        chatImgPreviewBox.classList.remove('hidden');
+                        chatImgPreviewBox.classList.add('flex');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (chatImgCancelBtn) {
+            chatImgCancelBtn.addEventListener('click', function() {
+                selectedChatFile = null;
+                if (chatFileInput) chatFileInput.value = '';
+                if (chatImgPreview) chatImgPreview.src = '';
+                if (chatImgPreviewBox) {
+                    chatImgPreviewBox.classList.add('hidden');
+                    chatImgPreviewBox.classList.remove('flex');
+                }
+            });
+        }
+
+        window.openChatLightbox = function(url) {
+            if (!url) return;
+            const modal = document.getElementById('chat-lightbox-modal');
+            const img = document.getElementById('chat-lightbox-img');
+            if (modal && img) {
+                img.src = url;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        };
+
         function renderMessages(msgs) {
             if (!messagesBox) return;
 
@@ -764,12 +848,22 @@
 
             const msgsHtml = msgs.map(m => {
                 const isUser = (m.senderType === 'USER');
+                const hasImg = !!m.imageUrl;
+                const imgHtml = hasImg ? `
+                    <div class="mb-1.5 overflow-hidden rounded-xl cursor-pointer inline-block group" onclick="openChatLightbox('\${m.imageUrl}')">
+                        <img src="\${m.imageUrl}" class="max-w-[200px] max-h-[160px] object-cover rounded-xl border border-white/20 shadow-xs group-hover:scale-105 transition-transform" alt="Ảnh đính kèm">
+                    </div>
+                ` : '';
+
+                const textHtml = (m.message && m.message !== '[Hình ảnh]') ? `<div class="leading-relaxed text-xs break-words">\${escapeHtml(m.message)}</div>` : '';
+
                 if (isUser) {
                     return `
                         <div class="flex justify-end items-end gap-1.5 my-2">
                             <div class="max-w-[78%]">
-                                <div class="bg-primary text-white p-3 rounded-2xl rounded-br-sm shadow-sm leading-relaxed text-xs break-words">
-                                    \${escapeHtml(m.message)}
+                                <div class="bg-primary text-white p-3 rounded-2xl rounded-br-sm shadow-sm">
+                                    \${imgHtml}
+                                    \${textHtml}
                                 </div>
                                 <div class="text-[9px] text-on-surface-variant/70 text-right mt-0.5 px-1">\${formatTime(m.createdAt)}</div>
                             </div>
@@ -782,8 +876,9 @@
                                 <span class="material-symbols-outlined text-sm">support_agent</span>
                             </div>
                             <div class="max-w-[78%]">
-                                <div class="bg-surface-container-lowest border border-outline-variant p-3 rounded-2xl rounded-tl-sm shadow-sm text-on-surface leading-relaxed text-xs break-words">
-                                    \${escapeHtml(m.message)}
+                                <div class="bg-surface-container-lowest border border-outline-variant p-3 rounded-2xl rounded-tl-sm shadow-sm text-on-surface">
+                                    \${imgHtml}
+                                    \${textHtml}
                                 </div>
                                 <div class="text-[9px] text-on-surface-variant/70 mt-0.5 px-1">\${formatTime(m.createdAt)}</div>
                             </div>
@@ -799,25 +894,47 @@
         if (sendForm) {
             sendForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (!chatInput) return;
-                const text = chatInput.value.trim();
-                if (!text) return;
+                const text = chatInput ? chatInput.value.trim() : '';
+                if (!text && !selectedChatFile) return;
 
-                chatInput.value = '';
+                const submitBtn = document.getElementById('chat-submit-btn');
+                if (submitBtn) submitBtn.disabled = true;
+
+                const formData = new FormData();
+                formData.append('message', text || '');
+                if (selectedChatFile) formData.append('chatImage', selectedChatFile);
+
+                if (chatInput) chatInput.value = '';
+                if (chatImgCancelBtn) chatImgCancelBtn.click();
 
                 fetch(contextPath + '/api/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'message=' + encodeURIComponent(text)
+                    body: formData
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
                         fetchMessages();
+                    } else if (data.message) {
+                        alert(data.message);
                     }
                 })
-                .catch(err => console.error('Send message error:', err));
+                .catch(err => console.error('Send message error:', err))
+                .finally(() => {
+                    if (submitBtn) submitBtn.disabled = false;
+                });
             });
         }
     })();
 </script>
+
+<!-- LIGHTBOX XEM ẢNH FULL-SIZE TRONG CHAT -->
+<div id="chat-lightbox-modal" class="hidden fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md items-center justify-center p-4 cursor-pointer select-none" onclick="this.classList.add('hidden'); this.classList.remove('flex');">
+    <div class="relative max-w-3xl max-h-[90vh]" onclick="event.stopPropagation()">
+        <img id="chat-lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/20">
+        <button type="button" onclick="document.getElementById('chat-lightbox-modal').classList.add('hidden'); document.getElementById('chat-lightbox-modal').classList.remove('flex');"
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-xl hover:bg-slate-100 transition-colors cursor-pointer" title="Đóng">
+            <span class="material-symbols-outlined text-lg font-bold pointer-events-none">close</span>
+        </button>
+    </div>
+</div>

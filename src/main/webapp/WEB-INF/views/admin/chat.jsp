@@ -102,13 +102,28 @@
         </div>
 
         <!-- Chat Reply Input Footer -->
-        <form id="admin-reply-form" class="p-4 border-t border-surface-variant bg-surface-container-lowest flex items-center gap-3 flex-shrink-0">
-          <input type="text" id="admin-reply-input" placeholder="Nhập câu trả lời tư vấn cho khách hàng..." autocomplete="off"
-                 class="flex-1 px-4 py-3 bg-surface-container-low rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface">
-          <button type="submit" class="px-5 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-label-bold text-xs flex items-center gap-2 transition-colors shadow-sm">
-            <span>Gửi phản hồi</span>
-            <span class="material-symbols-outlined text-sm">send</span>
-          </button>
+        <form id="admin-reply-form" class="p-4 border-t border-surface-variant bg-surface-container-lowest flex flex-col gap-2 flex-shrink-0">
+          <!-- Image Preview Container -->
+          <div id="admin-img-preview-box" class="hidden items-center gap-2 p-1.5 bg-surface-container rounded-xl border border-outline-variant w-fit max-w-[220px]">
+            <img id="admin-img-preview" src="" class="w-12 h-12 object-cover rounded-lg border border-outline-variant">
+            <span id="admin-img-preview-name" class="text-[10px] text-on-surface truncate max-w-[100px]"></span>
+            <button type="button" id="admin-img-cancel-btn" class="text-error hover:bg-error/10 p-1 rounded-full transition-colors ml-1 cursor-pointer" title="Hủy ảnh">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <input type="file" id="admin-chat-file-input" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+            <button type="button" id="admin-chat-attach-btn" class="w-11 h-11 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-primary flex items-center justify-center transition-all flex-shrink-0 border border-outline-variant cursor-pointer" title="Đính kèm hình ảnh gửi khách">
+              <span class="material-symbols-outlined text-xl">image</span>
+            </button>
+            <input type="text" id="admin-reply-input" placeholder="Nhập câu trả lời tư vấn cho khách hàng..." autocomplete="off"
+                   class="flex-1 px-4 py-3 bg-surface-container-low rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface">
+            <button type="submit" class="px-5 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-label-bold text-xs flex items-center gap-2 transition-colors shadow-sm cursor-pointer active:scale-95">
+              <span>Gửi</span>
+              <span class="material-symbols-outlined text-sm">send</span>
+            </button>
+          </div>
         </form>
       </div>
 
@@ -237,6 +252,75 @@
       .catch(console.error);
   }
 
+  // ----------------------------------------------------
+  // XỬ LÝ UPLOAD ẢNH LIVE CHAT (ADMIN PHẢN HỒI)
+  // ----------------------------------------------------
+  const adminChatFileInput = document.getElementById('admin-chat-file-input');
+  const adminChatAttachBtn = document.getElementById('admin-chat-attach-btn');
+  const adminImgPreviewBox = document.getElementById('admin-img-preview-box');
+  const adminImgPreview = document.getElementById('admin-img-preview');
+  const adminImgPreviewName = document.getElementById('admin-img-preview-name');
+  const adminImgCancelBtn = document.getElementById('admin-img-cancel-btn');
+  let selectedAdminChatFile = null;
+
+  if (adminChatAttachBtn && adminChatFileInput) {
+    adminChatAttachBtn.addEventListener('click', function() {
+      adminChatFileInput.click();
+    });
+
+    adminChatFileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Vui lòng chỉ chọn file hình ảnh (PNG, JPG, WEBP, GIF).');
+        this.value = '';
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Kích thước ảnh tối đa là 10MB.');
+        this.value = '';
+        return;
+      }
+
+      selectedAdminChatFile = file;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (adminImgPreview) adminImgPreview.src = e.target.result;
+        if (adminImgPreviewName) adminImgPreviewName.innerText = file.name;
+        if (adminImgPreviewBox) {
+          adminImgPreviewBox.classList.remove('hidden');
+          adminImgPreviewBox.classList.add('flex');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if (adminImgCancelBtn) {
+    adminImgCancelBtn.addEventListener('click', function() {
+      selectedAdminChatFile = null;
+      if (adminChatFileInput) adminChatFileInput.value = '';
+      if (adminImgPreview) adminImgPreview.src = '';
+      if (adminImgPreviewBox) {
+        adminImgPreviewBox.classList.add('hidden');
+        adminImgPreviewBox.classList.remove('flex');
+      }
+    });
+  }
+
+  window.openAdminChatLightbox = function(url) {
+    if (!url) return;
+    const modal = document.getElementById('admin-chat-lightbox-modal');
+    const img = document.getElementById('admin-chat-lightbox-img');
+    if (modal && img) {
+      img.src = url;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  };
+
   function renderMessages(msgs) {
     if (!msgsBox) return;
 
@@ -249,12 +333,22 @@
 
     msgsBox.innerHTML = msgs.map(m => {
       const isAdmin = (m.senderType === 'ADMIN');
+      const hasImg = !!m.imageUrl;
+      const imgHtml = hasImg ? `
+        <div class="mb-1.5 overflow-hidden rounded-xl cursor-pointer inline-block group" onclick="openAdminChatLightbox('\${m.imageUrl}')">
+          <img src="\${m.imageUrl}" class="max-w-[240px] max-h-[180px] object-cover rounded-xl border border-slate-200 shadow-xs group-hover:scale-105 transition-transform" alt="Ảnh đính kèm">
+        </div>
+      ` : '';
+
+      const textHtml = (m.message && m.message !== '[Hình ảnh]') ? `<div class="leading-relaxed text-xs break-words">\${escapeHtml(m.message)}</div>` : '';
+
       if (isAdmin) {
         return `
           <div class="flex justify-end items-end gap-2">
             <div class="max-w-[70%]">
-              <div class="bg-primary text-white p-3.5 rounded-2xl rounded-br-sm shadow-sm leading-relaxed text-xs break-words">
-                \${escapeHtml(m.message)}
+              <div class="bg-primary text-white p-3.5 rounded-2xl rounded-br-sm shadow-sm">
+                \${imgHtml}
+                \${textHtml}
               </div>
               <div class="text-[10px] text-on-surface-variant/70 text-right mt-0.5 px-1">\${formatTimestamp(m.createdAt)} (Bạn)</div>
             </div>
@@ -267,8 +361,9 @@
               \${(selectedUserObj && selectedUserObj.fullName) ? selectedUserObj.fullName.charAt(0).toUpperCase() : 'K'}
             </div>
             <div class="max-w-[70%]">
-              <div class="bg-white border border-outline-variant p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-on-surface leading-relaxed text-xs break-words">
-                \${escapeHtml(m.message)}
+              <div class="bg-white border border-outline-variant p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-on-surface">
+                \${imgHtml}
+                \${textHtml}
               </div>
               <div class="text-[10px] text-on-surface-variant/70 mt-0.5 px-1">\${formatTimestamp(m.createdAt)}</div>
             </div>
@@ -284,24 +379,37 @@
   replyForm.addEventListener('submit', function(e) {
     e.preventDefault();
     if (!selectedUserId) return;
-    const text = replyInput.value.trim();
-    if (!text) return;
+    const text = replyInput ? replyInput.value.trim() : '';
+    if (!text && !selectedAdminChatFile) return;
 
-    replyInput.value = '';
+    const replyBtn = replyForm.querySelector('button[type="submit"]');
+    if (replyBtn) replyBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('targetUserId', selectedUserId);
+    formData.append('message', text || '');
+    if (selectedAdminChatFile) formData.append('chatImage', selectedAdminChatFile);
+
+    if (replyInput) replyInput.value = '';
+    if (adminImgCancelBtn) adminImgCancelBtn.click();
 
     fetch('${pageContext.request.contextPath}/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'targetUserId=' + selectedUserId + '&message=' + encodeURIComponent(text)
+      body: formData
     })
     .then(r => r.json())
     .then(data => {
       if (data.success) {
         fetchMessagesForCurrent();
         loadConversations();
+      } else if (data.message) {
+        alert(data.message);
       }
     })
-    .catch(console.error);
+    .catch(console.error)
+    .finally(() => {
+      if (replyBtn) replyBtn.disabled = false;
+    });
   });
 
   searchInput.addEventListener('input', renderConversationList);
@@ -315,5 +423,16 @@
     }
   }, 2500);
 </script>
+
+<!-- LIGHTBOX XEM ẢNH FULL-SIZE TRONG ADMIN CHAT -->
+<div id="admin-chat-lightbox-modal" class="hidden fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md items-center justify-center p-4 cursor-pointer select-none" onclick="this.classList.add('hidden'); this.classList.remove('flex');">
+  <div class="relative max-w-4xl max-h-[90vh]" onclick="event.stopPropagation()">
+    <img id="admin-chat-lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/20">
+    <button type="button" onclick="document.getElementById('admin-chat-lightbox-modal').classList.add('hidden'); document.getElementById('admin-chat-lightbox-modal').classList.remove('flex');"
+            class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-xl hover:bg-slate-100 transition-colors cursor-pointer" title="Đóng">
+      <span class="material-symbols-outlined text-lg font-bold pointer-events-none">close</span>
+    </button>
+  </div>
+</div>
 </body>
 </html>

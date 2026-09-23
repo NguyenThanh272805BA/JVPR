@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50">
+<nav class="bg-surface w-full sticky top-0 shadow-sm z-50 rounded-b-2xl sm:rounded-b-none">
     <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex-nowrap gap-2 md:gap-4">
         <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
         <a class="group flex items-center gap-2.5 md:gap-3 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
@@ -344,13 +344,143 @@
                     </a>
                 </c:otherwise>
             </c:choose>
+
+            <!-- Nút bật tắt Menu Mobile (Bo góc mềm mại cho điện thoại) -->
+            <button type="button" id="mobile-menu-toggle-btn"
+                    class="lg:hidden text-on-surface hover:text-primary p-2 rounded-2xl hover:bg-surface-container-highest transition-all flex items-center justify-center border border-outline-variant/60"
+                    aria-label="Mở menu">
+                <span id="mobile-menu-icon" class="material-symbols-outlined text-[24px]">menu</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- KHUNG MENU MOBILE DẠNG THẺ NỔI BO GÓC DÀNH CHO ĐIỆN THOẠI -->
+    <div id="mobile-menu-drawer" class="hidden lg:hidden px-margin-mobile pb-4 pt-1 transition-all duration-300">
+        <div class="bg-surface-container-lowest/95 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-outline-variant space-y-3">
+            <!-- Ô tìm kiếm nhanh trên điện thoại -->
+            <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
+                <input type="text" name="keyword" autocomplete="off"
+                       placeholder="Tìm trái cây, rau củ..."
+                       class="w-full pl-9 pr-4 py-2 text-xs rounded-2xl border border-outline-variant bg-surface-container-low focus:bg-surface-container-lowest focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/60">
+                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
+            </form>
+
+            <!-- Danh sách liên kết điều hướng bo góc -->
+            <div class="grid grid-cols-1 gap-1 pt-1 font-body-md text-sm">
+                <a class="flex items-center gap-3 p-2.5 rounded-2xl text-on-surface hover:bg-primary/10 hover:text-primary transition-all font-medium" href="${pageContext.request.contextPath}/home">
+                    <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">home</span>
+                    </div>
+                    <span>Trang chủ</span>
+                </a>
+                <a class="flex items-center gap-3 p-2.5 rounded-2xl text-on-surface hover:bg-primary/10 hover:text-primary transition-all font-medium" href="${pageContext.request.contextPath}/shop">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">storefront</span>
+                    </div>
+                    <span>Cửa hàng hoa quả</span>
+                </a>
+                <a class="flex items-center justify-between p-2.5 rounded-2xl text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/70 transition-all font-semibold" href="${pageContext.request.contextPath}/gift-basket-builder">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">featured_seasonal_and_gifts</span>
+                        </div>
+                        <span>Tự mix giỏ quà</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 uppercase">Hot</span>
+                </a>
+                <a class="flex items-center justify-between p-2.5 rounded-2xl text-on-surface hover:bg-primary/10 hover:text-primary transition-all font-medium" href="${pageContext.request.contextPath}/promotions">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">redeem</span>
+                        </div>
+                        <span>Khuyến mãi & Flash Sale</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Ưu đãi</span>
+                </a>
+                <a class="flex items-center gap-3 p-2.5 rounded-2xl text-on-surface hover:bg-primary/10 hover:text-primary transition-all font-medium" href="${pageContext.request.contextPath}/guest-tracking">
+                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                    </div>
+                    <span>Tra cứu đơn hàng</span>
+                </a>
+            </div>
+
+            <!-- Tiện ích tài khoản trên điện thoại -->
+            <c:choose>
+                <c:when test="${not empty sessionScope.USERMODEL}">
+                    <div class="pt-2 border-t border-surface-variant flex flex-col gap-1 text-xs">
+                        <div class="flex items-center justify-between px-3 py-2 bg-surface-container rounded-2xl">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span class="font-bold text-on-surface truncate max-w-[170px]"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-900 uppercase tracking-wider" style="background-color: ${sessionScope.USERMODEL.vipTierColor != null ? sessionScope.USERMODEL.vipTierColor : '#fbbf24'}">
+                                ⭐ Hạng ${sessionScope.USERMODEL.vipTier}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <a href="${pageContext.request.contextPath}/profile" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl font-medium">
+                                <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
+                            </a>
+                            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl font-medium">
+                                <span class="material-symbols-outlined text-sm">receipt_long</span> Đơn hàng
+                            </a>
+                        </div>
+                        <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
+                            <a href="${pageContext.request.contextPath}/admin/dashboard" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-900 text-emerald-300 rounded-xl font-bold mt-1">
+                                <span class="material-symbols-outlined text-sm">dashboard</span> Cổng Quản Trị
+                            </a>
+                        </c:if>
+                        <c:if test="${sessionScope.USERMODEL.roleId == 4}">
+                            <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-amber-500 text-slate-900 rounded-xl font-bold mt-1">
+                                <span class="material-symbols-outlined text-sm">local_shipping</span> Cổng Tài Xế (Shipper)
+                            </a>
+                        </c:if>
+                        <a href="${pageContext.request.contextPath}/logout" class="flex items-center justify-center gap-1.5 py-2 px-3 text-error hover:bg-error-container rounded-xl font-medium mt-1">
+                            <span class="material-symbols-outlined text-sm">logout</span> Đăng xuất
+                        </a>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="pt-2 border-t border-surface-variant">
+                        <a href="${pageContext.request.contextPath}/login" class="w-full bg-primary hover:bg-primary-container text-white font-label-bold text-xs py-2.5 rounded-2xl flex items-center justify-center gap-1.5 shadow-sm transition-all">
+                            <span class="material-symbols-outlined text-base">person</span> Đăng nhập / Đăng ký
+                        </a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </nav>
 
-<!-- Script: Live Search Autocomplete -->
+<!-- Script: Live Search Autocomplete & Mobile Menu Toggle -->
 <script>
     (function() {
+        // Xử lý bật/tắt Mobile Menu Drawer bo góc
+        const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle-btn');
+        const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+        const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+
+        if (mobileMenuToggleBtn && mobileMenuDrawer) {
+            mobileMenuToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = mobileMenuDrawer.classList.contains('hidden');
+                if (isHidden) {
+                    mobileMenuDrawer.classList.remove('hidden');
+                    if (mobileMenuIcon) mobileMenuIcon.innerText = 'close';
+                } else {
+                    mobileMenuDrawer.classList.add('hidden');
+                    if (mobileMenuIcon) mobileMenuIcon.innerText = 'menu';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!mobileMenuDrawer.contains(e.target) && !mobileMenuToggleBtn.contains(e.target)) {
+                    mobileMenuDrawer.classList.add('hidden');
+                    if (mobileMenuIcon) mobileMenuIcon.innerText = 'menu';
+                }
+            });
+        }
         const searchInput = document.getElementById('navbar-search-input');
         const searchResults = document.getElementById('navbar-search-results');
         const searchList = document.getElementById('navbar-search-list');

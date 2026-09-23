@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         .chart-card {
@@ -24,6 +25,140 @@
         }
         .chart-card:hover {
             box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.07);
+        }
+
+        /* Định dạng giao diện cao cấp cho kết quả AI Phân tích */
+        #aiReportContent {
+            font-size: 0.8125rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+        #aiReportContent h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #34d399;
+            margin-top: 1.25rem;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid rgba(52, 211, 153, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #aiReportContent h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+        }
+        #aiReportContent h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6ee7b7;
+            margin-top: 0.75rem;
+            margin-bottom: 0.3rem;
+        }
+        #aiReportContent p {
+            margin-bottom: 0.65rem;
+        }
+        #aiReportContent ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 0.75rem;
+        }
+        #aiReportContent ul > li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+        }
+        #aiReportContent ul > li::before {
+            content: "•";
+            position: absolute;
+            left: 0.25rem;
+            top: 0;
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        #aiReportContent ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #cbd5e1;
+        }
+        #aiReportContent ol > li {
+            margin-bottom: 0.4rem;
+        }
+        #aiReportContent strong {
+            color: #ffffff;
+            font-weight: 700;
+        }
+        #aiReportContent table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: rgba(15, 23, 42, 0.75);
+            font-size: 0.75rem;
+        }
+        #aiReportContent th {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 78, 59, 0.4));
+            color: #6ee7b7;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+            border-right: 1px solid rgba(51, 65, 85, 0.4);
+        }
+        #aiReportContent th:last-child {
+            border-right: none;
+        }
+        #aiReportContent td {
+            padding: 0.6rem 0.85rem;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+            border-right: 1px solid rgba(51, 65, 85, 0.3);
+            color: #e2e8f0;
+        }
+        #aiReportContent td:last-child {
+            border-right: none;
+        }
+        #aiReportContent tr:last-child td {
+            border-bottom: none;
+        }
+        #aiReportContent tr:hover td {
+            background-color: rgba(30, 41, 59, 0.6);
+        }
+        #aiReportContent blockquote {
+            margin: 0.75rem 0;
+            padding: 0.65rem 1rem;
+            background-color: rgba(15, 23, 42, 0.85);
+            border-left: 4px solid #10b981;
+            border-radius: 0 0.5rem 0.5rem 0;
+            color: #94a3b8;
+            font-style: italic;
+        }
+        #aiReportContent code {
+            background-color: rgba(30, 41, 59, 0.9);
+            color: #34d399;
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+        .ai-callout-warning {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin: 0.6rem 0;
+            color: #fef3c7;
+        }
+        .ai-callout-recommend {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin: 0.6rem 0;
+            color: #d1fae5;
         }
     </style>
 </head>
@@ -1582,19 +1717,45 @@
 
     function renderMarkdownToHtml(md) {
         if (!md) return '';
-        let html = md
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/^### (.*$)/gim, '<h4 class="text-emerald-400 font-bold text-sm mt-3 mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>$1</h4>')
-            .replace(/^## (.*$)/gim, '<h3 class="text-white font-black text-base mt-4 mb-2 pb-1 border-b border-slate-700/60">$1</h3>')
-            .replace(/^# (.*$)/gim, '<h2 class="text-emerald-300 font-black text-lg mt-4 mb-2">$1</h2>')
-            .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-bold">$1</strong>')
-            .replace(/\*(.*?)\*/gim, '<em class="text-slate-300 italic">$1</em>')
-            .replace(/^\s*[-*+]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-200 py-0.5">$1</li>')
-            .replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-200 py-0.5"><span class="font-semibold text-emerald-300">$1.</span> $2</li>')
-            .replace(/\n\n+/g, '<div class="h-2"></div>')
-            .replace(/\n/g, '<br>');
+        let html = '';
+        try {
+            if (typeof marked !== 'undefined' && marked.parse) {
+                html = marked.parse(md, { breaks: true, gfm: true });
+            } else {
+                html = md
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/^### (.*$)/gim, '<h4 class="text-emerald-400 font-bold text-sm mt-3 mb-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>$1</h4>')
+                    .replace(/^## (.*$)/gim, '<h3 class="text-white font-black text-base mt-4 mb-2 pb-1 border-b border-slate-700/60">$1</h3>')
+                    .replace(/^# (.*$)/gim, '<h2 class="text-emerald-300 font-black text-lg mt-4 mb-2">$1</h2>')
+                    .replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-bold">$1</strong>')
+                    .replace(/\*(.*?)\*/gim, '<em class="text-slate-300 italic">$1</em>')
+                    .replace(/^\s*[-*+]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-200 py-0.5">$1</li>')
+                    .replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-200 py-0.5"><span class="font-semibold text-emerald-300">$1.</span> $2</li>')
+                    .replace(/\n\n+/g, '<div class="h-2"></div>')
+                    .replace(/\n/g, '<br>');
+            }
+        } catch (e) {
+            console.error("Lỗi parse markdown:", e);
+            html = md.replace(/\n/g, '<br>');
+        }
+
+        // Tự động đóng gói cảnh báo (⚠️, 🚨) và đề xuất chiến lược (💡, 🚀) vào Alert Card trực quan
+        html = html.replace(/<blockquote>([\s\S]*?)<\/blockquote>/gi, function(match, inner) {
+            const lower = inner.toLowerCase();
+            if (inner.includes('⚠️') || inner.includes('🚨') || lower.includes('cảnh báo') || lower.includes('rủi ro')) {
+                return '<div class="ai-callout-warning my-3">' + inner + '</div>';
+            }
+            if (inner.includes('💡') || inner.includes('🚀') || lower.includes('khuyến nghị') || lower.includes('giải pháp') || lower.includes('chiến lược')) {
+                return '<div class="ai-callout-recommend my-3">' + inner + '</div>';
+            }
+            return match;
+        });
+
+        // Bọc table trong overflow container để hỗ trợ vuốt mượt mà
+        html = html.replace(/<table>([\s\S]*?)<\/table>/gi, '<div class="overflow-x-auto my-3 rounded-xl border border-slate-700/80 shadow-md"><table>$1</table></div>');
+
         return html;
     }
 

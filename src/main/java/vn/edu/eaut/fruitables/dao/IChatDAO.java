@@ -9,6 +9,7 @@ public interface IChatDAO extends GenericDAO<ChatMessageModel> {
     List<ChatMessageModel> findByUserId(Long userId, int limit);
     Long saveMessage(ChatMessageModel msg);
     Long sendMessage(Long userId, String senderType, Long adminId, String message);
+    Long sendMessage(Long userId, String senderType, Long adminId, String message, String imageUrl);
     List<Map<String, Object>> findActiveConversations();
     List<Map<String, Object>> findActiveChatUsers();
     void markMessagesAsRead(Long userId, String readerType);

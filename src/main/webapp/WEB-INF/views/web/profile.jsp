@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -76,17 +77,17 @@
               <span class="text-xs text-slate-300 font-medium">Fruitables Loyalty Member</span>
             </div>
             <h2 class="text-2xl font-black text-white">${sessionScope.USERMODEL.fullName}</h2>
-            <p class="text-xs text-emerald-200/80">Thành viên thân thiết từ <fmt:formatDate value="${sessionScope.USERMODEL.createdAt}" pattern="MM/yyyy"/></p>
+            <p class="text-xs text-emerald-200/80">Thành viên thân thiết từ <c:choose><c:when test="${not empty sessionScope.USERMODEL.createdAt}"><fmt:formatDate value="${sessionScope.USERMODEL.createdAt}" pattern="MM/yyyy"/></c:when><c:otherwise>2026</c:otherwise></c:choose></p>
           </div>
 
-          <div class="flex items-center gap-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
+          <div class="flex items-center gap-4 sm:gap-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
             <div class="text-right">
               <span class="text-[11px] text-slate-300 block">Điểm khả dụng:</span>
               <span class="font-price-tag text-2xl font-black text-amber-400">
-                ${sessionScope.USERMODEL.points} <span class="text-xs font-normal text-slate-300">điểm</span>
+                <c:out value="${sessionScope.USERMODEL.points != null ? sessionScope.USERMODEL.points : 0}"/> <span class="text-xs font-normal text-slate-300">điểm</span>
               </span>
-              <span class="text-[10px] text-emerald-300 block mt-0.5">
-                (~<fmt:formatNumber value="${sessionScope.USERMODEL.points * 100}" type="number" groupingUsed="true"/> ₫ mua sắm)
+              <span class="text-[11px] text-emerald-300 block mt-0.5 font-medium">
+                (~<fmt:formatNumber value="${(sessionScope.USERMODEL.points != null ? sessionScope.USERMODEL.points : 0) * 100}" type="number" groupingUsed="true"/> ₫ mua sắm)
               </span>
             </div>
             <div class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center flex-shrink-0">
