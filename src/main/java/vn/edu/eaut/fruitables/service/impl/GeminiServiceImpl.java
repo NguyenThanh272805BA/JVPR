@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import vn.edu.eaut.fruitables.model.dto.ReviewAnalysisDTO;
 import vn.edu.eaut.fruitables.model.entity.ProductModel;
 import vn.edu.eaut.fruitables.service.IGeminiService;
 import vn.edu.eaut.fruitables.service.IProductService;
@@ -24,7 +25,7 @@ public class GeminiServiceImpl implements IGeminiService {
     private final Gson gson;
     private final IProductService productService;
 
-    // In-Memory Cache lưu câu trả lời cho các câu hỏi tương tự nhau (Tiết kiệm 100% token khi hit cache)
+    // In-Memory Cache lưu câu trả lời cho các câu hỏi tương tự nhau
     private static final Map<String, CachedResponse> RESPONSE_CACHE = new ConcurrentHashMap<>();
     private static final long CACHE_TTL_MS = 12 * 60 * 60 * 1000L; // 12 giờ
 
@@ -547,6 +548,119 @@ public class GeminiServiceImpl implements IGeminiService {
             cleaned = cleaned.substring(0, cleaned.length() - 3);
         }
         return cleaned.trim();
+    }
+
+    @Override
+    public ReviewAnalysisDTO analyzeAndReplyReview(String productName, String categoryName, int rating, String comment, String customerName) {
+        String safeCustomerName = (customerName != null && !customerName.trim().isEmpty()) ? customerName.trim() : "Quý khách";
+        String safeProductName = (productName != null && !productName.trim().isEmpty()) ? productName.trim() : "Sản phẩm";
+        String safeComment = (comment != null) ? comment.trim() : "";
+
+        String systemInstructionText = """
+                Bạn là Trưởng bộ phận Chăm Sóc Khách Hàng & Quản Lý Chất Lượng tại Fruitables - Chuỗi cửa hàng hoa quả tươi cao cấp.
+                Nhiệm vụ của bạn là:
+                1. Phân tích ngữ cảnh và cảm xúc (sentiment) của đánh giá từ khách hàng: "POSITIVE", "NEGATIVE", "NEUTRAL".
+                2. Soạn thảo một câu phản hồi chính thức từ "Fruitables Store 🌿" gửi tới khách hàng, đảm bảo sự tôn trọng, chuyên nghiệp, chân thành và tinh tế.
+
+                NGUYÊN TẮC PHÂN LOẠI & SOẠN PHẢN HỒI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
+
+                1. ĐÁNH GIÁ TIÊU CỰC (NEGATIVE):
+                   - Dấu hiệu: rating <= 2 SAO HOẶC trong nhận xét có từ ngữ phàn nàn, cáu giận, thất vọng, hoa quả bị dập, úa, sượng, chua, thối, sâu, giao trễ, đóng gói rách, shipper hay nhân viên thái độ kém.
+                   - sentiment: "NEGATIVE"
+                   - riskLevel: "HIGH"
+                   - needsSupportFollowup: true
+                   - QUY TẮC CỐT LÕI (CỰC KỲ QUAN TRỌNG - TUYỆT ĐỐI TUÂN THỦ):
+                     ❌ TUYỆT ĐỐI KHÔNG tự động hứa hẹn cấp mã giảm giá, voucher hay số tiền bồi thường cụ thể trong câu phản hồi (nhằm ngăn chặn hành vi khai thác lỗ hổng hoặc sử dụng lại ảnh hỏng từ trước).
+                     ✅ Lời phản hồi:
+                        + Bắt đầu bằng lời xin lỗi chân thành, chia sẻ sự tiếc nuối sâu sắc vì trải nghiệm của khách chưa trọn vẹn.
+                        + Khẳng định Fruitables luôn cam kết 100% hoa quả tươi sạch và chính sách bảo hành 1 đổi 1.
+                        + Hướng dẫn hành động rõ ràng: Mời khách BẤM VÀO MỤC NHẮN TIN VỚI CSKH (Live Chat ở góc dưới màn hình) hoặc liên hệ Hotline CSKH, cung cấp mã đơn hàng để đội ngũ CSKH trực tiếp xác minh và có phương án xử lý thỏa đáng nhất (đổi bù hoa quả mới hoặc bồi hoàn phù hợp).
+
+                2. ĐÁNH GIÁ TÍCH CỰC (POSITIVE):
+                   - Dấu hiệu: rating >= 4 SAO VÀ nội dung khen ngợi (ngon, ngọt, tươi, giao nhanh, đóng gói đẹp...).
+                   - sentiment: "POSITIVE"
+                   - riskLevel: "LOW"
+                   - needsSupportFollowup: false
+                   - Lời phản hồi:
+                     + Lời cảm ơn ấm áp, gọi tên khách hàng thân thiện.
+                     + Nhắc đúng tên loại trái cây khách mua, khen ngợi sự lựa chọn tuyệt vời.
+                     + Đưa kèm 1 mẹo nhỏ thực tế về bảo quản (ví dụ: bọc giấy báo để ngăn mát 3-5°C, hoặc công thức làm sinh tố/detox mát lành).
+                     + Chúc khách ngon miệng và bày tỏ mong muốn được tiếp tục phục vụ.
+
+                3. ĐÁNH GIÁ TRUNG TÍNH / THẮC MẮC (NEUTRAL):
+                   - Dấu hiệu: rating == 3 SAO HOẶC phản hồi không chê gắt gao mà chỉ thắc mắc về khẩu vị (chưa đủ ngọt, hơi xanh, hỏi cách ủ chín, cách phân biệt...).
+                   - sentiment: "NEUTRAL"
+                   - riskLevel: "MEDIUM"
+                   - needsSupportFollowup: false
+                   - Lời phản hồi:
+                     + Cảm ơn sự góp ý chân thực.
+                     + Giải thích nhẹ nhàng về đặc tính tự nhiên của nông sản theo mùa vụ.
+                     + Hướng dẫn cách ủ chín tự nhiên hoặc cách bảo quản tối ưu.
+                     + Mời khách nhắn tin vào Live Chat nếu cần hỗ trợ thêm thông tin chi tiết.
+
+                ĐỊNH DẠNG ĐẦU RA BẮT BUỘC:
+                Chỉ trả về DUY NHẤT một chuỗi JSON hợp lệ không bọc markdown ```json ... ```, định dạng:
+                {
+                  "sentiment": "POSITIVE",
+                  "reply": "Nội dung câu phản hồi bằng tiếng Việt trau chuốt, ấm áp 🌿🍎",
+                  "riskLevel": "LOW",
+                  "needsSupportFollowup": false,
+                  "reason": "Lý do ngắn gọn"
+                }
+                """;
+
+        String userPrompt = "Khách hàng: " + safeCustomerName
+                + "\nSản phẩm: " + safeProductName
+                + "\nDanh mục: " + (categoryName != null ? categoryName : "Trái cây tươi")
+                + "\nSố sao chấm: " + rating + " sao"
+                + "\nNội dung đánh giá: " + (safeComment.isEmpty() ? "(Khách không để lại nhận xét)" : safeComment);
+
+        try {
+            String result = executeGeminiRequest(systemInstructionText, userPrompt, 600, 0.3, 12);
+            if (result != null && !result.trim().isEmpty()) {
+                String jsonClean = cleanHtmlOutput(result).replaceAll("^```json|```$", "").trim();
+                JsonObject obj = gson.fromJson(jsonClean, JsonObject.class);
+                if (obj.has("sentiment") && obj.has("reply")) {
+                    String sentiment = obj.get("sentiment").getAsString();
+                    String reply = obj.get("reply").getAsString();
+                    String riskLevel = obj.has("riskLevel") ? obj.get("riskLevel").getAsString() : "LOW";
+                    boolean needsFollowup = obj.has("needsSupportFollowup") && obj.get("needsSupportFollowup").getAsBoolean();
+                    String reason = obj.has("reason") ? obj.get("reason").getAsString() : "";
+                    return new ReviewAnalysisDTO(sentiment, reply, riskLevel, needsFollowup, reason);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[GeminiService] Error analyzing review: " + e.getMessage());
+        }
+
+        // Fallback an toàn khi có sự cố mạng/Gemini API
+        return buildFallbackReviewAnalysis(safeCustomerName, safeProductName, rating, safeComment);
+    }
+
+    private ReviewAnalysisDTO buildFallbackReviewAnalysis(String customerName, String productName, int rating, String comment) {
+        String lowerComment = comment.toLowerCase();
+        boolean hasNegativeKeyword = lowerComment.contains("hỏng") || lowerComment.contains("dập")
+                || lowerComment.contains("thối") || lowerComment.contains("chua") || lowerComment.contains("sâu")
+                || lowerComment.contains("chậm") || lowerComment.contains("trễ") || lowerComment.contains("tệ")
+                || lowerComment.contains("bực") || lowerComment.contains("kém") || lowerComment.contains("sượng");
+
+        if (rating <= 2 || hasNegativeKeyword) {
+            String reply = "Dạ Fruitables vô cùng xin lỗi bạn " + customerName + " vì trải nghiệm chưa trọn vẹn với " + productName + " lần này ạ! 🌿 "
+                    + "Hoa quả tươi luôn được Fruitables kiểm tra kỹ lưỡng, tuy nhiên khâu vận chuyển hoặc bảo quản có thể phát sinh thiếu sót ngoài mong muốn. "
+                    + "Để Fruitables có thể xác minh đơn hàng và đưa ra giải pháp hỗ trợ thỏa đáng nhất cho bạn (đổi trả hoặc bồi hoàn theo chính sách 1 đổi 1), "
+                    + "bạn vui lòng nhắn tin trực tiếp vào mục Live Chat CSKH ở góc dưới màn hình hoặc gọi hotline hỗ trợ nhé ạ. Fruitables luôn sẵn sàng hỗ trợ bạn ngay lập tức!";
+            return new ReviewAnalysisDTO("NEGATIVE", reply, "HIGH", true, "Khách hàng không hài lòng hoặc đánh giá dưới 3 sao");
+        } else if (rating >= 4) {
+            String reply = "Fruitables chân thành cảm ơn bạn " + customerName + " đã tin tưởng lựa chọn và dành tặng đánh giá " + rating + "⭐ cho sản phẩm " + productName + "! 🍎✨ "
+                    + "Mách nhỏ bạn hãy bảo quản quả trong ngăn mát tủ lạnh từ 3-5°C để giữ trọn độ tươi giòn và mọng nước nhé. "
+                    + "Chúc bạn và gia đình luôn có những bữa ăn ngon miệng. Fruitables rất hân hạnh được phục vụ bạn ở các đơn hàng tiếp theo! 🌿";
+            return new ReviewAnalysisDTO("POSITIVE", reply, "LOW", false, "Đánh giá tích cực");
+        } else {
+            String reply = "Dạ Fruitables cảm ơn những chia sẻ chân thành của bạn " + customerName + " về sản phẩm " + productName + " ạ! 🌿 "
+                    + "Hoa quả mỗi mùa vụ có thể có độ ngọt và độ giòn tự nhiên khác nhau đôi chút. "
+                    + "Nếu bạn cần thêm tư vấn chi tiết về cách bảo quản tối ưu hoặc hỗ trợ thêm về đơn hàng, bạn đừng ngần ngại nhắn tin cho Fruitables qua mục Live Chat nhé ạ!";
+            return new ReviewAnalysisDTO("NEUTRAL", reply, "MEDIUM", false, "Đánh giá trung tính hoặc thắc mắc");
+        }
     }
 
     @Override

@@ -14,6 +14,19 @@ public class ReviewModel {
     private String avatarUrl;
     private String imageUrl;
 
+
+
+    // AI & Store Reply Fields
+    private String reply;
+    private String replyBy; // 'AI_AGENT' or 'ADMIN'
+    private Timestamp replyAt;
+    private String sentiment; // 'POSITIVE', 'NEGATIVE', 'NEUTRAL'
+    private Boolean isReported;
+
+    // Additional display fields
+    private String productName;
+    private String productImage;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -43,4 +56,25 @@ public class ReviewModel {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getReply() { return reply; }
+    public void setReply(String reply) { this.reply = reply; }
+
+    public String getReplyBy() { return replyBy; }
+    public void setReplyBy(String replyBy) { this.replyBy = replyBy; }
+
+    public Timestamp getReplyAt() { return replyAt; }
+    public void setReplyAt(Timestamp replyAt) { this.replyAt = replyAt; }
+
+    public String getSentiment() { return sentiment; }
+    public void setSentiment(String sentiment) { this.sentiment = sentiment; }
+
+    public Boolean getIsReported() { return isReported; }
+    public void setIsReported(Boolean isReported) { this.isReported = isReported; }
+
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
+
+    public String getProductImage() { return productImage; }
+    public void setProductImage(String productImage) { this.productImage = productImage; }
 }

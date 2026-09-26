@@ -45,6 +45,18 @@ public interface IGeminiService {
     String suggestProductSpecs(String productName, String categoryName);
 
     /**
+     * Phân tích ngữ cảnh đánh giá (Tích cực / Tiêu cực / Thắc mắc) và tự động soạn thảo câu phản hồi chuẩn CSKH Fruitables
+     *
+     * @param productName Tên sản phẩm được đánh giá
+     * @param categoryName Danh mục sản phẩm
+     * @param rating Số sao khách chấm (1-5)
+     * @param comment Bình luận/nhận xét của khách
+     * @param customerName Tên khách hàng
+     * @return DTO chứa sentiment, câu phản hồi, rủi ro và cờ cần CSKH can thiệp
+     */
+    vn.edu.eaut.fruitables.model.dto.ReviewAnalysisDTO analyzeAndReplyReview(String productName, String categoryName, int rating, String comment, String customerName);
+
+    /**
      * Làm mới hoặc xóa bộ nhớ đệm câu trả lời
      */
     void clearCache();

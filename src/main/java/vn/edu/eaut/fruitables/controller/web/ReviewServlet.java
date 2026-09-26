@@ -1,8 +1,17 @@
 package vn.edu.eaut.fruitables.controller.web;
 
+import vn.edu.eaut.fruitables.dao.INotificationDAO;
+import vn.edu.eaut.fruitables.dao.IReviewDAO;
+import vn.edu.eaut.fruitables.dao.impl.NotificationDAOImpl;
 import vn.edu.eaut.fruitables.dao.impl.ReviewDAOImpl;
+import vn.edu.eaut.fruitables.model.dto.ReviewAnalysisDTO;
+import vn.edu.eaut.fruitables.model.entity.ProductModel;
 import vn.edu.eaut.fruitables.model.entity.ReviewModel;
 import vn.edu.eaut.fruitables.model.entity.UserModel;
+import vn.edu.eaut.fruitables.service.IGeminiService;
+import vn.edu.eaut.fruitables.service.IProductService;
+import vn.edu.eaut.fruitables.service.impl.GeminiServiceImpl;
+import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -15,6 +24,7 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 @WebServlet(urlPatterns = {"/submit-review"})
 @MultipartConfig(
@@ -114,7 +124,52 @@ public class ReviewServlet extends HttpServlet {
                 review.setComment(comment.trim());
                 review.setImageUrl(dbImageUrl);
 
-                reviewDAO.insertReview(review);
+                Long reviewId = reviewDAO.insertReview(review);
+
+                // KÍCH HOẠT AI AGENT PHÂN TÍCH CẢM XÚC & PHẢN HỒI TỰ ĐỘNG CHẠY NỀN (ASYNC)
+                if (reviewId != null) {
+                    final int finalRating = rating;
+                    final String finalComment = comment.trim();
+                    final String customerName = (user.getFullName() != null && !user.getFullName().trim().isEmpty())
+                            ? user.getFullName().trim() : user.getUsername();
+                    final Long finalOrderId = orderId;
+
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            IProductService productService = new ProductServiceImpl();
+                            ProductModel product = productService.findById(productId);
+                            String productName = (product != null && product.getName() != null) ? product.getName() : "Sản phẩm";
+                            String categoryName = (product != null && product.getCategoryName() != null) ? product.getCategoryName() : "Trái cây tươi";
+
+                            IGeminiService geminiService = new GeminiServiceImpl();
+                            ReviewAnalysisDTO analysis = geminiService.analyzeAndReplyReview(productName, categoryName, finalRating, finalComment, customerName);
+
+                            if (analysis != null) {
+                                reviewDAO.updateAIReply(reviewId, analysis.getReply(), "AI_AGENT", analysis.getSentiment(), analysis.isNeedsSupportFollowup());
+
+                                // NẾU LÀ ĐÁNH GIÁ TIÊU CỰC: Bắn thông báo cảnh báo đỏ cho Admin CSKH
+                                if ("NEGATIVE".equalsIgnoreCase(analysis.getSentiment()) || analysis.isNeedsSupportFollowup()) {
+                                    try {
+                                        INotificationDAO notificationDAO = new NotificationDAOImpl();
+                                        notificationDAO.createNotification(
+                                                1L, // Admin user ID
+                                                finalOrderId,
+                                                "REVIEW-ALERT",
+                                                "⚠️ Đánh giá tiêu cực cần hỗ trợ - " + productName,
+                                                "Khách hàng " + customerName + " vừa đánh giá " + finalRating + "⭐: '" + finalComment + "'. AI đã phản hồi hướng dẫn khách nhắn tin Live Chat CSKH.",
+                                                "SYSTEM"
+                                        );
+                                    } catch (Exception notifEx) {
+                                        System.err.println("[ReviewServlet] Không thể tạo thông báo cho Admin: " + notifEx.getMessage());
+                                    }
+                                }
+                            }
+                        } catch (Exception aiEx) {
+                            System.err.println("[ReviewServlet] Lỗi chạy AI Review Agent: " + aiEx.getMessage());
+                        }
+                    });
+                }
+
                 response.sendRedirect(request.getContextPath() + "/product-detail?id=" + productId + "&review=success");
             } else {
                 // Kiểm tra lý do chi tiết để phản hồi chính xác cho người dùng

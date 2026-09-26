@@ -58,3 +58,6 @@ src/main/webapp/assets/uploads/**
 ### Secrets & AI Config ###
 src/main/resources/gemini.properties
 gemini.properties
+
+### Project Documentation & Reports ###
+docs/

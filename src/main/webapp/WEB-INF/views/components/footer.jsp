@@ -362,6 +362,12 @@
         tabBtnAi.addEventListener('click', () => switchTab('ai'));
         tabBtnLive.addEventListener('click', () => switchTab('live'));
 
+        // Cung cấp hàm toàn cục để các trang (như trang Chi tiết sản phẩm) có thể gọi mở thẳng Live Chat CSKH
+        window.openLiveChatSupport = function() {
+            openChat();
+            switchTab('live');
+        };
+
         // ----------------------------------------------------
         // TIỆN ÍCH ĐỊNH DẠNG
         // ----------------------------------------------------

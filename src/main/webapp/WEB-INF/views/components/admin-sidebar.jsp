@@ -121,6 +121,14 @@
                 <span class="px-2 py-0.5 text-xs font-bold bg-error text-white rounded-full shadow-sm">${totalUnread}</span>
             </c:if>
         </a>
+        <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/reviews') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/reviews">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-claim"/></svg>
+                <span>Đánh giá & AI Phản hồi</span>
+            </div>
+            <span class="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${reqURI.contains('/reviews') ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'} rounded-md">AI Bot</span>
+        </a>
 
         <!-- NHÓM 6: CÔNG CỤ & KIỂM THỬ -->
         <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-3 pb-1">

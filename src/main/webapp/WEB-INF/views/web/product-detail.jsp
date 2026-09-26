@@ -387,6 +387,50 @@
                           <span class="text-xs text-on-surface-variant italic">(Ảnh chụp thực tế)</span>
                         </div>
                       </c:if>
+
+                      <!-- PHẢN HỒI TỪ CỬA HÀNG / TRỢ LÝ AI CSKH -->
+                      <c:if test="${not empty rv.reply}">
+                        <div class="mt-4 ml-4 sm:ml-12 p-4 rounded-xl border ${rv.sentiment eq 'NEGATIVE' ? 'bg-amber-50/70 border-amber-200' : 'bg-surface-container-low border-surface-variant'} relative transition-all">
+                          <!-- Mũi tên chỉ lên mô phỏng reply bubble -->
+                          <div class="absolute -top-1.5 left-6 w-3 h-3 bg-inherit border-t border-l border-inherit transform rotate-45"></div>
+
+                          <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                            <div class="flex items-center gap-2">
+                              <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                                🌿
+                              </div>
+                              <span class="font-label-bold text-xs text-primary font-bold">Fruitables Store</span>
+                              <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${rv.sentiment eq 'NEGATIVE' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${rv.replyBy eq 'AI_AGENT' ? 'Trợ lý CSKH' : 'Quản trị viên'}
+                              </span>
+                            </div>
+                            <c:if test="${not empty rv.replyAt}">
+                              <span class="text-[11px] text-on-surface-variant">
+                                <fmt:formatDate value="${rv.replyAt}" pattern="dd/MM/yyyy HH:mm"/>
+                              </span>
+                            </c:if>
+                          </div>
+
+                          <p class="font-body-md text-xs sm:text-sm text-on-surface leading-relaxed whitespace-pre-line">
+                            <c:out value="${rv.reply}"/>
+                          </p>
+
+                          <!-- NẾU LÀ ĐÁNH GIÁ TIÊU CỰC: Nút Kêu Gọi Nhắn Tin Trực Tiếp Với CSKH -->
+                          <c:if test="${rv.sentiment eq 'NEGATIVE' or rv.rating le 2}">
+                            <div class="mt-3 pt-2.5 border-t border-amber-200/80 flex items-center justify-between flex-wrap gap-2">
+                              <span class="text-xs text-amber-900 font-medium flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-amber-700">support_agent</span>
+                                Trải nghiệm của bạn chưa như ý?
+                              </span>
+                              <button type="button" onclick="if(window.openLiveChatSupport) window.openLiveChatSupport();" 
+                                      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-all shadow-sm active:scale-95 cursor-pointer">
+                                <span class="material-symbols-outlined text-xs">chat</span>
+                                <span>Nhắn tin với CSKH ngay</span>
+                              </button>
+                            </div>
+                          </c:if>
+                        </div>
+                      </c:if>
                     </div>
                   </c:forEach>
                 </div>
