@@ -157,7 +157,7 @@ public class ReviewDAOImpl implements IReviewDAO {
 
     @Override
     public ReviewModel findById(Long reviewId) {
-        String sql = "SELECT r.*, u.full_name, u.avatar_url, p.name AS product_name, p.image AS product_image " +
+        String sql = "SELECT r.*, u.full_name, u.avatar_url, p.name AS product_name, p.image_url AS product_image " +
                      "FROM reviews r " +
                      "JOIN users u ON r.user_id = u.id " +
                      "JOIN products p ON r.product_id = p.id " +
@@ -185,7 +185,7 @@ public class ReviewDAOImpl implements IReviewDAO {
     public List<ReviewModel> findAllReviews(String sentimentFilter, String keyword, int page, int pageSize) {
         List<ReviewModel> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT r.*, u.full_name, u.avatar_url, p.name AS product_name, p.image AS product_image " +
+                "SELECT r.*, u.full_name, u.avatar_url, p.name AS product_name, p.image_url AS product_image " +
                 "FROM reviews r " +
                 "JOIN users u ON r.user_id = u.id " +
                 "JOIN products p ON r.product_id = p.id WHERE 1=1 "
