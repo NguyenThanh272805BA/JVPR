@@ -57,6 +57,16 @@ public interface IGeminiService {
     vn.edu.eaut.fruitables.model.dto.ReviewAnalysisDTO analyzeAndReplyReview(String productName, String categoryName, int rating, String comment, String customerName);
 
     /**
+     * Chẩn đoán độ tươi của hoa quả qua hình ảnh và gợi ý công thức chế biến chống lãng phí (Multimodal Fruit Doctor Agent)
+     *
+     * @param imageBytes Dữ liệu byte của ảnh chụp
+     * @param mimeType   Định dạng mime (image/jpeg, image/png, image/webp)
+     * @param userNote   Ghi chú hoặc câu hỏi kèm theo từ người dùng
+     * @return Báo cáo chẩn đoán, đánh giá an toàn, công thức món ngon và link mua nguyên liệu kèm theo
+     */
+    String diagnoseFruitImage(byte[] imageBytes, String mimeType, String userNote);
+
+    /**
      * Làm mới hoặc xóa bộ nhớ đệm câu trả lời
      */
     void clearCache();

@@ -129,17 +129,38 @@
                         <button type="button" class="ai-quick-btn bg-surface-container-lowest hover:bg-primary/10 hover:border-primary border border-outline-variant text-[11px] font-medium py-1 px-2.5 rounded-full text-on-surface transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="quick_recipes" data-prompt="Công thức nước ép">
                             🥤 Công thức nước ép
                         </button>
+                        <button type="button" id="ai-doctor-btn" class="ai-quick-btn bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-500 border border-emerald-300 text-[11px] font-bold py-1 px-2.5 rounded-full text-emerald-800 transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs" data-action="open_doctor" data-prompt="Chụp/tải ảnh để AI Bác Sĩ chẩn đoán độ tươi">
+                            🩺 Bác sĩ Hoa Quả (Tải ảnh)
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Form gửi tin nhắn cho AI -->
-            <form id="ai-send-form" class="mt-2.5 flex items-center gap-1.5 pt-2 border-t border-surface-variant flex-shrink-0">
-                <input type="text" id="ai-chat-input" placeholder="Hỏi về giảm giá, bán chạy, bảo quản, nước ép..." autocomplete="off"
-                       class="flex-1 px-3.5 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
-                <button type="submit" id="ai-submit-btn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-primary text-white flex items-center justify-center hover:opacity-90 transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer" title="Gửi câu hỏi">
-                    <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
-                </button>
+            <!-- Form gửi tin nhắn cho AI (Hỗ trợ Multimodal Vision) -->
+            <form id="ai-send-form" class="mt-2.5 flex flex-col gap-1.5 pt-2 border-t border-surface-variant flex-shrink-0">
+                <!-- Preview ảnh hoa quả cần chẩn đoán -->
+                <div id="ai-img-preview-box" class="hidden relative items-center gap-2 p-1.5 bg-surface-container rounded-xl border border-outline-variant w-fit max-w-[220px]">
+                    <img id="ai-img-preview" src="" class="w-10 h-10 object-cover rounded-lg border border-outline-variant">
+                    <div class="flex flex-col">
+                        <span id="ai-img-preview-name" class="text-[10px] text-on-surface truncate max-w-[100px] font-semibold"></span>
+                        <span class="text-[9px] text-emerald-700 font-bold">🩺 Sẵn sàng chẩn đoán</span>
+                    </div>
+                    <button type="button" id="ai-img-cancel-btn" class="text-error hover:bg-error/10 p-1 rounded-full transition-colors ml-1 cursor-pointer" title="Hủy ảnh">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-1.5 w-full">
+                    <input type="file" id="ai-file-input" accept="image/png,image/jpeg,image/webp,image/jpg" class="hidden">
+                    <button type="button" id="ai-attach-btn" class="w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary flex items-center justify-center transition-all flex-shrink-0 border border-outline-variant cursor-pointer" title="Chụp hoặc đính kèm ảnh trái cây để AI Bác Sĩ chẩn đoán">
+                        <span class="material-symbols-outlined text-lg">photo_camera</span>
+                    </button>
+                    <input type="text" id="ai-chat-input" placeholder="Hỏi đáp hoặc gửi ảnh để AI Bác sĩ chẩn đoán độ tươi..." autocomplete="off"
+                           class="flex-1 px-3.5 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant focus:border-primary outline-none text-xs text-on-surface shadow-inner">
+                    <button type="submit" id="ai-submit-btn" class="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-primary text-white flex items-center justify-center hover:opacity-90 transition-all flex-shrink-0 shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer" title="Gửi câu hỏi">
+                        <span class="material-symbols-outlined text-lg pointer-events-none">send</span>
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -236,6 +257,13 @@
         const aiSendForm = document.getElementById('ai-send-form');
         const aiChatInput = document.getElementById('ai-chat-input');
         const aiSubmitBtn = document.getElementById('ai-submit-btn');
+        const aiAttachBtn = document.getElementById('ai-attach-btn');
+        const aiFileInput = document.getElementById('ai-file-input');
+        const aiImgPreviewBox = document.getElementById('ai-img-preview-box');
+        const aiImgPreview = document.getElementById('ai-img-preview');
+        const aiImgPreviewName = document.getElementById('ai-img-preview-name');
+        const aiImgCancelBtn = document.getElementById('ai-img-cancel-btn');
+        let currentAiImageData = null;
 
         // Live Chat Elements
         const sendForm = document.getElementById('chat-send-form');
@@ -417,12 +445,17 @@
         // ----------------------------------------------------
         // HIỂN THỊ TIN NHẮN (ĐỢI RENDER XONG MỚI ĐẨY LÊN CHAT)
         // ----------------------------------------------------
-        function appendAiUserMessage(msg) {
+        function appendAiUserMessage(msg, imgData) {
             if (!aiMessagesBox) return;
+            let imgHtml = '';
+            if (imgData) {
+                imgHtml = `<div class="mb-1.5 overflow-hidden rounded-xl border border-white/30 max-w-[170px]"><img src="\${imgData}" class="w-full h-24 object-cover"></div>`;
+            }
             const html = `
                 <div class="flex justify-end items-end gap-1.5 my-2">
                     <div class="max-w-[80%]">
                         <div class="bg-gradient-to-r from-emerald-600 to-primary text-white p-2.5 px-3.5 rounded-2xl rounded-br-sm shadow-sm leading-relaxed text-xs break-words">
+                            \${imgHtml}
                             \${escapeHtml(msg)}
                         </div>
                     </div>
@@ -603,26 +636,61 @@
                 return;
             }
 
+            // 4.5. Trường hợp kết quả Giám định ảnh từ Bác Sĩ Hoa Quả (Fruit Doctor Multimodal AI Agent)
+            if (data.type === 'fruit_diagnosis') {
+                let diagHtml = `
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-1.5 pb-1 border-b border-primary/20">
+                            <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                                <span class="material-symbols-outlined text-sm">medical_services</span>
+                            </span>
+                            <span class="font-bold text-primary text-xs">\${escapeHtml(data.title || 'Fruit Doctor AI')}</span>
+                        </div>
+                        <div class="leading-relaxed text-[11.5px]">\${formatMarkdown(data.message)}</div>
+                        <div class="mt-2 pt-2 border-t border-outline-variant/60 flex items-center justify-between">
+                            <span class="text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full font-bold border border-emerald-300">🌱 Multimodal Vision AI</span>
+                            <a href="\${contextPath}/shop" class="text-primary hover:underline font-bold text-[10.5px] inline-flex items-center gap-0.5">
+                                Mua quả tươi bổ sung <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                appendAiBotBubble(diagHtml);
+                return;
+            }
+
             // 5. Trường hợp text thông thường (từ Gemini AI)
             const reply = data.message || 'Dạ em chưa rõ câu hỏi, bạn thử chọn các gợi ý bên dưới nhé! 🍎';
             appendAiBotBubble(formatMarkdown(reply));
         }
 
-        // Gửi câu hỏi lên Servlet
-        function sendAiPrompt(text, actionName) {
-            if (!text || !text.trim()) return;
-            const query = text.trim();
+        // Gửi câu hỏi lên Servlet (Hỗ trợ Multimodal Vision)
+        function sendAiPrompt(text, actionName, imgBase64) {
+            const query = (text || '').trim();
+            if (!query && !imgBase64) return;
 
-            appendAiUserMessage(query);
+            appendAiUserMessage(query || 'Yêu cầu chẩn đoán ảnh hoa quả', imgBase64);
             if (aiChatInput) aiChatInput.value = '';
+            if (aiImgPreviewBox) {
+                aiImgPreviewBox.classList.add('hidden');
+                aiImgPreviewBox.classList.remove('flex');
+            }
+            const sentImage = imgBase64 || currentAiImageData;
+            currentAiImageData = null;
 
             const typingId = showAiTypingIndicator();
             if (aiSubmitBtn) aiSubmitBtn.disabled = true;
 
             const payload = new URLSearchParams();
-            payload.append('action', actionName || 'chat');
-            payload.append('message', query);
-            payload.append('history', JSON.stringify(aiHistory));
+            if (sentImage) {
+                payload.append('action', 'multimodal_diagnose');
+                payload.append('imageBase64', sentImage);
+                payload.append('message', query || 'Bác sĩ hoa quả kiểm tra giúp độ tươi và gợi ý món ăn');
+            } else {
+                payload.append('action', actionName || 'chat');
+                payload.append('message', query);
+                payload.append('history', JSON.stringify(aiHistory));
+            }
 
             fetch(contextPath + '/api/ai-chat', {
                 method: 'POST',
@@ -720,13 +788,19 @@
             const action = btn.getAttribute('data-action');
             const prompt = btn.getAttribute('data-prompt') || btn.innerText.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 
-            // 1. Điền nội dung vào thanh chat và focus để người dùng thấy rõ câu hỏi
+            // 1. Chẩn đoán hoa quả qua ảnh -> mở hộp thoại chọn ảnh
+            if (action === 'open_doctor') {
+                if (aiFileInput) aiFileInput.click();
+                return;
+            }
+
+            // 2. Điền nội dung vào thanh chat và focus để người dùng thấy rõ câu hỏi
             if (aiChatInput) {
                 aiChatInput.value = prompt;
                 aiChatInput.focus();
             }
 
-            // 2. Tra cứu tiến độ đơn -> hiển thị form nhập SĐT
+            // 3. Tra cứu tiến độ đơn -> hiển thị form nhập SĐT
             if (action === 'open_tracker') {
                 appendAiUserMessage('📦 ' + prompt);
                 if (aiChatInput) aiChatInput.value = '';
@@ -734,18 +808,64 @@
                 return;
             }
 
-            // 3. Tự động gửi truy vấn để trả lời ngay lập tức
+            // 4. Tự động gửi truy vấn để trả lời ngay lập tức
             sendAiPrompt(prompt, action);
         });
+
+        // Xử lý đính kèm ảnh cho AI Bác Sĩ (Multimodal Vision)
+        if (aiAttachBtn && aiFileInput) {
+            aiAttachBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                aiFileInput.click();
+            });
+
+            aiFileInput.addEventListener('change', function(e) {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    alert('Vui lòng chọn tệp định dạng hình ảnh (PNG, JPG, WEBP)!');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentAiImageData = event.target.result;
+                    if (aiImgPreview) aiImgPreview.src = currentAiImageData;
+                    if (aiImgPreviewName) aiImgPreviewName.innerText = file.name;
+                    if (aiImgPreviewBox) {
+                        aiImgPreviewBox.classList.remove('hidden');
+                        aiImgPreviewBox.classList.add('flex');
+                    }
+                    if (aiChatInput) {
+                        aiChatInput.placeholder = 'Nhập câu hỏi kèm theo hoặc bấm Gửi để chẩn đoán ngay...';
+                        aiChatInput.focus();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (aiImgCancelBtn) {
+            aiImgCancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentAiImageData = null;
+                if (aiFileInput) aiFileInput.value = '';
+                if (aiImgPreviewBox) {
+                    aiImgPreviewBox.classList.add('hidden');
+                    aiImgPreviewBox.classList.remove('flex');
+                }
+                if (aiChatInput) {
+                    aiChatInput.placeholder = 'Hỏi đáp hoặc tải ảnh để AI Bác sĩ chẩn đoán độ tươi...';
+                }
+            });
+        }
 
         // Bắt sự kiện submit form AI chat (gõ vào ô chat và nhấn Enter hoặc nút gửi)
         if (aiSendForm) {
             aiSendForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if (!aiChatInput) return;
-                const text = aiChatInput.value.trim();
-                if (!text) return;
-                sendAiPrompt(text);
+                const text = aiChatInput ? aiChatInput.value.trim() : '';
+                if (!text && !currentAiImageData) return;
+                sendAiPrompt(text, currentAiImageData ? 'multimodal_diagnose' : 'chat', currentAiImageData);
             });
         }
 

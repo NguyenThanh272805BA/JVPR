@@ -664,6 +664,99 @@ public class GeminiServiceImpl implements IGeminiService {
     }
 
     @Override
+    public String diagnoseFruitImage(byte[] imageBytes, String mimeType, String userNote) {
+        if (imageBytes == null || imageBytes.length == 0) {
+            return "Dạ bạn vui lòng tải lên hình ảnh hoa quả để Trợ lý Fruit Doctor chẩn đoán giúp bạn nhé! 🍎";
+        }
+        if (mimeType == null || mimeType.trim().isEmpty()) {
+            mimeType = "image/jpeg";
+        }
+
+        String base64Data = Base64.getEncoder().encodeToString(imageBytes);
+        String compactCatalog = getCompactCatalog();
+
+        String prompt = """
+                Bạn là 'Multimodal Fruit Doctor & Anti-Waste AI Agent' của thương hiệu hoa quả sạch Fruitables.
+                Nhiệm vụ của bạn là giám định độ tươi, chất lượng của hoa quả trong ảnh và đưa ra giải pháp chế biến chống lãng phí:
+                
+                Danh mục hoa quả hiện có tại cửa hàng Fruitables:
+                """ + compactCatalog + """
+                
+                Ghi chú từ khách hàng: """ + (userNote != null && !userNote.trim().isEmpty() ? userNote : "Khách muốn biết hoa quả này có tươi không, ăn được không và gợi ý cách dùng ngon nhất.") + """
+                
+                Yêu cầu cấu trúc bài phân tích (Trình bày định dạng Markdown sinh động, rõ ràng):
+                1. 🔍 **Chẩn đoán & Độ chín/Độ tươi**:
+                   - Xác định tên các loại quả xuất hiện trong ảnh.
+                   - Nhận xét chi tiết tình trạng vỏ, cuống, màu sắc và mức độ chín (vd: Đang giòn tươi / Đã chín già có đốm mật / Vỏ hơi héo mất nước nhẹ / Cấn dập).
+                2. 🛡️ **Đánh giá mức độ an toàn**:
+                   - Kết luận rõ ràng: Thích hợp ăn tươi ngay, hay nên gọt vỏ sơ chế, hay dùng nấu chín/ép nước, hoặc cần loại bỏ phần nào.
+                3. 🥤 **Công thức chống lãng phí (Zero-Waste Recipe)**:
+                   - Gợi ý 1-2 công thức nước ép, sinh tố detox, sữa chua hoặc mứt hoa quả tận dụng quả này để giữ trọn vitamin.
+                4. 🛒 **Gợi ý kết hợp tại Fruitables**:
+                   - Gợi ý 1-2 loại quả hoặc nguyên liệu ăn kèm từ danh mục trên kèm nút mua Markdown dạng: [👉 Đặt mua Tên Sản Phẩm](/product-detail?id=ID).
+                
+                Lưu ý:
+                - Ngắn gọn, chuyên nghiệp, súc tích và truyền cảm hứng lối sống xanh lành mạnh.
+                - Tránh văn phong dài dòng, chia các đầu mục rõ ràng với emoji hoa quả tươi mát.
+                """;
+
+        try {
+            JsonObject root = new JsonObject();
+            JsonArray contents = new JsonArray();
+            JsonObject contentObj = new JsonObject();
+            contentObj.addProperty("role", "user");
+
+            JsonArray parts = new JsonArray();
+
+            // Part 1: Inline Data (Image)
+            JsonObject inlineDataPart = new JsonObject();
+            JsonObject inlineDataObj = new JsonObject();
+            inlineDataObj.addProperty("mimeType", mimeType);
+            inlineDataObj.addProperty("data", base64Data);
+            inlineDataPart.add("inlineData", inlineDataObj);
+            parts.add(inlineDataPart);
+
+            // Part 2: Text Prompt
+            JsonObject textPart = new JsonObject();
+            textPart.addProperty("text", prompt);
+            parts.add(textPart);
+
+            contentObj.add("parts", parts);
+            contents.add(contentObj);
+            root.add("contents", contents);
+
+            JsonObject genConfig = new JsonObject();
+            genConfig.addProperty("maxOutputTokens", 1200);
+            genConfig.addProperty("temperature", 0.3);
+            root.add("generationConfig", genConfig);
+
+            String requestBody = gson.toJson(root);
+            String apiUrl = GeminiConfigUtil.getApiUrl();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .header("Content-Type", "application/json; charset=UTF-8")
+                    .timeout(Duration.ofSeconds(20))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() == 200) {
+                String aiText = parseGeminiText(response.body());
+                if (aiText != null && !aiText.trim().isEmpty()) {
+                    return aiText;
+                }
+            } else {
+                System.err.println("[GeminiService Vision] Error: HTTP " + response.statusCode() + " - " + response.body());
+            }
+        } catch (Exception e) {
+            System.err.println("[GeminiService Vision] Call failed: " + e.getMessage());
+        }
+
+        return "Dạ Fruit Doctor Agent đã tiếp nhận ảnh của bạn 🍎. Tuy nhiên đường truyền AI đang xử lý tải cao. Tóm tắt nhanh: Với hoa quả đã chín già, bạn nên sơ chế làm sinh tố hoặc nước ép ngay trong ngày để giữ trọn dưỡng chất nhé! Bạn có thể thử gửi lại sau giây lát ạ.";
+    }
+
+    @Override
     public void clearCache() {
         RESPONSE_CACHE.clear();
         cachedCompactCatalog = "";

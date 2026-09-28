@@ -85,6 +85,9 @@ public class AIChatAPIServlet extends HttpServlet {
                 case "track_order":
                     handleTrackOrder(request, jsonResponse);
                     break;
+                case "multimodal_diagnose":
+                    handleMultimodalDiagnose(request, jsonResponse);
+                    break;
                 case "chat":
                 default:
                     handleSmartChatRouting(request, jsonResponse);
@@ -346,6 +349,41 @@ public class AIChatAPIServlet extends HttpServlet {
                 "**1. Nước ép Xanh Detox (Táo Envy + Cần tây + Dưa leo):** Thanh lọc gan, thanh nhiệt cơ thể và giữ dáng cực tốt. Uống ngon nhất vào buổi sáng.\n\n" +
                 "**2. Sinh tố Bơ Chuối Hạnh Nhân:** Giàu chất béo tốt Omega-3 và Kali, cung cấp năng lượng tức thì cho ngày dài năng động.\n\n" +
                 "**3. Nước ép Cam Dứa Mật Ong:** Cung cấp hàm lượng Vitamin C dồi dào, tăng sức đề kháng tự nhiên.");
+    }
+
+    /**
+     * Xử lý Giám định hoa quả đa phương thức qua hình ảnh & Gợi ý công thức chống lãng phí (Multimodal Fruit Doctor Agent)
+     */
+    private void handleMultimodalDiagnose(HttpServletRequest request, JsonObject response) {
+        String base64Param = request.getParameter("imageBase64");
+        String userNote = request.getParameter("message");
+        if (base64Param == null || base64Param.trim().isEmpty()) {
+            response.addProperty("type", "text");
+            response.addProperty("message", "Dạ bạn vui lòng chọn hoặc tải lên hình ảnh hoa quả để Trợ lý Fruit Doctor giám định nhé! 🍎");
+            return;
+        }
+
+        try {
+            String mimeType = "image/jpeg";
+            String cleanBase64 = base64Param.trim();
+            if (cleanBase64.contains(",")) {
+                String[] parts = cleanBase64.split(",", 2);
+                if (parts[0].contains("image/png")) mimeType = "image/png";
+                else if (parts[0].contains("image/webp")) mimeType = "image/webp";
+                cleanBase64 = parts[1];
+            }
+
+            byte[] imageBytes = Base64.getDecoder().decode(cleanBase64);
+            String diagnosis = geminiService.diagnoseFruitImage(imageBytes, mimeType, userNote);
+
+            response.addProperty("type", "fruit_diagnosis");
+            response.addProperty("title", "🩺 Fruit Doctor Agent: Giám Định Độ Tươi & Chống Lãng Phí");
+            response.addProperty("message", diagnosis);
+        } catch (Exception e) {
+            System.err.println("[AIChatAPIServlet] Error diagnosing fruit image: " + e.getMessage());
+            response.addProperty("type", "text");
+            response.addProperty("message", "Dạ em gặp chút lỗi khi đọc định dạng ảnh. Bạn thử chụp lại ảnh định dạng JPG hoặc PNG rõ nét hơn nhé! 🍎");
+        }
     }
 
     /**
