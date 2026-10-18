@@ -6,7 +6,7 @@
 
 <!-- THANH ĐIỀU HƯỚNG NỔI BO GÓC CAO CẤP (FLOATING CAPSULE ISLAND NAVBAR) -->
 <header class="sticky top-2 sm:top-3 z-50 px-2 sm:px-4 md:px-6 w-full max-w-[1440px] mx-auto transition-all duration-300">
-    <nav class="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-outline-variant/60 px-3 sm:px-4 md:px-5 lg:px-6 h-[68px] md:h-[72px] flex items-center justify-between gap-2.5 md:gap-3.5 lg:gap-4 transition-all">
+    <nav class="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-outline-variant/60 px-4 sm:px-5 md:px-6 lg:px-7 h-[68px] md:h-[72px] flex items-center justify-between gap-2.5 md:gap-3.5 lg:gap-4 transition-all">
         <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
         <a class="group flex items-center gap-2 md:gap-2.5 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
             <div class="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-[0_4px_16px_rgba(101,163,13,0.35)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 relative overflow-hidden flex-shrink-0 border border-white/30">
@@ -111,29 +111,8 @@
             </div>
         </div>
 
-        <!-- Tiện ích người dùng, Vòng quay & Giỏ hàng -->
-        <div class="flex items-center space-x-1.5 sm:space-x-2 md:space-x-2.5 flex-shrink-0">
-            <!-- Nút Vòng Quay May Mắn Đặc Trưng Trên Thanh Điều Hướng (Code-Drawn Animated Icon) -->
-            <a id="navbar-lucky-spin-btn" href="${pageContext.request.contextPath}/lucky-spin"
-               class="group/spin relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/20 hover:from-amber-500/25 hover:via-rose-500/20 hover:to-amber-500/35 border border-amber-400/60 hover:border-amber-500 shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all text-amber-950"
-               title="Vòng Quay May Mắn - Điểm danh nhận voucher & quà tặng mỗi ngày">
-                <!-- Icon bánh xe xoay đa sắc màu với ánh sáng hào quang nhấp nháy -->
-                <div class="relative w-5 h-5 sm:w-5.5 sm:h-5.5 flex-shrink-0 flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full bg-amber-400/35 blur-xs group-hover/spin:blur-sm animate-pulse"></div>
-                    <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5 relative z-10 transition-transform duration-700 ease-out group-hover/spin:rotate-180 animate-[spin_10s_linear_infinite]" viewBox="0 0 32 32">
-                        <use href="#icon-lucky-spin-color"/>
-                    </svg>
-                </div>
-                <div class="hidden xl:flex flex-col text-left leading-none">
-                    <span class="text-[11px] font-black text-amber-950 group-hover/spin:text-rose-600 transition-colors uppercase tracking-wider">Vòng Quay</span>
-                    <span class="text-[8px] font-bold text-amber-700/90">Quà mỗi ngày</span>
-                </div>
-                <!-- Badge HOT nhấp nháy lôi cuốn -->
-                <span class="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-xs animate-bounce">
-                    HOT
-                </span>
-            </a>
-
+        <!-- Tiện ích người dùng, Giỏ hàng & Thông báo -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 flex-shrink-0">
             <!-- Nút Giỏ Hàng -->
             <a id="navbar-cart-btn" href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors relative inline-flex items-center justify-center" title="Giỏ hàng">
                 <span id="navbar-cart-icon" class="material-symbols-outlined inline-block transition-transform select-none text-[22px]">shopping_cart</span>
@@ -334,7 +313,7 @@
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
                     <div class="group relative cursor-pointer py-1.5 flex-shrink-0">
-                        <div class="flex items-center gap-1.5 md:gap-2 text-primary hover:bg-primary/10 p-1 md:p-1.5 rounded-full transition-colors border border-outline-variant/50">
+                        <div class="flex items-center gap-1.5 md:gap-2 text-primary hover:bg-primary/5 px-2 py-1 md:px-2.5 md:py-1.5 rounded-full transition-colors border border-outline-variant/60 bg-surface-container-low/40">
                             <c:choose>
                                 <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
                                     <img src="${sessionScope.USERMODEL.avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-primary flex-shrink-0">
