@@ -130,7 +130,7 @@
                 <span class="material-symbols-outlined text-[20px]">
                   <c:choose>
                     <c:when test="${product.storageType == 'COLD_CHAIN'}">ac_unit</c:when>
-                    <c:when test="${product.storageType == 'FRAGILE_GIFT'}">featured_seasonal_and_gifts</c:when>
+                    <c:when test="${product.storageType == 'FRAGILE_GIFT'}">card_giftcard</c:when>
                     <c:otherwise>thermostat</c:otherwise>
                   </c:choose>
                 </span>

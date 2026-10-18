@@ -1,10 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<nav class="bg-surface w-full sticky top-0 shadow-sm z-50 rounded-b-2xl sm:rounded-b-none">
-    <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto flex-nowrap gap-2 md:gap-4">
+<!-- Nạp bộ thư viện vector SVG thuần (Code-Drawn Icons) dùng chung toàn web -->
+<jsp:include page="/WEB-INF/views/components/svg-icons.jsp" />
+
+<!-- THANH ĐIỀU HƯỚNG NỔI BO GÓC CAO CẤP (FLOATING CAPSULE ISLAND NAVBAR) -->
+<header class="sticky top-2 sm:top-3 z-50 px-2 sm:px-4 md:px-6 w-full max-w-[1440px] mx-auto transition-all duration-300">
+    <nav class="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-outline-variant/60 px-3 sm:px-4 md:px-5 lg:px-6 h-[68px] md:h-[72px] flex items-center justify-between gap-2.5 md:gap-3.5 lg:gap-4 transition-all">
         <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
-        <a class="group flex items-center gap-2.5 md:gap-3 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
+        <a class="group flex items-center gap-2 md:gap-2.5 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
             <div class="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-br from-[#84cc16] via-[#65a30d] to-[#4d7c0f] flex items-center justify-center text-white shadow-[0_4px_16px_rgba(101,163,13,0.35)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 relative overflow-hidden flex-shrink-0 border border-white/30">
                 <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent"></div>
                 <svg class="w-6 h-6 text-white drop-shadow-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,29 +18,32 @@
                 </svg>
             </div>
             <div class="flex flex-col">
-                <div class="flex items-center text-2xl md:text-[27px] font-black tracking-tight leading-none">
+                <div class="flex items-center text-xl sm:text-2xl md:text-[25px] font-black tracking-tight leading-none">
                     <span class="text-slate-900 font-display-lg">Fruit</span><span class="bg-gradient-to-r from-primary via-[#84cc16] to-[#65a30d] bg-clip-text text-transparent font-display-lg">ables</span>
                     <span class="w-2 h-2 rounded-full bg-primary ml-1 animate-pulse"></span>
                 </div>
-                <span class="text-[9px] font-bold text-on-surface-variant/75 tracking-[0.22em] uppercase mt-0.5 pl-0.5">Organic & Fresh</span>
+                <span class="text-[8.5px] md:text-[9px] font-bold text-on-surface-variant/75 tracking-[0.2em] uppercase mt-0.5 pl-0.5">Organic & Fresh</span>
             </div>
         </a>
 
-        <!-- Menu điều hướng đồng bộ icon -->
-        <div class="hidden lg:flex space-x-4 xl:space-x-6 items-center flex-shrink-0">
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/home">
-                <span class="material-symbols-outlined text-[18px]">home</span> Trang chủ
+        <!-- Menu điều hướng chức năng hệ thống hiển thị 100% trên Desktop -->
+        <div class="hidden lg:flex items-center gap-1 xl:gap-2 flex-shrink-0 text-[13px] xl:text-sm font-semibold">
+            <a class="px-2.5 py-1.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all flex items-center gap-1.5" href="${pageContext.request.contextPath}/home">
+                <span class="material-symbols-outlined text-[18px]">home</span>
+                <span>Trang chủ</span>
             </a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/shop">
-                <span class="material-symbols-outlined text-[18px]">storefront</span> Cửa hàng
+            <a class="px-2.5 py-1.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all flex items-center gap-1.5" href="${pageContext.request.contextPath}/shop">
+                <span class="material-symbols-outlined text-[18px]">storefront</span>
+                <span>Cửa hàng</span>
             </a>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 text-emerald-700 font-semibold" href="${pageContext.request.contextPath}/gift-basket-builder">
-                <span class="material-symbols-outlined text-[18px] text-amber-500">featured_seasonal_and_gifts</span> Tự mix giỏ quà
+            <a class="px-2.5 py-1.5 rounded-xl text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100 hover:text-emerald-800 transition-all flex items-center gap-1.5 font-bold" href="${pageContext.request.contextPath}/gift-basket-builder">
+                <span class="material-symbols-outlined text-[18px] text-amber-500">card_giftcard</span>
+                <span>Tự mix giỏ quà</span>
             </a>
             <!-- Khuyến mãi Dropdown trượt mượt mà khi hover -->
-            <div class="relative group py-2">
-                <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 cursor-pointer py-1" href="${pageContext.request.contextPath}/promotions">
-                    <span class="material-symbols-outlined text-[18px]">redeem</span>
+            <div class="relative group py-1.5">
+                <a class="px-2.5 py-1.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all flex items-center gap-1 cursor-pointer" href="${pageContext.request.contextPath}/promotions">
+                    <span class="material-symbols-outlined text-[18px] text-rose-500">redeem</span>
                     <span>Khuyến mãi</span>
                     <span class="material-symbols-outlined text-[16px] transition-transform duration-200 group-hover:rotate-180 text-on-surface-variant/70">expand_more</span>
                 </a>
@@ -77,18 +84,19 @@
                     </div>
                 </div>
             </div>
-            <a class="font-body-md text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5" href="${pageContext.request.contextPath}/guest-tracking">
-                <span class="material-symbols-outlined text-[18px]">local_shipping</span> Tra cứu đơn hàng
+            <a class="px-2.5 py-1.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all flex items-center gap-1.5" href="${pageContext.request.contextPath}/guest-tracking">
+                <span class="material-symbols-outlined text-[18px] text-sky-600">local_shipping</span>
+                <span>Tra cứu</span>
             </a>
         </div>
 
         <!-- Thanh Tìm kiếm Real-time với Autocomplete Dropdown -->
-        <div class="relative hidden sm:block min-w-[120px] max-w-[180px] md:max-w-[210px] lg:max-w-[220px] xl:max-w-[260px] flex-1" id="navbar-search-wrapper">
+        <div class="relative hidden md:block min-w-[130px] max-w-[160px] lg:max-w-[190px] xl:max-w-[240px] flex-1" id="navbar-search-wrapper">
             <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
                 <input type="text" id="navbar-search-input" name="keyword" autocomplete="off"
                        placeholder="Tìm trái cây, rau củ..."
-                       class="w-full pl-9 pr-4 py-1.5 text-xs rounded-full border border-outline-variant bg-surface-container-low focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/60">
-                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-base pointer-events-none">search</span>
+                       class="w-full pl-8 pr-3 py-1.5 text-xs rounded-full border border-outline-variant bg-surface-container-low focus:bg-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/60">
+                <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[17px] pointer-events-none">search</span>
             </form>
 
             <!-- Autocomplete Dropdown Result Box -->
@@ -103,16 +111,16 @@
             </div>
         </div>
 
-        <!-- Tiện ích người dùng & Giỏ hàng -->
-        <div class="flex items-center space-x-2 md:space-x-3.5 flex-shrink-0">
+        <!-- Tiện ích người dùng, Vòng quay & Giỏ hàng -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2 md:space-x-2.5 flex-shrink-0">
             <!-- Nút Vòng Quay May Mắn Đặc Trưng Trên Thanh Điều Hướng (Code-Drawn Animated Icon) -->
             <a id="navbar-lucky-spin-btn" href="${pageContext.request.contextPath}/lucky-spin"
                class="group/spin relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/20 hover:from-amber-500/25 hover:via-rose-500/20 hover:to-amber-500/35 border border-amber-400/60 hover:border-amber-500 shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all text-amber-950"
                title="Vòng Quay May Mắn - Điểm danh nhận voucher & quà tặng mỗi ngày">
                 <!-- Icon bánh xe xoay đa sắc màu với ánh sáng hào quang nhấp nháy -->
-                <div class="relative w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 flex items-center justify-center">
+                <div class="relative w-5 h-5 sm:w-5.5 sm:h-5.5 flex-shrink-0 flex items-center justify-center">
                     <div class="absolute inset-0 rounded-full bg-amber-400/35 blur-xs group-hover/spin:blur-sm animate-pulse"></div>
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6 relative z-10 transition-transform duration-700 ease-out group-hover/spin:rotate-180 animate-[spin_10s_linear_infinite]" viewBox="0 0 32 32">
+                    <svg class="w-5 h-5 sm:w-5.5 sm:h-5.5 relative z-10 transition-transform duration-700 ease-out group-hover/spin:rotate-180 animate-[spin_10s_linear_infinite]" viewBox="0 0 32 32">
                         <use href="#icon-lucky-spin-color"/>
                     </svg>
                 </div>
@@ -126,8 +134,9 @@
                 </span>
             </a>
 
-            <a id="navbar-cart-btn" href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative inline-block" title="Giỏ hàng">
-                <span id="navbar-cart-icon" class="material-symbols-outlined inline-block transition-transform select-none">shopping_cart</span>
+            <!-- Nút Giỏ Hàng -->
+            <a id="navbar-cart-btn" href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors relative inline-flex items-center justify-center" title="Giỏ hàng">
+                <span id="navbar-cart-icon" class="material-symbols-outlined inline-block transition-transform select-none text-[22px]">shopping_cart</span>
                 <c:if test="${not empty sessionScope.CART_TOTAL_ITEMS && sessionScope.CART_TOTAL_ITEMS > 0}">
                     <span id="navbar-cart-badge" class="absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center transition-transform">
                         <c:out value="${sessionScope.CART_TOTAL_ITEMS}"/>
@@ -138,7 +147,7 @@
             <!-- Notification Bell Icon (Chỉ hiện khi đã đăng nhập) -->
             <c:if test="${not empty sessionScope.USERMODEL}">
                 <div class="relative" id="notification-dropdown-wrapper">
-                    <button id="notification-btn" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative inline-block" title="Thông báo đơn hàng">
+                    <button id="notification-btn" class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors relative inline-flex items-center justify-center" title="Thông báo đơn hàng">
                         <span class="material-symbols-outlined inline-block select-none text-[22px]">notifications</span>
                         <span id="notif-badge" class="hidden absolute top-0 right-0 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full items-center justify-center animate-pulse">0</span>
                     </button>
@@ -324,58 +333,59 @@
             </c:if>
             <c:choose>
                 <c:when test="${not empty sessionScope.USERMODEL}">
-                    <div class="group relative cursor-pointer py-2 flex-shrink-0">
-                        <div class="flex items-center gap-1.5 md:gap-2 text-primary hover:bg-surface-container-highest p-1.5 md:p-2 rounded-full transition-colors">
+                    <div class="group relative cursor-pointer py-1.5 flex-shrink-0">
+                        <div class="flex items-center gap-1.5 md:gap-2 text-primary hover:bg-primary/10 p-1 md:p-1.5 rounded-full transition-colors border border-outline-variant/50">
                             <c:choose>
                                 <c:when test="${not empty sessionScope.USERMODEL.avatarUrl}">
                                     <img src="${sessionScope.USERMODEL.avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-primary flex-shrink-0">
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="material-symbols-outlined text-[28px] flex-shrink-0" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+                                    <span class="material-symbols-outlined text-[26px] flex-shrink-0 text-primary" style="font-variation-settings: 'FILL' 1;">account_circle</span>
                                 </c:otherwise>
                             </c:choose>
-                            <span class="font-label-bold hidden sm:inline-block max-w-[85px] md:max-w-[110px] xl:max-w-[150px] truncate whitespace-nowrap text-xs md:text-sm" title="<c:out value="${sessionScope.USERMODEL.fullName}"/>"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
+                            <span class="font-label-bold hidden sm:inline-block max-w-[80px] md:max-w-[100px] xl:max-w-[140px] truncate whitespace-nowrap text-xs md:text-sm text-slate-800" title="<c:out value="${sessionScope.USERMODEL.fullName}"/>"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
+                            <span class="material-symbols-outlined text-[16px] text-on-surface-variant hidden sm:inline-block">expand_more</span>
                         </div>
 
-                        <!-- Dropdown menu -->
-                        <div class="absolute right-0 top-full pt-2 z-[100] hidden group-hover:block w-52">
-                            <div class="bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant overflow-hidden py-1">
+                        <!-- Dropdown menu tài khoản -->
+                        <div class="absolute right-0 top-full pt-2 z-[100] hidden group-hover:block w-56">
+                            <div class="bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant overflow-hidden py-1.5">
                                 <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
-                                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
-                                        <span class="material-symbols-outlined text-sm">dashboard</span> Trang Quản Trị
+                                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-on-surface hover:bg-surface-container font-semibold transition-colors">
+                                        <span class="material-symbols-outlined text-base text-primary">dashboard</span> Trang Quản Trị
                                     </a>
                                 </c:if>
                                 <c:if test="${sessionScope.USERMODEL.roleId == 4}">
-                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2 px-4 py-2.5 text-amber-700 bg-amber-50 hover:bg-amber-100 font-bold transition-colors">
-                                        <span class="material-symbols-outlined text-sm text-amber-600">local_shipping</span> Cổng Tài Xế (Shipper)
+                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-amber-700 bg-amber-50 hover:bg-amber-100 font-bold transition-colors">
+                                        <span class="material-symbols-outlined text-base text-amber-600">local_shipping</span> Cổng Tài Xế (Shipper)
                                     </a>
                                 </c:if>
                                 <c:if test="${sessionScope.USERMODEL.roleId == 1}">
-                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
-                                        <span class="material-symbols-outlined text-sm text-amber-600">local_shipping</span> Xem Cổng Tài Xế
+                                    <a href="${pageContext.request.contextPath}/shipper/portal" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-on-surface hover:bg-surface-container transition-colors">
+                                        <span class="material-symbols-outlined text-base text-amber-600">local_shipping</span> Xem Cổng Tài Xế
                                     </a>
                                 </c:if>
-                                <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
-                                    <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
+                                <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-on-surface hover:bg-surface-container font-medium transition-colors">
+                                    <span class="material-symbols-outlined text-base text-slate-500">manage_accounts</span> Thông tin tài khoản
                                 </a>
-                                <a href="${pageContext.request.contextPath}/lucky-spin" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors group/item">
-                                    <svg class="w-4 h-4 animate-[spin_10s_linear_infinite] group-hover/item:rotate-180 transition-transform duration-500" viewBox="0 0 32 32"><use href="#icon-lucky-spin-color"/></svg>
-                                    <span>Vòng quay & Quà tặng</span>
+                                <a href="${pageContext.request.contextPath}/profile#wallet" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-amber-900 bg-amber-50/50 hover:bg-amber-100/70 font-semibold transition-colors group/item">
+                                    <svg class="w-4 h-4 animate-[spin_10s_linear_infinite] group-hover/item:rotate-180 transition-transform duration-500 flex-shrink-0" viewBox="0 0 32 32"><use href="#icon-lucky-spin-color"/></svg>
+                                    <span>Ví Quà & Vòng quay</span>
                                 </a>
-                                <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
-                                    <span class="material-symbols-outlined text-sm">receipt_long</span> Lịch sử đơn hàng
+                                <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-on-surface hover:bg-surface-container font-medium transition-colors">
+                                    <span class="material-symbols-outlined text-base text-slate-500">receipt_long</span> Lịch sử đơn hàng
                                 </a>
-                                <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-2 px-4 py-2.5 text-error hover:bg-error-container transition-colors border-t border-surface-variant">
-                                    <span class="material-symbols-outlined text-sm">logout</span> Đăng xuất
+                                <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-2.5 px-4 py-2.5 text-xs text-error hover:bg-error-container font-semibold transition-colors border-t border-surface-variant mt-1">
+                                    <span class="material-symbols-outlined text-base">logout</span> Đăng xuất
                                 </a>
                             </div>
                         </div>
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors flex items-center gap-1.5" title="Đăng nhập">
+                    <a href="${pageContext.request.contextPath}/login" class="text-primary hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 border border-primary/30" title="Đăng nhập">
                         <span class="material-symbols-outlined text-[18px]">person</span>
-                        <span class="font-label-bold text-sm hidden md:inline">Đăng nhập</span>
+                        <span class="font-label-bold text-xs hidden md:inline">Đăng nhập</span>
                     </a>
                 </c:otherwise>
             </c:choose>
@@ -387,11 +397,11 @@
                 <span id="mobile-menu-icon" class="material-symbols-outlined text-[24px]">menu</span>
             </button>
         </div>
-    </div>
+    </nav>
 
     <!-- KHUNG MENU MOBILE DẠNG THẺ NỔI BO GÓC DÀNH CHO ĐIỆN THOẠI -->
-    <div id="mobile-menu-drawer" class="hidden lg:hidden px-margin-mobile pb-4 pt-1 transition-all duration-300">
-        <div class="bg-surface-container-lowest/95 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-outline-variant space-y-3">
+    <div id="mobile-menu-drawer" class="hidden lg:hidden mt-2 transition-all duration-300">
+        <div class="bg-white/95 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-outline-variant space-y-3">
             <!-- Ô tìm kiếm nhanh trên điện thoại -->
             <form action="${pageContext.request.contextPath}/shop" method="GET" class="relative">
                 <input type="text" name="keyword" autocomplete="off"
@@ -417,7 +427,7 @@
                 <a class="flex items-center justify-between p-2.5 rounded-2xl text-emerald-800 bg-emerald-50/60 hover:bg-emerald-100/70 transition-all font-semibold" href="${pageContext.request.contextPath}/gift-basket-builder">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-[18px]">featured_seasonal_and_gifts</span>
+                            <span class="material-symbols-outlined text-[18px]">card_giftcard</span>
                         </div>
                         <span>Tự mix giỏ quà</span>
                     </div>
@@ -488,10 +498,10 @@
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 pt-1">
                             <a href="${pageContext.request.contextPath}/profile" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl font-medium">
-                                <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
+                                <span class="material-symbols-outlined text-sm">manage_accounts</span> Tài khoản
                             </a>
-                            <a href="${pageContext.request.contextPath}/order-history" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl font-medium">
-                                <span class="material-symbols-outlined text-sm">receipt_long</span> Đơn hàng
+                            <a href="${pageContext.request.contextPath}/profile#wallet" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl font-bold">
+                                <svg class="w-4 h-4"><use href="#icon-lucky-spin-color"/></svg> Ví Quà
                             </a>
                         </div>
                         <c:if test="${sessionScope.USERMODEL.roleId == 1 || sessionScope.USERMODEL.roleId == 2}">
@@ -519,7 +529,7 @@
             </c:choose>
         </div>
     </div>
-</nav>
+</header>
 
 <!-- Script: Live Search Autocomplete & Mobile Menu Toggle -->
 <script>

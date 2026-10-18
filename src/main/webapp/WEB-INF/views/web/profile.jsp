@@ -40,23 +40,48 @@
 
         <ul class="space-y-2 font-label-bold text-sm">
           <li>
-            <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary">
-              <span class="material-symbols-outlined text-[20px]">manage_accounts</span> Thông tin tài khoản
-            </a>
+            <button type="button" id="tab-btn-profile" onclick="switchProfileTab('profile')"
+                    class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary font-bold cursor-pointer w-full text-left transition-all">
+              <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+              <span>Thông tin tài khoản</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" id="tab-btn-wallet" onclick="switchProfileTab('wallet')"
+                    class="flex items-center justify-between p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer w-full text-left group">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-500 group-hover:rotate-45 transition-transform"><use href="#icon-lucky-spin-color"/></svg>
+                </div>
+                <span class="truncate">Ví Quà & Vòng Quay</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex-shrink-0 shadow-xs">
+                ${not empty spinCount ? spinCount : 0} lượt
+              </span>
+            </button>
           </li>
           <li>
             <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined text-[20px]">receipt_long</span> Lịch sử đơn hàng
+              <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+              <span>Lịch sử đơn hàng</span>
             </a>
           </li>
           <li>
             <a href="${pageContext.request.contextPath}/guest-tracking" class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
-              <span class="material-symbols-outlined text-[20px]">local_shipping</span> Tra cứu đơn hàng
+              <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+              <span>Tra cứu đơn hàng</span>
+            </a>
+          </li>
+          <li>
+            <a href="${pageContext.request.contextPath}/lucky-spin" class="flex items-center gap-3 p-3 rounded-xl text-amber-800 bg-amber-50/70 hover:bg-amber-100 hover:text-amber-900 transition-colors">
+              <span class="material-symbols-outlined text-[20px] text-amber-500">stars</span>
+              <span>Vào Vòng Quay May Mắn</span>
             </a>
           </li>
           <li>
             <a href="${pageContext.request.contextPath}/logout" class="flex items-center gap-3 p-3 rounded-xl text-error hover:bg-error-container transition-colors mt-2 border-t border-surface-variant pt-4">
-              <span class="material-symbols-outlined text-[20px]">logout</span> Đăng xuất
+              <span class="material-symbols-outlined text-[20px]">logout</span>
+              <span>Đăng xuất</span>
             </a>
           </li>
         </ul>
@@ -132,233 +157,297 @@
         <span class="material-symbols-outlined absolute -right-8 -bottom-8 text-[180px] text-white/5 pointer-events-none">loyalty</span>
       </div>
 
-      <div class="bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-outline-variant">
-        <h1 class="font-headline-md text-2xl text-on-surface mb-6 border-b border-surface-variant pb-4 font-bold">Thông tin cá nhân</h1>
+      <!-- TAB PANEL 1: THÔNG TIN TÀI KHOẢN & FORM CẬP NHẬT -->
+      <div id="panel-profile" class="tab-panel space-y-6 transition-all duration-300">
+        <div class="bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-sm border border-outline-variant">
+          <h1 class="font-headline-md text-2xl text-on-surface mb-6 border-b border-surface-variant pb-4 font-bold flex items-center justify-between">
+            <span>Thông tin cá nhân</span>
+            <button type="button" onclick="switchProfileTab('wallet')" class="text-xs font-bold text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors">
+              <svg class="w-4 h-4"><use href="#icon-lucky-spin-color"/></svg>
+              <span>Xem Ví Quà (${not empty spinCount ? spinCount : 0} lượt)</span>
+            </button>
+          </h1>
 
-        <c:if test="${not empty message}">
-          <div class="mb-6 bg-primary/10 border border-primary/40 text-primary p-4 rounded-xl flex items-center gap-3 shadow-sm text-sm font-label-bold">
-            <span class="material-symbols-outlined">check_circle</span>
-            <span>${message}</span>
+          <c:if test="${not empty message}">
+            <div class="mb-6 bg-primary/10 border border-primary/40 text-primary p-4 rounded-xl flex items-center gap-3 shadow-sm text-sm font-label-bold">
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>${message}</span>
+            </div>
+          </c:if>
+
+          <c:if test="${not empty errorMessage}">
+            <div class="mb-6 bg-error/10 border border-error/40 text-error p-4 rounded-xl flex items-center gap-3 shadow-sm text-sm font-label-bold">
+              <span class="material-symbols-outlined">error</span>
+              <span>${errorMessage}</span>
+            </div>
+          </c:if>
+
+          <!-- BANNER KHUYẾN MẠI LIÊN KẾT GMAIL TẶNG 50K -->
+          <c:if test="${empty sessionScope.USERMODEL.email}">
+            <div id="gmail-promo-banner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-emerald-500/15 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-900 font-bold flex items-center justify-center flex-shrink-0 shadow-md">
+                  <span class="material-symbols-outlined text-2xl">redeem</span>
+                </div>
+                <div>
+                  <h4 class="font-label-bold text-sm text-on-surface flex items-center gap-2">
+                    <span>Liên kết Gmail ngay - Nhận Voucher 50.000₫</span>
+                    <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse">HOT DEAL</span>
+                  </h4>
+                  <p class="text-xs text-on-surface-variant mt-0.5">Bổ sung địa chỉ Gmail để nhận hóa đơn điện tử, thông báo đơn hàng và nhận ngay mã giảm giá 50.000₫!</p>
+                </div>
+              </div>
+              <button type="button" onclick="openOtpModal()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0">
+                <span class="material-symbols-outlined text-[16px]">verified</span> Liên kết ngay
+              </button>
+            </div>
+          </c:if>
+
+          <!-- CONTAINER HIỂN THỊ MÃ VOUCHER NẾU VỪA NHẬN THƯỞNG -->
+          <div id="reward-voucher-container" class="${not empty rewardCoupon ? '' : 'hidden'} mb-6 bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-primary/15 border border-emerald-500/40 text-emerald-900 p-4 rounded-2xl flex items-center gap-3.5 shadow-sm text-sm">
+            <span class="material-symbols-outlined text-emerald-600 text-3xl flex-shrink-0">celebration</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-emerald-900 text-base">🎉 Chúc mừng bạn đã nhận được Voucher 50.000₫!</p>
+              <p class="text-xs text-emerald-800 mt-1">
+                Mã ưu đãi của bạn: <span id="reward-voucher-code" class="font-mono font-black text-sm bg-emerald-100 text-emerald-900 px-3 py-1 rounded-lg border border-emerald-300 select-all tracking-wider"><c:out value="${rewardCoupon}"/></span>
+                <button type="button" onclick="copyVoucherCode()" class="ml-2 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg transition-colors">
+                  Sao chép mã
+                </button>
+                <span class="block sm:inline sm:ml-2 text-[11px] text-emerald-700 mt-1 sm:mt-0">(Giảm 50.000₫ cho đơn từ 150K, áp dụng ngay trong giỏ hàng).</span>
+              </p>
+            </div>
           </div>
-        </c:if>
 
-        <c:if test="${not empty errorMessage}">
-          <div class="mb-6 bg-error/10 border border-error/40 text-error p-4 rounded-xl flex items-center gap-3 shadow-sm text-sm font-label-bold">
-            <span class="material-symbols-outlined">error</span>
-            <span>${errorMessage}</span>
-          </div>
-        </c:if>
+          <form action="${pageContext.request.contextPath}/profile" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
+            <div>
+              <label class="block font-label-bold text-sm text-on-surface mb-2">Ảnh đại diện mới</label>
+              <input type="file" name="avatarFile" accept="image/*"
+                     class="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-label-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer">
+            </div>
 
-        <!-- BANNER KHUYẾN MẠI LIÊN KẾT GMAIL TẶNG 50K -->
-        <c:if test="${empty sessionScope.USERMODEL.email}">
-          <div id="gmail-promo-banner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-emerald-500/15 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-900 font-bold flex items-center justify-center flex-shrink-0 shadow-md">
-                <span class="material-symbols-outlined text-2xl">redeem</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block font-label-bold text-sm text-on-surface mb-1.5">Tên đăng nhập</label>
+                <input type="text" value="${sessionScope.USERMODEL.username}" disabled
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm font-medium">
               </div>
               <div>
-                <h4 class="font-label-bold text-sm text-on-surface flex items-center gap-2">
-                  <span>Liên kết Gmail ngay - Nhận Voucher 50.000₫</span>
-                  <span class="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold animate-pulse">HOT DEAL</span>
-                </h4>
-                <p class="text-xs text-on-surface-variant mt-0.5">Bổ sung địa chỉ Gmail để nhận hóa đơn điện tử, thông báo đơn hàng và nhận ngay mã giảm giá 50.000₫!</p>
-              </div>
-            </div>
-            <button type="button" onclick="openOtpModal()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all whitespace-nowrap flex items-center gap-1.5 flex-shrink-0">
-              <span class="material-symbols-outlined text-[16px]">verified</span> Liên kết ngay
-            </button>
-          </div>
-        </c:if>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="font-label-bold text-sm text-on-surface">Địa chỉ Email / Gmail</label>
+                  <div id="email-badge-container">
+                    <c:choose>
+                      <c:when test="${not empty sessionScope.USERMODEL.email}">
+                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
+                          <span class="material-symbols-outlined text-[13px]">verified</span> Đã liên kết
+                        </span>
+                      </c:when>
+                      <c:otherwise>
+                        <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-200 animate-pulse">
+                          <span class="material-symbols-outlined text-[13px]">redeem</span> Nhận 50K
+                        </span>
+                      </c:otherwise>
+                    </c:choose>
+                  </div>
+                </div>
 
-        <!-- CONTAINER HIỂN THỊ MÃ VOUCHER NẾU VỪA NHẬN THƯỞNG -->
-        <div id="reward-voucher-container" class="${not empty rewardCoupon ? '' : 'hidden'} mb-6 bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-primary/15 border border-emerald-500/40 text-emerald-900 p-4 rounded-2xl flex items-center gap-3.5 shadow-sm text-sm">
-          <span class="material-symbols-outlined text-emerald-600 text-3xl flex-shrink-0">celebration</span>
-          <div class="flex-1 min-w-0">
-            <p class="font-bold text-emerald-900 text-base">🎉 Chúc mừng bạn đã nhận được Voucher 50.000₫!</p>
-            <p class="text-xs text-emerald-800 mt-1">
-              Mã ưu đãi của bạn: <span id="reward-voucher-code" class="font-mono font-black text-sm bg-emerald-100 text-emerald-900 px-3 py-1 rounded-lg border border-emerald-300 select-all tracking-wider"><c:out value="${rewardCoupon}"/></span>
-              <button type="button" onclick="copyVoucherCode()" class="ml-2 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg transition-colors">
-                Sao chép mã
-              </button>
-              <span class="block sm:inline sm:ml-2 text-[11px] text-emerald-700 mt-1 sm:mt-0">(Giảm 50.000₫ cho đơn từ 150K, áp dụng ngay trong giỏ hàng).</span>
-            </p>
-          </div>
-        </div>
-
-        <form action="${pageContext.request.contextPath}/profile" method="POST" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
-          <div>
-            <label class="block font-label-bold text-sm text-on-surface mb-2">Ảnh đại diện mới</label>
-            <input type="file" name="avatarFile" accept="image/*"
-                   class="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-label-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer">
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Tên đăng nhập</label>
-              <input type="text" value="${sessionScope.USERMODEL.username}" disabled
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-not-allowed text-sm font-medium">
-            </div>
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <label class="font-label-bold text-sm text-on-surface">Địa chỉ Email / Gmail</label>
-                <div id="email-badge-container">
-                  <c:choose>
-                    <c:when test="${not empty sessionScope.USERMODEL.email}">
-                      <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
-                        <span class="material-symbols-outlined text-[13px]">verified</span> Đã liên kết
-                      </span>
-                    </c:when>
-                    <c:otherwise>
-                      <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-200 animate-pulse">
-                        <span class="material-symbols-outlined text-[13px]">redeem</span> Nhận 50K
-                      </span>
-                    </c:otherwise>
-                  </c:choose>
+                <!-- Hàng nhập Email có nút kích hoạt xác minh OTP -->
+                <div class="flex gap-2">
+                  <input type="email" id="profile-email-display" value="${sessionScope.USERMODEL.email}" readonly
+                         placeholder="Chưa liên kết Gmail..."
+                         class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface text-sm focus:outline-none ${not empty sessionScope.USERMODEL.email ? 'font-medium' : 'text-slate-400'}">
+                  <button type="button" onclick="openOtpModal()" id="btn-link-email-trigger"
+                          class="px-3.5 py-2 rounded-xl text-xs font-label-bold flex items-center gap-1 transition-all whitespace-nowrap flex-shrink-0 ${not empty sessionScope.USERMODEL.email ? 'border border-outline-variant hover:bg-surface-container text-on-surface-variant' : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm hover:shadow hover:-translate-y-0.5'}">
+                    <span class="material-symbols-outlined text-[16px]">${not empty sessionScope.USERMODEL.email ? 'edit' : 'link'}</span>
+                    <span>${not empty sessionScope.USERMODEL.email ? 'Thay đổi' : 'Liên kết'}</span>
+                  </button>
                 </div>
               </div>
+            </div>
 
-              <!-- Hàng nhập Email có nút kích hoạt xác minh OTP -->
-              <div class="flex gap-2">
-                <input type="email" id="profile-email-display" value="${sessionScope.USERMODEL.email}" readonly
-                       placeholder="Chưa liên kết Gmail..."
-                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-low text-on-surface text-sm focus:outline-none ${not empty sessionScope.USERMODEL.email ? 'font-medium' : 'text-slate-400'}">
-                <button type="button" onclick="openOtpModal()" id="btn-link-email-trigger"
-                        class="px-3.5 py-2 rounded-xl text-xs font-label-bold flex items-center gap-1 transition-all whitespace-nowrap flex-shrink-0 ${not empty sessionScope.USERMODEL.email ? 'border border-outline-variant hover:bg-surface-container text-on-surface-variant' : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm hover:shadow hover:-translate-y-0.5'}">
-                  <span class="material-symbols-outlined text-[16px]">${not empty sessionScope.USERMODEL.email ? 'edit' : 'link'}</span>
-                  <span>${not empty sessionScope.USERMODEL.email ? 'Thay đổi' : 'Liên kết'}</span>
-                </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block font-label-bold text-sm text-on-surface mb-1.5">Họ và tên <span class="text-error">*</span></label>
+                <input type="text" name="fullName" value="${sessionScope.USERMODEL.fullName}" required
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
+              </div>
+              <div>
+                <label class="block font-label-bold text-sm text-on-surface mb-1.5">Số điện thoại</label>
+                <input type="tel" name="phone" value="${sessionScope.USERMODEL.phone}"
+                       class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
               </div>
             </div>
-          </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Họ và tên <span class="text-error">*</span></label>
-              <input type="text" name="fullName" value="${sessionScope.USERMODEL.fullName}" required
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
+              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ nhận hàng mặc định</label>
+              <textarea name="address" rows="3" placeholder="Nhập địa chỉ nhà của bạn..."
+                        class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm leading-relaxed">${sessionScope.USERMODEL.address}</textarea>
             </div>
-            <div>
-              <label class="block font-label-bold text-sm text-on-surface mb-1.5">Số điện thoại</label>
-              <input type="tel" name="phone" value="${sessionScope.USERMODEL.phone}"
-                     class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm">
+
+            <div class="pt-2">
+              <button type="submit" class="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-label-bold hover:bg-primary-container transition-all shadow-md hover:-translate-y-0.5 text-sm">
+                <span class="material-symbols-outlined text-[18px]">save</span> Lưu thay đổi
+              </button>
             </div>
-          </div>
-
-          <div>
-            <label class="block font-label-bold text-sm text-on-surface mb-1.5">Địa chỉ nhận hàng mặc định</label>
-            <textarea name="address" rows="3" placeholder="Nhập địa chỉ nhà của bạn..."
-                      class="w-full px-4 py-2.5 rounded-xl border border-outline-variant focus:border-primary outline-none bg-surface-container-lowest text-on-surface text-sm leading-relaxed">${sessionScope.USERMODEL.address}</textarea>
-          </div>
-
-          <div class="pt-2">
-            <button type="submit" class="flex items-center justify-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-label-bold hover:bg-primary-container transition-all shadow-md hover:-translate-y-0.5 text-sm">
-              <span class="material-symbols-outlined text-[18px]">save</span> Lưu thay đổi
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
 
-      <!-- ============================================================ -->
-      <!-- PHÂN HỆ VÍ QUÀ TẶNG & VÒNG QUAY MAY MẮN (LUCKY SPIN WALLET)  -->
-      <!-- ============================================================ -->
-      <div class="mt-8 bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-surface-variant">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-amber-500/20">
-              <svg class="w-6 h-6"><use href="#icon-lucky-spin"/></svg>
-            </div>
+      <!-- TAB PANEL 2: PHÂN HỆ VÍ QUÀ TẶNG & VÒNG QUAY MAY MẮN (CHUYỂN VÀO NAVBAR DỌC THEO YÊU CẦU) -->
+      <div id="panel-wallet" class="tab-panel hidden space-y-6 transition-all duration-300">
+        <!-- THỐNG KÊ NHANH VÍ QUÀ TẶNG -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-amber-500/5 border border-amber-400/50 shadow-xs flex items-center justify-between">
             <div>
-              <h2 class="font-headline-md text-xl text-on-surface font-bold flex items-center gap-2">
-                <span>Ví Quà Tặng & Vòng Quay May Mắn</span>
-                <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold shadow-xs">
-                  ${not empty spinCount ? spinCount : 0} Lượt quay
-                </span>
-              </h2>
-              <p class="text-xs text-on-surface-variant mt-0.5">Quản lý các mã giảm giá, voucher freeship và quà tặng bạn đã tích lũy từ vòng quay.</p>
-            </div>
-          </div>
-          <a href="${pageContext.request.contextPath}/lucky-spin" 
-             class="group inline-flex items-center justify-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
-            <svg class="w-5 h-5 flex-shrink-0 animate-[spin_10s_linear_infinite] group-hover:rotate-180 transition-transform duration-700"><use href="#icon-lucky-spin-color"/></svg>
-            <span>Vào Vòng Quay Ngay</span>
-          </a>
-        </div>
-
-        <!-- DANH SÁCH QUÀ TẶNG TRONG VÍ -->
-        <c:choose>
-          <c:when test="${not empty userRewards}">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <c:forEach var="item" items="${userRewards}">
-                <div class="p-4 rounded-2xl border ${item.isUsed ? 'bg-surface-container-low/60 border-outline-variant/60 opacity-75' : (item.expired ? 'bg-rose-50/50 border-rose-200 opacity-75' : 'bg-surface-container-lowest border-emerald-500/30 shadow-xs hover:shadow-md')} transition-all flex flex-col justify-between">
-                  <div>
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                      <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl ${item.prizeType == 'FREESHIP' ? 'bg-emerald-100 text-emerald-700' : (item.prizeType == 'GIFT_PRODUCT' ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700')} flex items-center justify-center flex-shrink-0">
-                          <c:choose>
-                            <c:when test="${item.prizeType == 'FREESHIP'}">
-                              <svg class="w-4 h-4"><use href="#icon-prize-shipping"/></svg>
-                            </c:when>
-                            <c:when test="${item.prizeType == 'GIFT_PRODUCT'}">
-                              <svg class="w-4 h-4"><use href="#icon-prize-gift"/></svg>
-                            </c:when>
-                            <c:otherwise>
-                              <svg class="w-4 h-4"><use href="#icon-prize-voucher"/></svg>
-                            </c:otherwise>
-                          </c:choose>
-                        </div>
-                        <div>
-                          <h4 class="font-bold text-xs text-on-surface line-clamp-1"><c:out value="${item.prizeName}"/></h4>
-                          <span class="text-[10px] text-on-surface-variant">Ngày nhận: <fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy"/></span>
-                        </div>
-                      </div>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.isUsed ? 'bg-slate-200 text-slate-700' : (item.expired ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700')}">
-                        <c:out value="${item.statusBadge}"/>
-                      </span>
-                    </div>
-
-                    <c:if test="${not empty item.rewardCode}">
-                      <div class="mt-3 p-2 rounded-xl bg-surface-container flex items-center justify-between border border-outline-variant/60">
-                        <div class="flex flex-col">
-                          <span class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">Mã Voucher</span>
-                          <span class="font-mono font-black text-xs text-primary tracking-wide"><c:out value="${item.rewardCode}"/></span>
-                        </div>
-                        <c:if test="${!item.isUsed && !item.expired}">
-                          <button type="button" onclick="navigator.clipboard.writeText('${item.rewardCode}'); alert('Đã sao chép mã: ${item.rewardCode}');"
-                                  class="p-1.5 hover:bg-surface-container-high rounded-lg text-primary transition-colors cursor-pointer" title="Sao chép">
-                            <span class="material-symbols-outlined text-sm">content_copy</span>
-                          </button>
-                        </c:if>
-                      </div>
-                    </c:if>
-                  </div>
-
-                  <div class="mt-3 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-[11px]">
-                    <span class="text-on-surface-variant">HSD: <fmt:formatDate value="${item.expiredAt}" pattern="dd/MM/yyyy"/></span>
-                    <c:if test="${!item.isUsed && !item.expired}">
-                      <a href="${pageContext.request.contextPath}/shop" class="font-bold text-primary hover:underline flex items-center gap-0.5">
-                        Dùng ngay <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                      </a>
-                    </c:if>
-                  </div>
-                </div>
-              </c:forEach>
-            </div>
-          </c:when>
-          <c:otherwise>
-            <div class="text-center py-10 px-4 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
-              <div class="w-14 h-14 mx-auto rounded-3xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
-                <svg class="w-8 h-8"><use href="#icon-lucky-spin"/></svg>
-              </div>
-              <h4 class="font-bold text-sm text-on-surface mb-1">Ví quà tặng của bạn đang trống</h4>
-              <p class="text-xs text-on-surface-variant max-w-md mx-auto mb-4">Hãy tham gia Vòng quay may mắn mỗi ngày để nhận ngay mã Freeship 100%, Voucher 50K và các giỏ quà hoa quả tươi sạch từ Fruitables!</p>
-              <a href="${pageContext.request.contextPath}/lucky-spin" 
-                 class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-primary text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 transition-all">
-                <svg class="w-4 h-4"><use href="#icon-lucky-spin"/></svg>
-                <span>Nhận Lượt Quay & Thử Vận May</span>
+              <span class="text-xs font-semibold text-amber-900/80 block">Lượt quay sẵn sàng</span>
+              <span class="text-2xl font-black text-amber-950 font-price-tag mt-0.5 block">${not empty spinCount ? spinCount : 0} lượt</span>
+              <a href="${pageContext.request.contextPath}/lucky-spin" class="text-[11px] font-bold text-rose-600 hover:underline mt-1 inline-flex items-center gap-0.5">
+                Quay ngay <span class="material-symbols-outlined text-[14px]">play_arrow</span>
               </a>
             </div>
-          </c:otherwise>
-        </c:choose>
+            <div class="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <svg class="w-7 h-7"><use href="#icon-lucky-spin-color"/></svg>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border border-emerald-400/50 shadow-xs flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-emerald-900/80 block">Quà tặng trong ví</span>
+              <span class="text-2xl font-black text-emerald-950 font-price-tag mt-0.5 block">${not empty userRewards ? userRewards.size() : 0} phần quà</span>
+              <span class="text-[11px] text-emerald-700 mt-1 block">Tích lũy từ vòng quay</span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-400/20 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-2xl">card_giftcard</span>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-sky-500/15 via-blue-500/10 to-sky-500/5 border border-sky-400/50 shadow-xs flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-sky-900/80 block">Điểm thưởng VIP</span>
+              <span class="text-2xl font-black text-sky-950 font-price-tag mt-0.5 block">${sessionScope.USERMODEL.points != null ? sessionScope.USERMODEL.points : 0} điểm</span>
+              <span class="text-[11px] text-sky-700 mt-1 block">Hạng: <strong class="text-sky-900">${sessionScope.USERMODEL.vipTier}</strong></span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-sky-400/20 text-sky-600 flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-2xl">stars</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DANH SÁCH CHI TIẾT VOUCHER & PHẦN THƯỞNG -->
+        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-surface-variant">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-amber-500/20">
+                <svg class="w-6 h-6"><use href="#icon-lucky-spin"/></svg>
+              </div>
+              <div>
+                <h2 class="font-headline-md text-xl text-on-surface font-bold flex items-center gap-2">
+                  <span>Ví Quà Tặng & Vòng Quay May Mắn</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold shadow-xs">
+                    ${not empty spinCount ? spinCount : 0} Lượt quay
+                  </span>
+                </h2>
+                <p class="text-xs text-on-surface-variant mt-0.5">Quản lý các mã giảm giá, voucher freeship và quà tặng bạn đã tích lũy từ vòng quay.</p>
+              </div>
+            </div>
+            <a href="${pageContext.request.contextPath}/lucky-spin" 
+               class="group inline-flex items-center justify-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
+              <svg class="w-5 h-5 flex-shrink-0 animate-[spin_10s_linear_infinite] group-hover:rotate-180 transition-transform duration-700"><use href="#icon-lucky-spin-color"/></svg>
+              <span>Vào Vòng Quay Ngay</span>
+            </a>
+          </div>
+
+          <!-- DANH SÁCH QUÀ TẶNG TRONG VÍ -->
+          <c:choose>
+            <c:when test="${not empty userRewards}">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <c:forEach var="item" items="${userRewards}">
+                  <div class="p-4 rounded-2xl border ${item.isUsed ? 'bg-surface-container-low/60 border-outline-variant/60 opacity-75' : (item.expired ? 'bg-rose-50/50 border-rose-200 opacity-75' : 'bg-surface-container-lowest border-emerald-500/30 shadow-xs hover:shadow-md')} transition-all flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-start justify-between gap-2 mb-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-8 h-8 rounded-xl ${item.prizeType == 'FREESHIP' ? 'bg-emerald-100 text-emerald-700' : (item.prizeType == 'GIFT_PRODUCT' ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700')} flex items-center justify-center flex-shrink-0">
+                            <c:choose>
+                              <c:when test="${item.prizeType == 'FREESHIP'}">
+                                <svg class="w-4 h-4"><use href="#icon-prize-shipping"/></svg>
+                              </c:when>
+                              <c:when test="${item.prizeType == 'GIFT_PRODUCT'}">
+                                <svg class="w-4 h-4"><use href="#icon-prize-gift"/></svg>
+                              </c:when>
+                              <c:otherwise>
+                                <svg class="w-4 h-4"><use href="#icon-prize-voucher"/></svg>
+                              </c:otherwise>
+                            </c:choose>
+                          </div>
+                          <div>
+                            <h4 class="font-bold text-xs text-on-surface line-clamp-1"><c:out value="${item.prizeName}"/></h4>
+                            <span class="text-[10px] text-on-surface-variant">Ngày nhận: <fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy"/></span>
+                          </div>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.isUsed ? 'bg-slate-200 text-slate-700' : (item.expired ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700')}">
+                          <c:out value="${item.statusBadge}"/>
+                        </span>
+                      </div>
+
+                      <c:if test="${not empty item.rewardCode}">
+                        <div class="mt-3 p-2 rounded-xl bg-surface-container flex items-center justify-between border border-outline-variant/60">
+                          <div class="flex flex-col">
+                            <span class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">Mã Voucher</span>
+                            <span class="font-mono font-black text-xs text-primary tracking-wide"><c:out value="${item.rewardCode}"/></span>
+                          </div>
+                          <c:if test="${!item.isUsed && !item.expired}">
+                            <button type="button" onclick="navigator.clipboard.writeText('${item.rewardCode}'); alert('Đã sao chép mã: ${item.rewardCode}');"
+                                    class="p-1.5 hover:bg-surface-container-high rounded-lg text-primary transition-colors cursor-pointer" title="Sao chép">
+                              <span class="material-symbols-outlined text-sm">content_copy</span>
+                            </button>
+                          </c:if>
+                        </div>
+                      </c:if>
+                    </div>
+
+                    <div class="mt-3 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-[11px]">
+                      <span class="text-on-surface-variant">HSD: <fmt:formatDate value="${item.expiredAt}" pattern="dd/MM/yyyy"/></span>
+                      <c:if test="${!item.isUsed && !item.expired}">
+                        <a href="${pageContext.request.contextPath}/shop" class="font-bold text-primary hover:underline flex items-center gap-0.5">
+                          Dùng ngay <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                        </a>
+                      </c:if>
+                    </div>
+                  </div>
+                </c:forEach>
+              </div>
+            </c:when>
+            <c:otherwise>
+              <div class="text-center py-10 px-4 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
+                <div class="w-14 h-14 mx-auto rounded-3xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                  <svg class="w-8 h-8"><use href="#icon-lucky-spin"/></svg>
+                </div>
+                <h4 class="font-bold text-sm text-on-surface mb-1">Ví quà tặng của bạn đang trống</h4>
+                <p class="text-xs text-on-surface-variant max-w-md mx-auto mb-4">Hãy tham gia Vòng quay may mắn mỗi ngày để nhận ngay mã Freeship 100%, Voucher 50K và các giỏ quà hoa quả tươi sạch từ Fruitables!</p>
+                <a href="${pageContext.request.contextPath}/lucky-spin" 
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-primary text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 transition-all">
+                  <svg class="w-4 h-4"><use href="#icon-lucky-spin"/></svg>
+                  <span>Nhận Lượt Quay & Thử Vận May</span>
+                </a>
+              </div>
+            </c:otherwise>
+          </c:choose>
+
+          <!-- HƯỚNG DẪN NHẬN THÊM LƯỢT QUAY -->
+          <div class="mt-6 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-lg">tips_and_updates</span>
+              </div>
+              <div>
+                <p class="font-bold text-amber-900">Cách nhận thêm lượt quay mỗi ngày:</p>
+                <p class="text-amber-800/80 mt-0.5">Điểm danh đăng nhập mỗi ngày (+1 lượt) • Mỗi đơn hàng hoàn tất (+1 lượt) • Mời bạn bè (+2 lượt)</p>
+              </div>
+            </div>
+            <a href="${pageContext.request.contextPath}/lucky-spin" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl whitespace-nowrap shadow-xs hover:shadow transition-all flex items-center gap-1.5 flex-shrink-0">
+              <span>Quay ngay</span>
+              <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+        </div>
       </div>
     </div>
   </div>
@@ -627,6 +716,57 @@
       });
     }
   }
+
+  // Quản lý chuyển đổi Tab giữa Thông tin tài khoản và Ví Quà & Vòng quay
+  function switchProfileTab(tabName) {
+    const profilePanel = document.getElementById('panel-profile');
+    const walletPanel = document.getElementById('panel-wallet');
+    const btnProfile = document.getElementById('tab-btn-profile');
+    const btnWallet = document.getElementById('tab-btn-wallet');
+
+    if (tabName === 'wallet') {
+      if (profilePanel) profilePanel.classList.add('hidden');
+      if (walletPanel) walletPanel.classList.remove('hidden');
+
+      if (btnProfile) {
+        btnProfile.className = 'flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer w-full text-left font-medium';
+      }
+      if (btnWallet) {
+        btnWallet.className = 'flex items-center justify-between p-3 rounded-xl bg-amber-500/15 text-amber-900 border border-amber-400/50 shadow-xs font-bold cursor-pointer w-full text-left';
+      }
+      if (window.location.hash !== '#wallet') {
+        history.replaceState(null, null, '#wallet');
+      }
+    } else {
+      if (profilePanel) profilePanel.classList.remove('hidden');
+      if (walletPanel) walletPanel.classList.add('hidden');
+
+      if (btnProfile) {
+        btnProfile.className = 'flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary font-bold cursor-pointer w-full text-left transition-all';
+      }
+      if (btnWallet) {
+        btnWallet.className = 'flex items-center justify-between p-3 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer w-full text-left group font-medium';
+      }
+      if (window.location.hash !== '#profile') {
+        history.replaceState(null, null, '#profile');
+      }
+    }
+  }
+
+  // Tự động kích hoạt tab dựa vào Hash trên URL khi tải trang
+  window.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#wallet') {
+      switchProfileTab('wallet');
+    }
+  });
+
+  window.addEventListener('hashchange', function() {
+    if (window.location.hash === '#wallet') {
+      switchProfileTab('wallet');
+    } else if (window.location.hash === '#profile') {
+      switchProfileTab('profile');
+    }
+  });
 </script>
 </body>
 </html>

@@ -27,7 +27,7 @@
         <div class="bg-gradient-to-r from-[#1c3d24] via-[#0d2818] to-[#041a0f] text-white rounded-3xl p-6 md:p-10 shadow-xl mb-8 relative overflow-hidden">
             <div class="relative z-10 max-w-2xl space-y-3">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
-                    <span class="material-symbols-outlined text-sm">featured_seasonal_and_gifts</span> Thiết kế quà tặng cao cấp
+                    <span class="material-symbols-outlined text-sm">card_giftcard</span> Thiết kế quà tặng cao cấp
                 </div>
                 <h1 class="font-headline-lg text-3xl sm:text-4xl font-extrabold tracking-tight">
                     Tự Tay Mix Giỏ Quà Hoa Quả Theo Ý Muốn
