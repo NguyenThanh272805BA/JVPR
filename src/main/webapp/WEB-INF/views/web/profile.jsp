@@ -238,6 +238,109 @@
           </div>
         </form>
       </div>
+
+      <!-- ============================================================ -->
+      <!-- PHÂN HỆ VÍ QUÀ TẶNG & VÒNG QUAY MAY MẮN (LUCKY SPIN WALLET)  -->
+      <!-- ============================================================ -->
+      <div class="mt-8 bg-surface-container-lowest p-6 md:p-8 rounded-2xl shadow-sm border border-outline-variant">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-surface-variant">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm border border-amber-500/20">
+              <svg class="w-6 h-6"><use href="#icon-lucky-spin"/></svg>
+            </div>
+            <div>
+              <h2 class="font-headline-md text-xl text-on-surface font-bold flex items-center gap-2">
+                <span>Ví Quà Tặng & Vòng Quay May Mắn</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold shadow-xs">
+                  ${not empty spinCount ? spinCount : 0} Lượt quay
+                </span>
+              </h2>
+              <p class="text-xs text-on-surface-variant mt-0.5">Quản lý các mã giảm giá, voucher freeship và quà tặng bạn đã tích lũy từ vòng quay.</p>
+            </div>
+          </div>
+          <a href="${pageContext.request.contextPath}/lucky-spin" 
+             class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-600 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
+            <svg class="w-4 h-4"><use href="#icon-lucky-spin"/></svg>
+            <span>Vào Vòng Quay Ngay</span>
+          </a>
+        </div>
+
+        <!-- DANH SÁCH QUÀ TẶNG TRONG VÍ -->
+        <c:choose>
+          <c:when test="${not empty userRewards}">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <c:forEach var="item" items="${userRewards}">
+                <div class="p-4 rounded-2xl border ${item.isUsed ? 'bg-surface-container-low/60 border-outline-variant/60 opacity-75' : (item.expired ? 'bg-rose-50/50 border-rose-200 opacity-75' : 'bg-surface-container-lowest border-emerald-500/30 shadow-xs hover:shadow-md')} transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                      <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl ${item.prizeType == 'FREESHIP' ? 'bg-emerald-100 text-emerald-700' : (item.prizeType == 'GIFT_PRODUCT' ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700')} flex items-center justify-center flex-shrink-0">
+                          <c:choose>
+                            <c:when test="${item.prizeType == 'FREESHIP'}">
+                              <svg class="w-4 h-4"><use href="#icon-prize-shipping"/></svg>
+                            </c:when>
+                            <c:when test="${item.prizeType == 'GIFT_PRODUCT'}">
+                              <svg class="w-4 h-4"><use href="#icon-prize-gift"/></svg>
+                            </c:when>
+                            <c:otherwise>
+                              <svg class="w-4 h-4"><use href="#icon-prize-voucher"/></svg>
+                            </c:otherwise>
+                          </c:choose>
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-xs text-on-surface line-clamp-1"><c:out value="${item.prizeName}"/></h4>
+                          <span class="text-[10px] text-on-surface-variant">Ngày nhận: <fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy"/></span>
+                        </div>
+                      </div>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.isUsed ? 'bg-slate-200 text-slate-700' : (item.expired ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700')}">
+                        <c:out value="${item.statusBadge}"/>
+                      </span>
+                    </div>
+
+                    <c:if test="${not empty item.rewardCode}">
+                      <div class="mt-3 p-2 rounded-xl bg-surface-container flex items-center justify-between border border-outline-variant/60">
+                        <div class="flex flex-col">
+                          <span class="text-[9px] uppercase tracking-wider text-on-surface-variant font-bold">Mã Voucher</span>
+                          <span class="font-mono font-black text-xs text-primary tracking-wide"><c:out value="${item.rewardCode}"/></span>
+                        </div>
+                        <c:if test="${!item.isUsed && !item.expired}">
+                          <button type="button" onclick="navigator.clipboard.writeText('${item.rewardCode}'); alert('Đã sao chép mã: ${item.rewardCode}');"
+                                  class="p-1.5 hover:bg-surface-container-high rounded-lg text-primary transition-colors cursor-pointer" title="Sao chép">
+                            <span class="material-symbols-outlined text-sm">content_copy</span>
+                          </button>
+                        </c:if>
+                      </div>
+                    </c:if>
+                  </div>
+
+                  <div class="mt-3 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-[11px]">
+                    <span class="text-on-surface-variant">HSD: <fmt:formatDate value="${item.expiredAt}" pattern="dd/MM/yyyy"/></span>
+                    <c:if test="${!item.isUsed && !item.expired}">
+                      <a href="${pageContext.request.contextPath}/shop" class="font-bold text-primary hover:underline flex items-center gap-0.5">
+                        Dùng ngay <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                      </a>
+                    </c:if>
+                  </div>
+                </div>
+              </c:forEach>
+            </div>
+          </c:when>
+          <c:otherwise>
+            <div class="text-center py-10 px-4 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant">
+              <div class="w-14 h-14 mx-auto rounded-3xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                <svg class="w-8 h-8"><use href="#icon-lucky-spin"/></svg>
+              </div>
+              <h4 class="font-bold text-sm text-on-surface mb-1">Ví quà tặng của bạn đang trống</h4>
+              <p class="text-xs text-on-surface-variant max-w-md mx-auto mb-4">Hãy tham gia Vòng quay may mắn mỗi ngày để nhận ngay mã Freeship 100%, Voucher 50K và các giỏ quà hoa quả tươi sạch từ Fruitables!</p>
+              <a href="${pageContext.request.contextPath}/lucky-spin" 
+                 class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-primary text-white text-xs font-bold rounded-xl shadow-md hover:opacity-95 transition-all">
+                <svg class="w-4 h-4"><use href="#icon-lucky-spin"/></svg>
+                <span>Nhận Lượt Quay & Thử Vận May</span>
+              </a>
+            </div>
+          </c:otherwise>
+        </c:choose>
+      </div>
     </div>
   </div>
 </main>

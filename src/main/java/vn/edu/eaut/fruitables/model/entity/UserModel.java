@@ -58,6 +58,16 @@ public class UserModel {
     private Integer points = 0;
     private Integer accumulatedPoints = 0;
 
+    // Phân hệ Vòng quay may mắn (Lucky Spin)
+    private Integer spinCount = 1;
+    private java.sql.Date lastDailySpinDate;
+
+    public Integer getSpinCount() { return spinCount != null ? spinCount : 0; }
+    public void setSpinCount(Integer spinCount) { this.spinCount = spinCount; }
+
+    public java.sql.Date getLastDailySpinDate() { return lastDailySpinDate; }
+    public void setLastDailySpinDate(java.sql.Date lastDailySpinDate) { this.lastDailySpinDate = lastDailySpinDate; }
+
     public Integer getPoints() { return points != null ? points : 0; }
     public void setPoints(Integer points) { this.points = points; }
 

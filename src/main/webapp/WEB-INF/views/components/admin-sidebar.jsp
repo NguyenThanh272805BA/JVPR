@@ -86,6 +86,14 @@
             <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-coupon"/></svg>
             <span>Mã khuyến mãi</span>
         </a>
+        <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/lucky-spin') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+           href="${pageContext.request.contextPath}/admin/lucky-spin">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-lucky-spin"/></svg>
+                <span>Vòng quay may mắn</span>
+            </div>
+            <span class="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${reqURI.contains('/lucky-spin') ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'} rounded-md">Game</span>
+        </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/delivery-failures') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/delivery-failures">
             <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-delivery"/></svg>

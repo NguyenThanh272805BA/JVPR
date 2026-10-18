@@ -64,6 +64,16 @@
                                 <span class="text-[10px] text-on-surface-variant truncate">Hoa quả tươi giảm giá sốc</span>
                             </div>
                         </a>
+                        <a href="${pageContext.request.contextPath}/lucky-spin"
+                           class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-container transition-all group/item">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 group-hover/item:scale-110 transition-transform">
+                                <svg class="w-5 h-5 text-amber-600"><use href="#icon-lucky-spin"/></svg>
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-xs font-bold text-on-surface group-hover/item:text-amber-600 transition-colors">Vòng Quay May Mắn</span>
+                                <span class="text-[10px] text-on-surface-variant truncate">Quay thưởng hàng ngày & Ví quà</span>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -326,6 +336,9 @@
                                 </c:if>
                                 <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
                                     <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
+                                </a>
+                                <a href="${pageContext.request.contextPath}/lucky-spin" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
+                                    <svg class="w-4 h-4 text-amber-500"><use href="#icon-lucky-spin"/></svg> Vòng quay & Quà tặng
                                 </a>
                                 <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
                                     <span class="material-symbols-outlined text-sm">receipt_long</span> Lịch sử đơn hàng

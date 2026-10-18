@@ -35,6 +35,13 @@ public class ProfileServlet extends HttpServlet {
         if (freshUser != null) {
             session.setAttribute("USERMODEL", freshUser);
         }
+
+        // Tải Ví quà tặng & Phiếu giảm giá trúng thưởng từ Vòng quay may mắn
+        vn.edu.eaut.fruitables.service.ILuckySpinService luckySpinService = new vn.edu.eaut.fruitables.service.impl.LuckySpinServiceImpl();
+        java.util.List<vn.edu.eaut.fruitables.model.entity.LuckySpinHistoryModel> userRewards = luckySpinService.getUserRewardWallet(user.getId());
+        request.setAttribute("userRewards", userRewards);
+        request.setAttribute("spinCount", freshUser != null ? freshUser.getSpinCount() : user.getSpinCount());
+
         request.getRequestDispatcher("/WEB-INF/views/web/profile.jsp").forward(request, response);
     }
 

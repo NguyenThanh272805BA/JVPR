@@ -47,6 +47,14 @@ public class UserMapper implements IRowMapper<UserModel> {
                 user.setVehiclePlate(rs.getString("vehicle_plate"));
             } catch (SQLException e) {}
 
+            try {
+                user.setSpinCount(rs.getInt("spin_count"));
+            } catch (SQLException e) {}
+
+            try {
+                user.setLastDailySpinDate(rs.getDate("last_daily_spin_date"));
+            } catch (SQLException e) {}
+
             return user;
         } catch (SQLException e) {
             e.printStackTrace();

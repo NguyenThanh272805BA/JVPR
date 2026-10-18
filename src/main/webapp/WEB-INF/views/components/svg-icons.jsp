@@ -364,5 +364,75 @@
       <polyline points="15 3 21 3 21 9"></polyline>
       <line x1="10" y1="14" x2="21" y2="3"></line>
     </symbol>
+
+    <!-- ============================================== -->
+    <!-- BỘ BIỂU TƯỢNG VÒNG QUAY MAY MẮN (CODE-DRAWN ICONS) -->
+    <!-- ============================================== -->
+
+    <!-- Vòng quay may mắn (Lucky Spin Wheel) -->
+    <symbol id="icon-lucky-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M12 2v20"></path>
+      <path d="M2 12h20"></path>
+      <path d="m4.93 4.93 14.14 14.14"></path>
+      <path d="m19.07 4.93-14.14 14.14"></path>
+      <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+      <path d="m12 2 2 4h-4z" fill="currentColor"></path>
+    </symbol>
+
+    <!-- Phiếu giảm giá / Voucher (Voucher Coupon) -->
+    <symbol id="icon-prize-voucher" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a3 3 0 0 1 0-6V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+      <path d="M13 5v2"></path>
+      <path d="M13 11v2"></path>
+      <path d="M13 17v2"></path>
+      <circle cx="8" cy="12" r="2"></circle>
+    </symbol>
+
+    <!-- Miễn phí giao hàng (Freeship Truck) -->
+    <symbol id="icon-prize-shipping" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="1" y="3" width="15" height="13" rx="2"></rect>
+      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+      <circle cx="5.5" cy="18.5" r="2.5"></circle>
+      <circle cx="18.5" cy="18.5" r="2.5"></circle>
+      <path d="M7 8h4"></path>
+      <path d="M5 11h6"></path>
+    </symbol>
+
+    <!-- Hộp quà may mắn (Gift Box) -->
+    <symbol id="icon-prize-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12"></polyline>
+      <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+      <line x1="12" y1="22" x2="12" y2="7"></line>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+    </symbol>
+
+    <!-- Ngôi sao VIP / Giải đặc biệt (Star Prize) -->
+    <symbol id="icon-prize-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </symbol>
+
+    <!-- Thêm lượt quay (Extra Spin / Reload) -->
+    <symbol id="icon-prize-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6"></path>
+      <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+
+    <!-- Chúc may mắn lần sau (Smile / Hope) -->
+    <symbol id="icon-prize-luck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+      <line x1="9" y1="9" x2="9.01" y2="9"></line>
+      <line x1="15" y1="9" x2="15.01" y2="9"></line>
+    </symbol>
+
+    <!-- Ví quà tặng & Voucher (Reward Wallet) -->
+    <symbol id="icon-wallet-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
+      <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
+      <circle cx="18" cy="14" r="1" fill="currentColor"></circle>
+    </symbol>
   </defs>
 </svg>
