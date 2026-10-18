@@ -5,7 +5,7 @@
 <jsp:include page="/WEB-INF/views/components/svg-icons.jsp" />
 
 <!-- THANH ĐIỀU HƯỚNG NỔI BO GÓC CAO CẤP (FLOATING CAPSULE ISLAND NAVBAR) -->
-<header class="sticky top-2 sm:top-3 z-50 px-2 sm:px-4 md:px-6 w-full max-w-[1440px] mx-auto transition-all duration-300">
+<header id="main-floating-header" class="sticky top-2 sm:top-3 z-50 px-2 sm:px-4 md:px-6 w-full max-w-[1440px] mx-auto transition-all duration-300 ease-out will-change-transform">
     <nav class="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.07)] border border-outline-variant/60 px-4 sm:px-5 md:px-6 lg:px-7 h-[68px] md:h-[72px] flex items-center justify-between gap-2.5 md:gap-3.5 lg:gap-4 transition-all">
         <!-- Logo Fruitables Đẳng Cấp Thương Hiệu -->
         <a class="group flex items-center gap-2 md:gap-2.5 transition-all duration-300 select-none flex-shrink-0" href="${pageContext.request.contextPath}/home" title="Fruitables - Thực phẩm sạch hữu cơ">
@@ -631,5 +631,76 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
         }
+    })();
+
+    // Hiệu ứng ẩn thanh navbar khi vuốt xuống và hiện lại khi vuốt lên (Smart Scroll Hide/Show)
+    (function() {
+        const header = document.getElementById('main-floating-header');
+        if (!header) return;
+
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+        let isHidden = false;
+        const threshold = 8; // Ngưỡng cuộn tối thiểu chống gián đoạn thao tác
+        const topSafeZone = 80; // Vùng an toàn ở sát đỉnh trang luôn giữ thanh navbar hiện diện
+
+        function handleScroll() {
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Nếu menu mobile, thông báo hoặc kết quả tìm kiếm đang mở thì không ẩn thanh điều hướng
+            const mobileDrawer = document.getElementById('mobile-menu-drawer');
+            if (mobileDrawer && !mobileDrawer.classList.contains('hidden')) {
+                lastScrollY = currentScrollY;
+                return;
+            }
+            const notifDropdown = document.getElementById('notif-dropdown');
+            if (notifDropdown && !notifDropdown.classList.contains('hidden')) {
+                lastScrollY = currentScrollY;
+                return;
+            }
+            const searchResults = document.getElementById('navbar-search-results');
+            if (searchResults && !searchResults.classList.contains('hidden')) {
+                lastScrollY = currentScrollY;
+                return;
+            }
+
+            // Luôn hiện khi ở gần đỉnh trang
+            if (currentScrollY <= topSafeZone) {
+                if (isHidden) {
+                    header.style.transform = 'translateY(0)';
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                    isHidden = false;
+                }
+                lastScrollY = currentScrollY;
+                return;
+            }
+
+            const delta = currentScrollY - lastScrollY;
+            if (Math.abs(delta) < threshold) {
+                return;
+            }
+
+            if (delta > 0 && currentScrollY > topSafeZone) {
+                // Người dùng vuốt xuống -> Ẩn thanh navbar
+                if (!isHidden) {
+                    header.style.transform = 'translateY(-135%)';
+                    header.style.opacity = '0';
+                    header.style.pointerEvents = 'none';
+                    isHidden = true;
+                }
+            } else if (delta < 0) {
+                // Người dùng vuốt lên -> Hiện lại thanh navbar
+                if (isHidden) {
+                    header.style.transform = 'translateY(0)';
+                    header.style.opacity = '1';
+                    header.style.pointerEvents = 'auto';
+                    isHidden = false;
+                }
+            }
+
+            lastScrollY = currentScrollY;
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
     })();
 </script>
