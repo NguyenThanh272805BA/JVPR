@@ -374,6 +374,17 @@ public class CheckoutServlet extends HttpServlet {
                 // TĂNG SỐ LƯỢT ĐÃ DÙNG CHO VOUCHER (NẾU HỢP LỆ)
                 if (couponValid && appliedCoupon != null && !appliedCoupon.trim().isEmpty()) {
                     productDAO.update("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?", appliedCoupon.trim());
+                    try {
+                        productDAO.update("UPDATE lucky_spin_history SET is_used = TRUE, used_at = CURRENT_TIMESTAMP WHERE reward_code = ?", appliedCoupon.trim());
+                    } catch (Exception ignored) {}
+                }
+
+                // TẶNG THÊM 1 LƯỢT QUAY MAY MẮN KHI ĐẶT HÀNG THÀNH CÔNG
+                if (userId != null) {
+                    try {
+                        vn.edu.eaut.fruitables.service.ILuckySpinService luckySpinService = new vn.edu.eaut.fruitables.service.impl.LuckySpinServiceImpl();
+                        luckySpinService.grantUserSpins(userId, 1);
+                    } catch (Exception ignored) {}
                 }
 
                 // DỌN DẸP BẢNG CART_ITEMS TRONG DATABASE CHO USER
