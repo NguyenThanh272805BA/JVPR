@@ -167,17 +167,17 @@
                 <fmt:formatNumber value="${order.totalAmount}" type="number" groupingUsed="true"/> ₫
               </td>
               <td class="py-4 px-6 text-on-surface-variant whitespace-nowrap"><c:out value="${order.paymentMethod}"/></td>
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td id="order-pay-badge-${order.id}" class="py-4 px-6 whitespace-nowrap">
                 <c:choose>
-                  <c:when test="${order.paymentStatus == 'PAID'}">
-                    <span class="px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                  <c:when test="${order.paymentStatus == 'PAID' || order.status == 'COMPLETED' || order.status == 'DELIVERED'}">
+                    <button type="button" onclick="togglePaymentStatus(${order.id}, 'UNPAID')" title="Bấm để đổi sang Chưa TT" class="px-2.5 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors">
                       <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Đã TT
-                    </span>
+                    </button>
                   </c:when>
                   <c:otherwise>
-                    <span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1">
+                    <button type="button" onclick="togglePaymentStatus(${order.id}, 'PAID')" title="Bấm để xác nhận Đã TT" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors">
                       <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chưa TT
-                    </span>
+                    </button>
                   </c:otherwise>
                 </c:choose>
               </td>
@@ -572,6 +572,14 @@
     }
     badgeCell.innerHTML = badgeHtml;
 
+    // Cập nhật trạng thái thanh toán tự động nếu đơn đã giao hoặc hoàn tất
+    if (status === 'DELIVERED' || status === 'COMPLETED') {
+      const payBadge = document.getElementById('order-pay-badge-' + orderId);
+      if (payBadge) {
+        payBadge.innerHTML = '<button type="button" onclick="togglePaymentStatus(' + orderId + ', \'UNPAID\')" title="Bấm để đổi sang Chưa TT" class="px-2.5 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Đã TT</button>';
+      }
+    }
+
     // B. Cập nhật Action Buttons tương ứng
     let actionsHtml = '<div class="flex items-center justify-center gap-1.5 flex-wrap">';
     
@@ -694,6 +702,47 @@
       toast.classList.add('translate-y-4', 'opacity-0');
       setTimeout(() => toast.remove(), 300);
     }, 3200);
+  }
+
+  // 6.1. XÁC NHẬN / THAY ĐỔI TRẠNG THÁI THANH TOÁN (PAID / UNPAID)
+  async function togglePaymentStatus(orderId, newPayStatus) {
+    const badgeCell = document.getElementById('order-pay-badge-' + orderId);
+    if (!badgeCell) return;
+    try {
+      const resp = await fetch('${pageContext.request.contextPath}/admin/orders', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: new URLSearchParams({
+          action: 'updatePaymentStatus',
+          orderId: orderId,
+          paymentStatus: newPayStatus
+        }).toString()
+      });
+      const data = await resp.json();
+      if (data.success) {
+        if (newPayStatus === 'PAID') {
+          badgeCell.innerHTML = `
+            <button type="button" onclick="togglePaymentStatus(\${orderId}, 'UNPAID')" title="Bấm để đổi sang Chưa TT" class="px-2.5 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Đã TT
+            </button>`;
+          showToast('Đã xác nhận thanh toán cho đơn hàng #' + orderId, 'success');
+        } else {
+          badgeCell.innerHTML = `
+            <button type="button" onclick="togglePaymentStatus(\${orderId}, 'PAID')" title="Bấm để xác nhận Đã TT" class="px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition-colors">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chưa TT
+            </button>`;
+          showToast('Đã chuyển đơn hàng #' + orderId + ' sang Chưa thanh toán', 'info');
+        }
+      } else {
+        showToast('Lỗi: ' + (data.message || 'Không thể cập nhật TT thanh toán'), 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Lỗi kết nối máy chủ', 'error');
+    }
   }
 
   // 7. ĐIỀU PHỐI SHIPPER NỘI BỘ FRUITABLES
@@ -839,7 +888,7 @@
 
       // Tài chính
       document.getElementById('modalPaymentMethod').innerText = order.paymentMethod || 'COD';
-      const isPaid = (order.paymentStatus === 'PAID');
+      const isPaid = (order.paymentStatus === 'PAID' || order.status === 'COMPLETED' || order.status === 'DELIVERED');
       document.getElementById('modalPaymentStatusBadge').innerHTML = isPaid 
         ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Đã thanh toán</span>'
         : '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Chưa thanh toán</span>';

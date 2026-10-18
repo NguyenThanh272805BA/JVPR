@@ -124,10 +124,16 @@ public class ProductDAOImpl extends AbstractDAO<ProductModel> implements IProduc
             params.add(maxPrice);
         }
 
+        if ("discount".equals(sortOption)) {
+            sql.append("AND p.discount_price IS NOT NULL AND p.discount_price > 0 AND p.discount_price < p.price ");
+        }
+
         if ("price_asc".equals(sortOption)) {
             sql.append("ORDER BY (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) ASC");
         } else if ("price_desc".equals(sortOption)) {
             sql.append("ORDER BY (CASE WHEN (p.discount_price IS NOT NULL AND p.discount_price > 0) THEN p.discount_price ELSE p.price END) DESC");
+        } else if ("discount".equals(sortOption)) {
+            sql.append("ORDER BY ((p.price - p.discount_price) / p.price) DESC, p.id DESC");
         } else {
             sql.append("ORDER BY p.id DESC");
         }

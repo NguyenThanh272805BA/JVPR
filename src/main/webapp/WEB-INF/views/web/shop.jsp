@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -189,11 +190,18 @@
                 <!-- Dải nút cuộn hàng ngang -->
                 <div id="categoryPillsTrack" class="flex items-center gap-2 overflow-x-auto py-1 scroll-smooth w-full [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                     <!-- Nút Tất cả -->
-                    <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort}'>&sort=${selectedSort}</c:if>"
-                       class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${empty selectedCategory ? 'bg-primary text-white shadow-md scale-105 active-pill' : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary border border-outline-variant/60'}">
+                    <a href="${pageContext.request.contextPath}/shop<c:if test='${not empty keyword}'>?keyword=${keyword}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if><c:if test='${not empty selectedSort && selectedSort != \"discount\"}'>&sort=${selectedSort}</c:if>"
+                       class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${empty selectedCategory && selectedSort != 'discount' ? 'bg-primary text-white shadow-md scale-105 active-pill' : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary border border-outline-variant/60'}">
                         <span class="material-symbols-outlined text-sm">apps</span>
                         <span>Tất cả</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${empty selectedCategory ? 'bg-white/20 text-white' : 'bg-surface-container-lowest text-on-surface-variant'}">${totalProducts}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${empty selectedCategory && selectedSort != 'discount' ? 'bg-white/20 text-white' : 'bg-surface-container-lowest text-on-surface-variant'}">${totalProducts}</span>
+                    </a>
+
+                    <!-- Nút Đang giảm giá -->
+                    <a href="${pageContext.request.contextPath}/shop?sort=discount<c:if test='${not empty keyword}'>&keyword=${keyword}</c:if><c:if test='${not empty selectedCategory}'>&category=${selectedCategory}</c:if><c:if test='${not empty selectedMinPrice}'>&minPrice=${selectedMinPrice}</c:if><c:if test='${not empty selectedMaxPrice}'>&maxPrice=${selectedMaxPrice}</c:if>"
+                       class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${selectedSort == 'discount' ? 'bg-rose-600 text-white shadow-md scale-105 active-pill' : 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200'}">
+                        <span class="material-symbols-outlined text-sm">bolt</span>
+                        <span>⚡ Đang giảm giá</span>
                     </a>
 
                     <!-- Danh mục động từ DB -->
@@ -376,6 +384,7 @@
                         </label>
                         <select name="sort" onchange="this.form.submit()" class="border-0 bg-transparent text-xs font-bold text-on-surface outline-none cursor-pointer focus:ring-0">
                             <option value="newest" ${selectedSort == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                            <option value="discount" ${selectedSort == 'discount' ? 'selected' : ''}>⚡ Giảm giá nhiều nhất</option>
                             <option value="price_asc" ${selectedSort == 'price_asc' ? 'selected' : ''}>Giá: Thấp đến Cao</option>
                             <option value="price_desc" ${selectedSort == 'price_desc' ? 'selected' : ''}>Giá: Cao xuống Thấp</option>
                         </select>
@@ -388,7 +397,7 @@
                 <c:forEach var="item" items="${products}">
                     <c:set var="isOutOfStock" value="${item.stock != null && item.stock <= 0}" />
                     <c:set var="hasDiscount" value="${item.discountPrice != null && item.discountPrice > 0 && item.discountPrice < item.price}" />
-
+                    <c:if test="${selectedSort != 'discount' || hasDiscount}">
                     <div class="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/80 hover:border-primary/50 overflow-hidden group flex flex-col hover:-translate-y-1 relative">
                         <!-- Product Image Clickable -->
                         <a href="${pageContext.request.contextPath}/product-detail?id=${item.id}" class="relative w-full h-48 bg-surface-container overflow-hidden block">
@@ -398,8 +407,9 @@
                             </div>
 
                             <c:if test="${hasDiscount}">
-                                <div class="absolute top-3 right-3 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md animate-pulse">
-                                    -<fmt:formatNumber value="${(item.price - item.discountPrice) / item.price * 100}" maxFractionDigits="0"/>%
+                                <div class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-rose-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md flex items-center gap-0.5 animate-pulse">
+                                    <span class="material-symbols-outlined text-[13px]">bolt</span>
+                                    -${Math.round((item.price - item.discountPrice) / item.price * 100)}%
                                 </div>
                             </c:if>
 
@@ -455,17 +465,22 @@
                                     <c:choose>
                                         <c:when test="${hasDiscount}">
                                             <div class="flex flex-col">
-                                                <span class="font-price-tag text-lg text-primary font-bold">
-                                                    <fmt:formatNumber value="${item.discountPrice}" type="number" groupingUsed="true"/> ₫
-                                                </span>
-                                                <span class="text-xs text-on-surface-variant line-through -mt-1">
-                                                    <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                                <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <span class="font-price-tag text-lg text-rose-600 font-extrabold">
+                                                        <fmt:formatNumber pattern="#,##0" value="${item.discountPrice}"/> ₫
+                                                    </span>
+                                                    <span class="bg-rose-50 text-rose-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-200">
+                                                        -${Math.round((item.price - item.discountPrice) / item.price * 100)}%
+                                                    </span>
+                                                </div>
+                                                <span class="text-xs text-on-surface-variant line-through -mt-0.5">
+                                                    <fmt:formatNumber pattern="#,##0" value="${item.price}"/> ₫
                                                 </span>
                                             </div>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="font-price-tag text-lg text-primary font-bold">
-                                                <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                                <fmt:formatNumber pattern="#,##0" value="${item.price}"/> ₫
                                             </span>
                                         </c:otherwise>
                                     </c:choose>
@@ -490,6 +505,7 @@
                             </div>
                         </div>
                     </div>
+                    </c:if>
                 </c:forEach>
             </div>
 

@@ -422,7 +422,17 @@
                                         <div>
                                             <span class="text-on-surface-variant">Phương thức:</span>
                                             <span class="font-medium text-on-surface">${order.paymentMethod}</span>
-                                            <span class="ml-2 font-bold ${order.paymentStatus == 'PAID' ? 'text-primary' : 'text-error'}">(${order.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'PAID' || order.status == 'COMPLETED' || order.status == 'DELIVERED'}">
+                                                    <span class="ml-2 font-bold text-primary">(Đã thanh toán)</span>
+                                                </c:when>
+                                                <c:when test="${order.paymentMethod == 'COD'}">
+                                                    <span class="ml-2 font-bold text-sky-600">(Thanh toán khi nhận hàng)</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="ml-2 font-bold text-amber-600">(Chưa thanh toán)</span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                         <div class="flex items-center gap-4 flex-wrap">
                                             <div class="text-right">

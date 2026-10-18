@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -358,7 +359,7 @@
               <!-- Badge % Giảm Sốc -->
               <div class="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[11px] font-black px-2.5 py-1 rounded-lg z-10 shadow-md flex items-center gap-0.5">
                 <span class="material-symbols-outlined text-[13px]">bolt</span>
-                -<fmt:formatNumber value="${(product.price - product.discountPrice) / product.price * 100}" maxFractionDigits="0"/>%
+                -${Math.round((product.price - product.discountPrice) / product.price * 100)}%
               </div>
 
               <!-- Product Image -->
@@ -377,8 +378,8 @@
                 </a>
 
                 <div class="flex flex-wrap items-baseline gap-2 mb-5">
-                  <span class="text-rose-600 font-black text-lg"><fmt:formatNumber value="${product.discountPrice}" type="number" groupingUsed="true"/> ₫</span>
-                  <span class="text-slate-400 text-xs line-through"><fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> ₫</span>
+                  <span class="text-rose-600 font-black text-lg"><fmt:formatNumber pattern="#,##0" value="${product.discountPrice}"/> ₫</span>
+                  <span class="text-slate-400 text-xs line-through"><fmt:formatNumber pattern="#,##0" value="${product.price}"/> ₫</span>
                 </div>
 
                 <form action="${pageContext.request.contextPath}/cart" method="POST" class="mt-auto">

@@ -223,8 +223,13 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                 }
             }
 
-            // 3. Cập nhật trạng thái mới cho đơn hàng
-            String updateOrderSql = "UPDATE orders SET status = ? WHERE id = ?";
+            // 3. Cập nhật trạng thái mới cho đơn hàng (Nếu giao xong hoặc hoàn tất thì tự động cập nhật thanh toán là PAID)
+            String updateOrderSql;
+            if ("DELIVERED".equalsIgnoreCase(newStatus) || "COMPLETED".equalsIgnoreCase(newStatus)) {
+                updateOrderSql = "UPDATE orders SET status = ?, payment_status = 'PAID' WHERE id = ?";
+            } else {
+                updateOrderSql = "UPDATE orders SET status = ? WHERE id = ?";
+            }
             psOrder = conn.prepareStatement(updateOrderSql);
             psOrder.setString(1, newStatus);
             psOrder.setLong(2, orderId);
@@ -404,5 +409,11 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                 }
             } catch (SQLException ignored) {}
         }
+    }
+
+    @Override
+    public void updatePaymentStatus(Long orderId, String paymentStatus) {
+        if (orderId == null || paymentStatus == null) return;
+        update("UPDATE orders SET payment_status = ? WHERE id = ?", paymentStatus, orderId);
     }
 }

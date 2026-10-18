@@ -75,7 +75,7 @@ public class InventoryAgentServiceImpl implements IInventoryAgentService {
             couponCode = "CLEAR-AUTUMN-30";
             actionType = "FLASH_SALE";
             riskDesc = "Lô nho nhập 4 ngày trước. Vỏ mỏng, cuống bắt đầu se khô, dự báo nguy cơ thối rụng trong 48h nếu tốc độ bán không tăng gấp 3.";
-            reasoning = "Tốc độ bán hiện tại 2.4 hộp/ngày, với tồn kho 80 hộp cần tới 33 ngày mới bán hết. Agent đề xuất xả hàng Flash Sale chiết khấu 30% trong 48 giờ để kích cầu, thu hồi 70% vốn lưu động ngay lập tức.";
+            reasoning = "Tốc độ bán hiện tại 2.4 hộp/ngày, với tồn kho 80 hộp cần tới 33 ngày mới bán hết. Đề xuất xả hàng Flash Sale giảm giá 30% trong 48 giờ để kích cầu người mua, thu hồi 70% tiền vốn ngay lập tức.";
         } else if (id == 15L) { // Cherry Đỏ Mỹ
             riskLevel = "CRITICAL";
             discountPercent = 25;
@@ -84,7 +84,7 @@ public class InventoryAgentServiceImpl implements IInventoryAgentService {
             couponCode = "CLEAR-CHERRY-25";
             actionType = "FLASH_SALE";
             riskDesc = "Trái cây nhạy cảm nhiệt độ cao. Tồn kho 60 hộp, cuống xanh đang nhạt màu, nguy cơ cấn dập đáy hộp.";
-            reasoning = "Cherry là mặt hàng giá trị cao (320.000đ/hộp). Tồn kho 60 hộp tương đương 19.200.000đ. Agent kích hoạt chiến dịch ưu đãi 25% kết hợp đẩy banner trang chủ nhằm giải phóng ít nhất 40 hộp trong 2 ngày.";
+            reasoning = "Cherry là mặt hàng giá trị cao (320.000đ/hộp). Tồn kho 60 hộp tương đương 19.200.000đ. Đề xuất giảm giá 25% kết hợp đưa lên banner nổi bật trên trang chủ nhằm bán hết ít nhất 40 hộp trong 2 ngày.";
         } else if (id == 17L) { // Việt Quất Tươi
             riskLevel = "HIGH";
             discountPercent = 20;
@@ -93,7 +93,7 @@ public class InventoryAgentServiceImpl implements IInventoryAgentService {
             couponCode = "CLEAR-BERRY-20";
             actionType = "BUNDLE_PROMO";
             riskDesc = "Quả mọng việt quất dễ lên men khi bảo quản quá 5 ngày. Tồn kho còn 80 hộp.";
-            reasoning = "Agent khuyến nghị ghép Combo Nước ép Việt quất - Táo Envy hoặc chiết khấu 20% khi mua từ 2 hộp để tăng giá trị giỏ hàng (AOV).";
+            reasoning = "Đề xuất ghép Combo Nước ép Việt quất - Táo Envy hoặc giảm giá 20% khi mua từ 2 hộp để bán được số lượng nhiều hơn.";
         } else if (id == 14L) { // Kiwi Vàng
             riskLevel = "HIGH";
             discountPercent = 20;
@@ -102,7 +102,7 @@ public class InventoryAgentServiceImpl implements IInventoryAgentService {
             couponCode = "FLASH-KIWI-20";
             actionType = "FLASH_SALE";
             riskDesc = "Kiwi đã đạt độ chín mềm tay chuẩn ăn ngay, nếu để thêm 3 ngày sẽ bị nẫu.";
-            reasoning = "Agent đề xuất phát hành mã FLASH-KIWI-20 giảm 20% gửi qua Live Chat và email cho nhóm khách hàng yêu thích ăn kiêng, eat clean.";
+            reasoning = "Đề xuất phát hành mã FLASH-KIWI-20 giảm giá 20% gửi qua Live Chat và email cho nhóm khách hàng thích hoa quả sạch, ăn kiêng.";
         } else { // Dưa Lưới Huỳnh Long
             riskLevel = "MEDIUM";
             discountPercent = 15;
@@ -111,7 +111,7 @@ public class InventoryAgentServiceImpl implements IInventoryAgentService {
             couponCode = "SALE-DUALUOI-15";
             actionType = "VIP_BLAST";
             riskDesc = "Dưa chín tới độ đường đỉnh điểm (Brix 15). Cần đẩy nhanh trước khi mất độ giòn.";
-            reasoning = "Áp dụng giảm nhẹ 15% cho đơn hàng mua kèm trái cây khác để tối ưu chi phí vận chuyển.";
+            reasoning = "Áp dụng giảm nhẹ 15% cho đơn hàng mua kèm trái cây khác để khách tiện mua thêm.";
         }
 
         double suggestedPrice = price * (100 - discountPercent) / 100.0;

@@ -342,10 +342,13 @@
                         <div>
                             <p class="text-xs text-on-surface-variant">Phương thức: <span class="font-semibold text-on-surface">${order.paymentMethod}</span></p>
                             <p class="text-xs text-on-surface-variant mt-1 flex items-center gap-1">
-                                Trạng thái:
+                                Thanh toán:
                                 <c:choose>
-                                    <c:when test="${order.paymentStatus == 'PAID'}">
+                                    <c:when test="${order.paymentStatus == 'PAID' || order.status == 'COMPLETED' || order.status == 'DELIVERED'}">
                                         <span class="text-primary font-bold flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">check_circle</span> Đã thanh toán</span>
+                                    </c:when>
+                                    <c:when test="${order.paymentMethod == 'COD'}">
+                                        <span class="text-sky-600 font-bold flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">payments</span> Thanh toán khi nhận hàng (COD)</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="text-amber-600 font-bold flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">schedule</span> Chờ thanh toán</span>

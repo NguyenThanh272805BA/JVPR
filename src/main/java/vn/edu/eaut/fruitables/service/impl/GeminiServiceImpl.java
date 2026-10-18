@@ -10,6 +10,8 @@ import vn.edu.eaut.fruitables.service.IGeminiService;
 import vn.edu.eaut.fruitables.service.IProductService;
 import vn.edu.eaut.fruitables.util.GeminiConfigUtil;
 
+import vn.edu.eaut.fruitables.util.AICircuitBreaker;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -25,9 +27,17 @@ public class GeminiServiceImpl implements IGeminiService {
     private final Gson gson;
     private final IProductService productService;
 
-    // In-Memory Cache lưu câu trả lời cho các câu hỏi tương tự nhau
-    private static final Map<String, CachedResponse> RESPONSE_CACHE = new ConcurrentHashMap<>();
+    // LRU Cache có giới hạn tối đa 500 câu hỏi và TTL 12 giờ, chống rò rỉ bộ nhớ (Memory Leak)
+    private static final int MAX_CACHE_SIZE = 500;
     private static final long CACHE_TTL_MS = 12 * 60 * 60 * 1000L; // 12 giờ
+    private static final Map<String, CachedResponse> RESPONSE_CACHE = Collections.synchronizedMap(
+            new LinkedHashMap<String, CachedResponse>(128, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, CachedResponse> eldest) {
+                    return size() > MAX_CACHE_SIZE;
+                }
+            }
+    );
 
     // Cache danh mục sản phẩm tóm tắt để không phải query DB liên tục
     private static String cachedCompactCatalog = "";
@@ -72,6 +82,12 @@ public class GeminiServiceImpl implements IGeminiService {
             if (cached != null && !cached.isExpired()) {
                 return cached.text;
             }
+        }
+
+        // 1.5. Kiểm tra Circuit Breaker (Bộ ngắt mạch bảo vệ hệ thống)
+        if (!AICircuitBreaker.getInstance().allowRequest()) {
+            System.out.println("[GeminiService] Circuit Breaker đang OPEN (Ngắt mạch). Bỏ qua gọi Google API để bảo vệ hệ thống.");
+            return "Dạ hiện tại Trợ lý AI đang tiếp nhận lượng lớn người dùng cùng lúc 🍎. Để phục vụ bạn tức thì, bạn có thể bấm vào các gợi ý nhanh bên dưới (Mặt hàng giảm giá, Mẹo bảo quản, Tra cứu đơn hàng) hoặc chuyển sang Live Chat để nhân viên CSKH hỗ trợ ngay nhé!";
         }
 
         // 2. Lấy hoặc làm mới mini-catalog tóm tắt (Compact Context ~120 tokens)
@@ -172,6 +188,7 @@ public class GeminiServiceImpl implements IGeminiService {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
             if (response.statusCode() == 200) {
+                AICircuitBreaker.getInstance().recordSuccess();
                 String responseBody = response.body();
                 String aiText = parseGeminiText(responseBody);
                 if (aiText != null && !aiText.trim().isEmpty()) {
@@ -182,9 +199,11 @@ public class GeminiServiceImpl implements IGeminiService {
                     return aiText;
                 }
             } else {
+                AICircuitBreaker.getInstance().recordFailure(response.statusCode(), "HTTP " + response.statusCode());
                 System.err.println("[GeminiService] API Error: HTTP " + response.statusCode() + " - " + response.body());
             }
         } catch (Exception e) {
+            AICircuitBreaker.getInstance().recordFailure(500, e.getMessage());
             System.err.println("[GeminiService] Call failed: " + e.getMessage());
         }
 
@@ -524,13 +543,21 @@ public class GeminiServiceImpl implements IGeminiService {
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                     .build();
 
+            if (!AICircuitBreaker.getInstance().allowRequest()) {
+                System.err.println("[GeminiService-Product] Circuit Breaker OPEN -> skip call");
+                return null;
+            }
+
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() == 200) {
+                AICircuitBreaker.getInstance().recordSuccess();
                 return parseGeminiText(response.body());
             } else {
+                AICircuitBreaker.getInstance().recordFailure(response.statusCode(), "Product API HTTP " + response.statusCode());
                 System.err.println("[GeminiService-Product] API Error: " + response.statusCode() + " - " + response.body());
             }
         } catch (Exception e) {
+            AICircuitBreaker.getInstance().recordFailure(500, e.getMessage());
             System.err.println("[GeminiService-Product] Exception: " + e.getMessage());
         }
         return null;
@@ -560,7 +587,7 @@ public class GeminiServiceImpl implements IGeminiService {
                 Bạn là Trưởng bộ phận Chăm Sóc Khách Hàng & Quản Lý Chất Lượng tại Fruitables - Chuỗi cửa hàng hoa quả tươi cao cấp.
                 Nhiệm vụ của bạn là:
                 1. Phân tích ngữ cảnh và cảm xúc (sentiment) của đánh giá từ khách hàng: "POSITIVE", "NEGATIVE", "NEUTRAL".
-                2. Soạn thảo một câu phản hồi chính thức từ "Fruitables Store 🌿" gửi tới khách hàng, đảm bảo sự tôn trọng, chuyên nghiệp, chân thành và tinh tế.
+                2. Soạn thảo một câu phản hồi chính thức từ "Fruitables Store " gửi tới khách hàng, đảm bảo sự tôn trọng, chuyên nghiệp, chân thành và tinh tế.
 
                 NGUYÊN TẮC PHÂN LOẠI & SOẠN PHẢN HỒI (BẮT BUỘC TUÂN THỦ NGHIÊM NGẶT):
 
@@ -570,8 +597,8 @@ public class GeminiServiceImpl implements IGeminiService {
                    - riskLevel: "HIGH"
                    - needsSupportFollowup: true
                    - QUY TẮC CỐT LÕI (CỰC KỲ QUAN TRỌNG - TUYỆT ĐỐI TUÂN THỦ):
-                     ❌ TUYỆT ĐỐI KHÔNG tự động hứa hẹn cấp mã giảm giá, voucher hay số tiền bồi thường cụ thể trong câu phản hồi (nhằm ngăn chặn hành vi khai thác lỗ hổng hoặc sử dụng lại ảnh hỏng từ trước).
-                     ✅ Lời phản hồi:
+                      TUYỆT ĐỐI KHÔNG tự động hứa hẹn cấp mã giảm giá, voucher hay số tiền bồi thường cụ thể trong câu phản hồi (nhằm ngăn chặn hành vi khai thác lỗ hổng hoặc sử dụng lại ảnh hỏng từ trước).
+                      Lời phản hồi:
                         + Bắt đầu bằng lời xin lỗi chân thành, chia sẻ sự tiếc nuối sâu sắc vì trải nghiệm của khách chưa trọn vẹn.
                         + Khẳng định Fruitables luôn cam kết 100% hoa quả tươi sạch và chính sách bảo hành 1 đổi 1.
                         + Hướng dẫn hành động rõ ràng: Mời khách BẤM VÀO MỤC NHẮN TIN VỚI CSKH (Live Chat ở góc dưới màn hình) hoặc liên hệ Hotline CSKH, cung cấp mã đơn hàng để đội ngũ CSKH trực tiếp xác minh và có phương án xử lý thỏa đáng nhất (đổi bù hoa quả mới hoặc bồi hoàn phù hợp).
@@ -602,7 +629,7 @@ public class GeminiServiceImpl implements IGeminiService {
                 Chỉ trả về DUY NHẤT một chuỗi JSON hợp lệ không bọc markdown ```json ... ```, định dạng:
                 {
                   "sentiment": "POSITIVE",
-                  "reply": "Nội dung câu phản hồi bằng tiếng Việt trau chuốt, ấm áp 🌿🍎",
+                  "reply": "Nội dung câu phản hồi bằng tiếng Việt trau chuốt, ấm áp ",
                   "riskLevel": "LOW",
                   "needsSupportFollowup": false,
                   "reason": "Lý do ngắn gọn"
@@ -700,6 +727,12 @@ public class GeminiServiceImpl implements IGeminiService {
                 - Tránh văn phong dài dòng, chia các đầu mục rõ ràng với emoji hoa quả tươi mát.
                 """;
 
+        // Kiểm tra Circuit Breaker trước khi gửi ảnh phân tích
+        if (!AICircuitBreaker.getInstance().allowRequest()) {
+            System.out.println("[GeminiService Vision] Circuit Breaker đang OPEN. Trả về fallback chẩn đoán an toàn.");
+            return "Dạ Trợ lý Fruit Doctor đang tiếp nhận nhiều ảnh phân tích cùng lúc 🔬. Tóm tắt nhanh: Với hoa quả đã chín già, bạn nên sơ chế làm sinh tố hoặc nước ép ngay trong ngày để giữ trọn dưỡng chất nhé! Bạn có thể thử gửi lại ảnh sau vài giây ạ.";
+        }
+
         try {
             JsonObject root = new JsonObject();
             JsonArray contents = new JsonArray();
@@ -736,20 +769,23 @@ public class GeminiServiceImpl implements IGeminiService {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
                     .header("Content-Type", "application/json; charset=UTF-8")
-                    .timeout(Duration.ofSeconds(20))
+                    .timeout(Duration.ofSeconds(15))
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() == 200) {
+                AICircuitBreaker.getInstance().recordSuccess();
                 String aiText = parseGeminiText(response.body());
                 if (aiText != null && !aiText.trim().isEmpty()) {
                     return aiText;
                 }
             } else {
+                AICircuitBreaker.getInstance().recordFailure(response.statusCode(), "Vision HTTP " + response.statusCode());
                 System.err.println("[GeminiService Vision] Error: HTTP " + response.statusCode() + " - " + response.body());
             }
         } catch (Exception e) {
+            AICircuitBreaker.getInstance().recordFailure(500, e.getMessage());
             System.err.println("[GeminiService Vision] Call failed: " + e.getMessage());
         }
 

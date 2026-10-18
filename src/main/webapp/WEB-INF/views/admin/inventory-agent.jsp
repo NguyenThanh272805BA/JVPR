@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>AI Agent Xả Kho & Giám Sát Độ Tươi - Fruitables Admin</title>
+  <title>Điều Phối Xả Kho & Chống Thất Thoát Hoa Quả Tươi Tự Động - Fruitables Admin</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/web/css/style.css">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="${pageContext.request.contextPath}/assets/web/js/tailwind-config.js"></script>
@@ -22,17 +22,14 @@
   <!-- Header -->
   <header class="h-20 bg-surface flex items-center justify-between px-6 shadow-sm z-10 flex-shrink-0 border-b border-surface-variant">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center shadow-md">
-        <span class="material-symbols-outlined text-2xl">smart_toy</span>
-      </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="font-headline-md text-lg font-bold text-on-surface">AI Agent: Điều Phối Xả Kho & Chống Thất Thoát Hoa Quả Tươi</h1>
+          <h1 class="font-headline-md text-lg font-bold text-on-surface">Điều Phối Xả Kho & Chống Thất Thoát Hoa Quả Tươi Tự Động</h1>
           <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-300 flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Autonomous Active
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Đang hoạt động tự động
           </span>
         </div>
-        <p class="text-xs text-on-surface-variant">Hệ thống AI Agent tự chủ quét CSDL kho hàng, tính toán chu kỳ chín và tự động kích hoạt kế hoạch cứu vốn</p>
+        <p class="text-xs text-on-surface-variant">Hệ thống tự động theo dõi kho hoa quả, tính toán độ tươi và chủ động đề xuất giải pháp xả hàng kịp thời</p>
       </div>
     </div>
     <div class="flex items-center gap-4">
@@ -114,18 +111,18 @@
     <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-teal-900 text-white rounded-2xl p-6 shadow-md border border-emerald-500/30 flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="space-y-2 max-w-2xl">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
-          <span class="material-symbols-outlined text-sm">psychology</span> ReAct Autonomous Decision Engine
+          <span class="material-symbols-outlined text-sm">auto_mode</span> Tự Động Tính Toán Xả Hàng
         </div>
-        <h3 class="text-lg font-bold">Cơ chế Tự Chủ Của AI Agent Trong Vận Hành Kho Hoa Quả</h3>
+        <h3 class="text-lg font-bold">Cách Hệ Thống Tự Động Xử Lý Trái Cây Tồn Kho & Cận Date</h3>
         <p class="text-xs text-slate-300 leading-relaxed">
-          Agent liên tục đối chiếu số lượng tồn kho với tốc độ tiêu thụ hàng ngày (run-rate) và ngày nhập lô hàng. Khi phát hiện chỉ số rủi ro vượt ngưỡng, Agent chủ động tính toán mức chiết khấu tối ưu để kích cầu mà không gây lỗ, tự động sinh mã Voucher và cập nhật giá Flash Sale tức thì trên hệ thống.
+          Hệ thống liên tục theo dõi lượng trái cây còn trong kho, xem mỗi loại bán nhanh hay chậm và số ngày bảo quản còn lại. Khi phát hiện loại nào bán chậm hoặc sắp hết độ tươi ngon, hệ thống sẽ tự động tính mức giảm giá hợp lý để xả hàng thu hồi vốn nhanh nhất mà không bị lỗ, đồng thời tự tạo mã giảm giá và áp dụng giá ưu đãi ngay trên website.
         </p>
       </div>
       <div class="flex items-center gap-3 flex-shrink-0">
         <div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 text-center">
-          <div class="text-xs text-emerald-300 font-semibold">Tần suất quét tự động</div>
+          <div class="text-xs text-emerald-300 font-semibold">Tần suất kiểm tra kho</div>
           <div class="text-lg font-extrabold mt-0.5">30 Phút / Lần</div>
-          <div class="text-[10px] text-slate-300 mt-1">Lần quét cuối: Vừa xong</div>
+          <div class="text-[10px] text-slate-300 mt-1">Lần kiểm tra gần nhất: Vừa xong</div>
         </div>
       </div>
     </div>
@@ -135,7 +132,7 @@
       <div class="p-5 border-b border-surface-variant flex items-center justify-between bg-surface-container-low">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-xl">auto_fix_high</span>
-          <h2 class="font-headline-md text-base font-bold text-on-surface">Danh Sách Đề Xuất Kế Hoạch Xả Kho Tự Chủ</h2>
+          <h2 class="font-headline-md text-base font-bold text-on-surface">Danh Sách Đề Xuất Giảm Giá & Xả Kho</h2>
         </div>
         <span class="text-xs text-on-surface-variant font-medium">Phát hiện ${recommendations.size()} mặt hàng hoa quả tươi cần xử lý</span>
       </div>
@@ -154,7 +151,11 @@
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
                     <span class="text-[11px] font-bold px-2 py-0.5 rounded-md ${item.spoilageRisk == 'CRITICAL' ? 'bg-rose-100 text-rose-700 border border-rose-200' : (item.spoilageRisk == 'HIGH' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-blue-100 text-blue-700 border border-blue-200')}">
-                      ${item.spoilageRisk} RISK
+                      <c:choose>
+                        <c:when test="${item.spoilageRisk == 'CRITICAL'}">Cần xả gấp</c:when>
+                        <c:when test="${item.spoilageRisk == 'HIGH'}">Rủi ro cao</c:when>
+                        <c:otherwise>Cần lưu ý</c:otherwise>
+                      </c:choose>
                     </span>
                     <span class="text-xs text-on-surface-variant font-medium">${item.categoryName}</span>
                   </div>
@@ -178,7 +179,7 @@
                 <p class="text-xs text-on-surface leading-relaxed">${item.riskDescription}</p>
                 <div class="pt-2 border-t border-slate-200/80 flex items-start gap-1.5 text-xs text-on-surface-variant leading-relaxed">
                   <span class="material-symbols-outlined text-sm text-emerald-600 flex-shrink-0 mt-0.5">psychology</span>
-                  <div><strong class="text-emerald-800">Lập luận của Agent:</strong> ${item.agentReasoning}</div>
+                  <div><strong class="text-emerald-800">Lý do đề xuất:</strong> ${item.agentReasoning}</div>
                 </div>
               </div>
 
@@ -216,7 +217,7 @@
                               onclick="executeClearance(${item.productId}, '${item.suggestedCouponCode}', ${item.discountPercent}, '${item.actionType}')"
                               id="btn-exec-${item.productId}"
                               class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-primary text-white font-bold text-xs hover:opacity-95 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                        <span class="material-symbols-outlined text-sm">bolt</span> Phê Duyệt & Kích Hoạt 1-Click
+                        <span class="material-symbols-outlined text-sm">bolt</span> Duyệt & Giảm Giá Ngay
                       </button>
                     </c:otherwise>
                   </c:choose>
@@ -235,17 +236,17 @@
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-bold text-sm text-on-surface flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-lg">history</span>
-          Nhật Ký Tác Vụ Tự Chủ Của AI Agent (Autonomous Audit Log)
+          Nhật Ký Tự Động Xử Lý Kho Hàng
         </h3>
-        <span class="text-xs text-on-surface-variant">Hệ thống lưu vết tự động bảo đảm tính minh bạch</span>
+        <span class="text-xs text-on-surface-variant">Lưu lại toàn bộ lịch sử kiểm tra kho và áp dụng giảm giá</span>
       </div>
       <div class="space-y-3 text-xs" id="audit-log-container">
         <div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/60 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <div>
-              <span class="font-bold text-on-surface">[AUTONOMOUS_SCAN]</span>
-              <span class="text-on-surface-variant ml-1">Đã hoàn thành lượt rà soát 25 mặt hàng trái cây tươi. Phát hiện 4 sản phẩm cận hạn cần can thiệp.</span>
+              <span class="font-bold text-on-surface">[KIỂM TRA KHO]</span>
+              <span class="text-on-surface-variant ml-1">Đã hoàn thành lượt kiểm tra 25 mặt hàng trái cây tươi. Phát hiện 4 sản phẩm cận hạn cần can thiệp xả hàng.</span>
             </div>
           </div>
           <span class="text-on-surface-variant text-[11px]">Hôm nay, 14:30:15</span>
@@ -254,8 +255,8 @@
           <div class="flex items-center gap-3">
             <span class="w-2 h-2 rounded-full bg-primary"></span>
             <div>
-              <span class="font-bold text-on-surface">[AUTO_CALCULATE]</span>
-              <span class="text-on-surface-variant ml-1">Tính toán ma trận chiết khấu bảo toàn vốn: Mức chiết khấu tối ưu từ 15% đến 30% đối với các lô Nho Mỹ, Cherry và Kiwi.</span>
+              <span class="font-bold text-on-surface">[TÍNH GIẢM GIÁ]</span>
+              <span class="text-on-surface-variant ml-1">Đã tính mức chiết khấu hợp lý: Giảm từ 15% đến 30% đối với các lô Nho Mỹ, Cherry và Kiwi để thu hồi vốn nhanh nhất.</span>
             </div>
           </div>
           <span class="text-on-surface-variant text-[11px]">Hôm nay, 14:30:18</span>
@@ -329,8 +330,8 @@
               <div class="flex items-center gap-3">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <div>
-                  <span class="font-bold text-emerald-900">[ACTION_EXECUTED]</span>
-                  <span class="text-emerald-800 ml-1">AI Agent đã phát hành mã \${couponCode} (- \${discountPercent}%) cho sản phẩm ID \${productId}.</span>
+                  <span class="font-bold text-emerald-900">[ĐÃ XẢ HÀNG]</span>
+                  <span class="text-emerald-800 ml-1">Đã áp dụng mã \${couponCode} (giảm \${discountPercent}%) cho sản phẩm ID \${productId}.</span>
                 </div>
               </div>
               <span class="text-emerald-700 text-[11px]">Vừa xong</span>
@@ -342,7 +343,7 @@
         alert(data.message || 'Lỗi xử lý');
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = '<span class="material-symbols-outlined text-sm">bolt</span> Phê Duyệt & Kích Hoạt 1-Click';
+          btn.innerHTML = '<span class="material-symbols-outlined text-sm">bolt</span> Duyệt & Giảm Giá Ngay';
         }
       }
     })
@@ -350,7 +351,7 @@
       alert('Lỗi kết nối tới máy chủ!');
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined text-sm">bolt</span> Phê Duyệt & Kích Hoạt 1-Click';
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">bolt</span> Duyệt & Giảm Giá Ngay';
       }
     });
   }

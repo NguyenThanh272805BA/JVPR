@@ -517,10 +517,14 @@
                         }
 
                         searchList.innerHTML = data.map(p => {
-                            const price = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+                            const hasDisc = (p.discountPrice && p.discountPrice > 0 && p.discountPrice < p.price);
+                            const price = hasDisc ? p.discountPrice : p.price;
                             const priceFmt = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
-                            const origPriceFmt = (p.discountPrice && p.discountPrice > 0)
+                            const origPriceFmt = hasDisc
                                 ? `<span class="line-through text-on-surface-variant/70 text-[10px] ml-1">\${new Intl.NumberFormat('vi-VN').format(p.price)} ₫</span>`
+                                : '';
+                            const discBadge = hasDisc
+                                ? `<span class="bg-rose-50 text-rose-600 text-[9px] font-bold px-1 rounded border border-rose-200 ml-1">-\${Math.round((p.price - p.discountPrice) / p.price * 100)}%</span>`
                                 : '';
                             const img = p.imageUrl || '${pageContext.request.contextPath}/assets/web/images/placeholder.png';
 
@@ -529,9 +533,10 @@
                                     <img src="\${img}" class="w-10 h-10 object-cover rounded-lg border border-outline-variant flex-shrink-0 bg-surface-container">
                                     <div class="flex-1 min-w-0">
                                         <h5 class="text-xs font-bold text-on-surface truncate">\${escapeHtml(p.name)}</h5>
-                                        <div class="flex items-center gap-1 mt-0.5">
-                                            <span class="text-xs font-extrabold text-primary font-price-tag">\${priceFmt}</span>
+                                        <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                                            <span class="text-xs font-extrabold \${hasDisc ? 'text-rose-600' : 'text-primary'} font-price-tag">\${priceFmt}</span>
                                             \${origPriceFmt}
+                                            \${discBadge}
                                         </div>
                                     </div>
                                 </a>

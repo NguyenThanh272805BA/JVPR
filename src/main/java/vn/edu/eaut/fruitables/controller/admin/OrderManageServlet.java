@@ -103,6 +103,31 @@ public class OrderManageServlet extends HttpServlet {
             }
         }
 
+        // Cập nhật trạng thái thanh toán từ Admin (PAID, UNPAID, REFUNDED)
+        if ("updatePaymentStatus".equals(action)) {
+            try {
+                Long orderId = Long.parseLong(request.getParameter("orderId"));
+                String paymentStatus = request.getParameter("paymentStatus");
+
+                if (paymentStatus != null && !paymentStatus.trim().isEmpty()) {
+                    orderService.updatePaymentStatus(orderId, paymentStatus);
+                    if (isAjax) {
+                        response.setContentType("application/json; charset=UTF-8");
+                        response.getWriter().write("{\"success\":true,\"orderId\":" + orderId + ",\"paymentStatus\":\"" + paymentStatus + "\"}");
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (isAjax) {
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("{\"success\":false,\"message\":\"" + e.getMessage() + "\"}");
+                    return;
+                }
+            }
+        }
+
         // Nếu submit form thông thường, chuyển hướng bảo toàn bộ lọc và vị trí đơn hàng
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("filterStatus");

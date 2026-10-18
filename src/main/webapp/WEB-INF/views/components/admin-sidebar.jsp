@@ -51,18 +51,15 @@
             <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-category"/></svg>
             <span>Danh mục</span>
         </a>
-        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/inventory') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/inventory') && !reqURI.contains('/inventory-agent') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/inventory">
             <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-warehouse"/></svg>
             <span>Kho nhập hàng</span>
         </a>
-        <a class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/inventory-agent') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
+        <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/inventory-agent') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/inventory-agent">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-warehouse"/></svg>
-                <span>AI Agent Xả Kho</span>
-            </div>
-            <span class="px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${reqURI.contains('/inventory-agent') ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'} rounded-md">AI Agent</span>
+            <svg class="w-5 h-5 flex-shrink-0"><use href="#icon-warehouse"/></svg>
+            <span>Xả kho</span>
         </a>
         <a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150 ${reqURI.contains('/suppliers') ? 'bg-primary text-white shadow-md font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}" 
            href="${pageContext.request.contextPath}/admin/suppliers">

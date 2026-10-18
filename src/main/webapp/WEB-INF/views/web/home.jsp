@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -309,8 +310,9 @@
 
                         <!-- Huy hiệu Giảm giá (nếu có) -->
                         <c:if test="${hasDiscount}">
-                            <div class="absolute top-3 right-3 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-md animate-pulse">
-                                -<fmt:formatNumber value="${(item.price - item.discountPrice) / item.price * 100}" maxFractionDigits="0"/>%
+                            <div class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-rose-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md flex items-center gap-0.5 animate-pulse">
+                                <span class="material-symbols-outlined text-[13px]">bolt</span>
+                                -${Math.round((item.price - item.discountPrice) / item.price * 100)}%
                             </div>
                         </c:if>
 
@@ -371,17 +373,22 @@
                                 <c:choose>
                                     <c:when test="${hasDiscount}">
                                         <div class="flex flex-col">
-                                            <span class="font-price-tag text-lg text-primary font-bold">
-                                                <fmt:formatNumber value="${item.discountPrice}" type="number" groupingUsed="true"/> ₫
-                                            </span>
-                                            <span class="text-xs text-on-surface-variant line-through -mt-1">
-                                                <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                            <div class="flex items-center gap-1.5 flex-wrap">
+                                                <span class="font-price-tag text-lg text-rose-600 font-extrabold">
+                                                    <fmt:formatNumber pattern="#,##0" value="${item.discountPrice}"/> ₫
+                                                </span>
+                                                <span class="bg-rose-50 text-rose-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-rose-200">
+                                                    -${Math.round((item.price - item.discountPrice) / item.price * 100)}%
+                                                </span>
+                                            </div>
+                                            <span class="text-xs text-on-surface-variant line-through -mt-0.5">
+                                                <fmt:formatNumber pattern="#,##0" value="${item.price}"/> ₫
                                             </span>
                                         </div>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="font-price-tag text-lg text-primary font-bold">
-                                            <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true"/> ₫
+                                            <fmt:formatNumber pattern="#,##0" value="${item.price}"/> ₫
                                         </span>
                                     </c:otherwise>
                                 </c:choose>

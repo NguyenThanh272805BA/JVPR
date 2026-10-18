@@ -280,6 +280,7 @@
         let pollInterval = null;
         let lastMessageCount = 0;
         let aiHistory = [];
+        let lastAiSendTime = 0;
 
         // ----------------------------------------------------
         // ĐÓNG / MỞ CHAT
@@ -537,9 +538,10 @@
                             <a href="\${contextPath}/product-detail?id=\${p.id}" class="font-bold text-[11px] line-clamp-1 text-on-surface hover:text-primary transition-colors" title="\${escapeHtml(p.name)}">
                                 \${escapeHtml(p.name)}
                             </a>
-                            <div class="mt-1 flex items-baseline gap-1">
-                                <span class="text-primary font-bold text-xs">\${formatCurrency(p.discountPrice || p.price)}</span>
+                            <div class="mt-1 flex items-baseline gap-1 flex-wrap">
+                                <span class="\${hasDiscount ? 'text-rose-600' : 'text-primary'} font-bold text-xs">\${formatCurrency(p.discountPrice || p.price)}</span>
                                 \${hasDiscount ? `<span class="line-through text-[9px] text-on-surface-variant/70">\${formatCurrency(p.price)}</span>` : ''}
+                                \${hasDiscount ? `<span class="bg-rose-50 text-rose-600 text-[8px] font-bold px-1 rounded border border-rose-200">-\${Math.round((p.price - p.discountPrice) / p.price * 100)}%</span>` : ''}
                             </div>
                             <a href="\${contextPath}/product-detail?id=\${p.id}" class="mt-2 block text-center py-1.5 px-2 bg-gradient-to-r from-emerald-600 to-primary text-white hover:opacity-90 text-[10px] font-bold rounded-lg transition-all shadow-2xs">
                                 Xem chi tiết
@@ -659,6 +661,35 @@
                 return;
             }
 
+            // 4.6. Trường hợp Kiểm soát lưu lượng (Rate Limited) hoặc Hệ thống quá tải (Circuit Breaker OPEN)
+            if (data.type === 'rate_limited' || data.type === 'system_busy') {
+                let alertHtml = `
+                    <div class="space-y-2.5">
+                        <div class="flex items-center gap-1.5 pb-1 border-b border-amber-500/20">
+                            <span class="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                            </span>
+                            <span class="font-bold text-amber-700 dark:text-amber-400 text-xs">
+                                \${data.type === 'rate_limited' ? 'Thông báo kiểm soát lưu lượng' : 'Hệ thống đang phục vụ lượng lớn khách hàng'}
+                            </span>
+                        </div>
+                        <div class="leading-relaxed text-[11.5px] text-on-surface">\${formatMarkdown(data.message)}</div>
+                        <div class="pt-2 border-t border-outline-variant/60 flex flex-col gap-1.5">
+                            <button type="button" onclick="if (window.openLiveChatSupport) { window.openLiveChatSupport(); } else { switchTab('live'); }"
+                                    class="w-full py-1.5 px-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                                <span class="material-symbols-outlined text-xs">support_agent</span> Trò chuyện với nhân viên CSKH
+                            </button>
+                            <button type="button" onclick="sendAiPrompt('', 'quick_discount')"
+                                    class="w-full py-1.5 px-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg font-bold text-[11px] transition-colors flex items-center justify-center gap-1 cursor-pointer border border-outline-variant">
+                                <span class="material-symbols-outlined text-xs">local_fire_department</span> Xem hoa quả giảm giá hôm nay
+                            </button>
+                        </div>
+                    </div>
+                `;
+                appendAiBotBubble(alertHtml);
+                return;
+            }
+
             // 5. Trường hợp text thông thường (từ Gemini AI)
             const reply = data.message || 'Dạ em chưa rõ câu hỏi, bạn thử chọn các gợi ý bên dưới nhé! 🍎';
             appendAiBotBubble(formatMarkdown(reply));
@@ -668,6 +699,13 @@
         function sendAiPrompt(text, actionName, imgBase64) {
             const query = (text || '').trim();
             if (!query && !imgBase64) return;
+
+            // Chống spam click liên tiếp
+            const now = Date.now();
+            if (now - lastAiSendTime < 1000) {
+                return;
+            }
+            lastAiSendTime = now;
 
             appendAiUserMessage(query || 'Yêu cầu chẩn đoán ảnh hoa quả', imgBase64);
             if (aiChatInput) aiChatInput.value = '';
@@ -824,6 +862,11 @@
                 if (!file) return;
                 if (!file.type.startsWith('image/')) {
                     alert('Vui lòng chọn tệp định dạng hình ảnh (PNG, JPG, WEBP)!');
+                    return;
+                }
+                if (file.size > 4 * 1024 * 1024) {
+                    alert('Ảnh bạn chọn có kích thước lớn hơn 4MB. Vui lòng chọn ảnh nhẹ hơn để tải nhanh và tiết kiệm dung lượng nhé!');
+                    if (aiFileInput) aiFileInput.value = '';
                     return;
                 }
                 const reader = new FileReader();

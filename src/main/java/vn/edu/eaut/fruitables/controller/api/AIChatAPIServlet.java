@@ -14,6 +14,9 @@ import vn.edu.eaut.fruitables.service.IProductService;
 import vn.edu.eaut.fruitables.service.impl.GeminiServiceImpl;
 import vn.edu.eaut.fruitables.service.impl.ProductServiceImpl;
 
+import vn.edu.eaut.fruitables.util.AICircuitBreaker;
+import vn.edu.eaut.fruitables.util.ChatRateLimiter;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -67,6 +70,23 @@ public class AIChatAPIServlet extends HttpServlet {
         if (action == null) action = "chat";
 
         JsonObject jsonResponse = new JsonObject();
+
+        // 1. Kiểm soát lưu lượng & Chống spam/quá tải (Rate Limiting)
+        String clientIp = ChatRateLimiter.getInstance().resolveClientIp(request);
+        ChatRateLimiter.RateLimitResult rateCheck = "multimodal_diagnose".equals(action)
+                ? ChatRateLimiter.getInstance().checkImageRequest(clientIp)
+                : ChatRateLimiter.getInstance().checkTextRequest(clientIp);
+
+        if (!rateCheck.isAllowed()) {
+            jsonResponse.addProperty("status", "rate_limited");
+            jsonResponse.addProperty("type", "rate_limited");
+            jsonResponse.addProperty("retryAfter", rateCheck.getRetryAfterSeconds());
+            jsonResponse.addProperty("message", rateCheck.getMessage());
+            jsonResponse.addProperty("canSwitchToLiveChat", true);
+            out.print(gson.toJson(jsonResponse));
+            out.flush();
+            return;
+        }
 
         try {
             switch (action) {
@@ -260,9 +280,14 @@ public class AIChatAPIServlet extends HttpServlet {
         }
 
         // 7. CÂU HỎI MỞ RỘNG (Bảo quản, Nấu nướng, Dinh dưỡng, Giảm cân, Sức khỏe...) -> Gọi LLM Gemini
+        boolean isCircuitOpen = (AICircuitBreaker.getInstance().getState() == AICircuitBreaker.State.OPEN);
         String aiResponse = geminiService.askProductAssistant(rawQuery, historyList);
-        response.addProperty("type", "text");
+        response.addProperty("type", isCircuitOpen ? "system_busy" : "text");
         response.addProperty("message", aiResponse);
+        if (isCircuitOpen) {
+            response.addProperty("canSwitchToLiveChat", true);
+            response.addProperty("circuitStatus", "OPEN");
+        }
     }
 
     /**
@@ -360,6 +385,13 @@ public class AIChatAPIServlet extends HttpServlet {
         if (base64Param == null || base64Param.trim().isEmpty()) {
             response.addProperty("type", "text");
             response.addProperty("message", "Dạ bạn vui lòng chọn hoặc tải lên hình ảnh hoa quả để Trợ lý Fruit Doctor giám định nhé! 🍎");
+            return;
+        }
+
+        // Kiểm tra dung lượng ảnh để chống DoS và tránh cạn kiệt RAM (Max 4MB Base64)
+        if (base64Param.length() > 5 * 1024 * 1024) {
+            response.addProperty("type", "text");
+            response.addProperty("message", "Dạ ảnh gửi lên vượt quá dung lượng tối đa (4MB). Bạn vui lòng chọn bức ảnh nhẹ hơn một chút để Trợ lý xử lý nhanh nhất nhé! 🍎");
             return;
         }
 

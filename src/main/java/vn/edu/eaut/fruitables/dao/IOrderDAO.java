@@ -21,5 +21,6 @@ public interface IOrderDAO extends GenericDAO<OrderModel> {
     List<OrderModel> searchAndFilterOrders(String keyword, String status, String startDate, String endDate);
     List<OrderModel> findRecentOrdersByPhone(String phone, int limit);
     boolean assignShipper(Long orderId, Long shipperId, String trackingNumber, String estimatedDeliveryTime);
+    void updatePaymentStatus(Long orderId, String paymentStatus);
     void populateShipper(OrderModel order);
 }

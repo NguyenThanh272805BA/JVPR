@@ -64,7 +64,7 @@ public class AdminInventoryAgentServlet extends HttpServlet {
         String action = request.getParameter("action");
         JsonObject res = new JsonObject();
 
-        if ("execute_clearance".equalsIgnoreCase(action)) {
+        if ("execute_clearance".equalsIgnoreCase(action) || "execute".equalsIgnoreCase(action)) {
             try {
                 Long productId = Long.parseLong(request.getParameter("productId"));
                 String couponCode = request.getParameter("couponCode");

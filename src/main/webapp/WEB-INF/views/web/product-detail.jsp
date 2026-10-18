@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -34,6 +35,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
 
         <!-- Cột Trái: Ảnh Sản Phẩm -->
+        <c:set var="hasDiscount" value="${product.discountPrice != null && product.discountPrice > 0 && product.discountPrice < product.price}" />
         <div class="relative group">
           <div class="w-full h-[400px] md:h-[500px] bg-surface-container rounded-xl overflow-hidden flex items-center justify-center border border-outline-variant">
             <img src="${not empty product.imageUrl ? product.imageUrl : pageContext.request.contextPath.concat('/assets/uploads/no-image.svg')}" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/uploads/no-image.svg';" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -41,6 +43,12 @@
           <c:if test="${product.stock > 0}">
             <div class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
               <span class="material-symbols-outlined text-[14px]">check_circle</span> Còn hàng
+            </div>
+          </c:if>
+          <c:if test="${hasDiscount}">
+            <div class="absolute top-4 right-4 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+              <span class="material-symbols-outlined text-[15px]">bolt</span>
+              Giảm -${Math.round((product.price - product.discountPrice) / product.price * 100)}%
             </div>
           </c:if>
         </div>
@@ -73,9 +81,31 @@
           </div>
 
           <div class="mb-6">
-            <div class="text-4xl font-price-tag text-primary font-extrabold tracking-tight">
-              <fmt:formatNumber value="${product.price}" type="number" groupingUsed="true"/> ₫
-            </div>
+            <c:choose>
+              <c:when test="${hasDiscount}">
+                <div class="flex items-baseline gap-3 flex-wrap">
+                  <div class="text-4xl font-price-tag text-rose-600 font-extrabold tracking-tight">
+                    <fmt:formatNumber pattern="#,##0" value="${product.discountPrice}"/> ₫
+                  </div>
+                  <div class="text-xl text-on-surface-variant line-through font-medium">
+                    <fmt:formatNumber pattern="#,##0" value="${product.price}"/> ₫
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 font-extrabold text-xs border border-rose-200 flex items-center gap-1 shadow-xs">
+                    <span class="material-symbols-outlined text-sm text-rose-600">bolt</span>
+                    -${Math.round((product.price - product.discountPrice) / product.price * 100)}%
+                  </span>
+                </div>
+                <div class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200/80 inline-flex items-center gap-1.5 mt-2">
+                  <span class="material-symbols-outlined text-sm">savings</span>
+                  Tiết kiệm <fmt:formatNumber pattern="#,##0" value="${product.price - product.discountPrice}"/> ₫ khi mua hôm nay
+                </div>
+              </c:when>
+              <c:otherwise>
+                <div class="text-4xl font-price-tag text-primary font-extrabold tracking-tight">
+                  <fmt:formatNumber pattern="#,##0" value="${product.price}"/> ₫
+                </div>
+              </c:otherwise>
+            </c:choose>
             <c:if test="${product.taxRate > 0}">
               <div class="text-sm text-on-surface-variant mt-1">* Giá chưa bao gồm ${product.taxRate}% Thuế VAT</div>
             </c:if>
