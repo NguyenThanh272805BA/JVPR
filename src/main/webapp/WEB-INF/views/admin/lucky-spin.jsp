@@ -172,8 +172,8 @@
                   <td class="py-3 px-4">
                     <div class="flex items-center gap-3">
                       <!-- Màu preview ô bánh xe -->
-                      <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-xs border border-white"
-                           style="background-color: ${p.colorBg}; color: ${p.colorText};">
+                      <div class="prize-badge-color w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white shadow-xs border border-white"
+                           data-bg="${p.colorBg}" data-color="${p.colorText}">
                         <c:choose>
                           <c:when test="${p.iconType == 'shipping'}"><svg class="w-4 h-4"><use href="#icon-prize-shipping"/></svg></c:when>
                           <c:when test="${p.iconType == 'gift'}"><svg class="w-4 h-4"><use href="#icon-prize-gift"/></svg></c:when>
@@ -221,7 +221,7 @@
                   <td class="py-3 px-4">
                     <div class="flex items-center gap-2">
                       <div class="w-16 bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div class="bg-amber-500 h-full rounded-full" style="width: ${p.probability * 2.5}%;"></div>
+                        <div class="prob-progress-bar bg-amber-500 h-full rounded-full" data-width="${p.probability * 2.5}%"></div>
                       </div>
                       <span class="font-mono font-bold text-slate-800">${p.probability}%</span>
                     </div>
@@ -234,8 +234,12 @@
                             ${p.quantityRemain}
                           </span>
                           <span class="text-slate-400">/ ${p.quantityLimit}</span>
-                          <button type="button" onclick="openResetQuotaModal(${p.id}, '${p.name}', ${p.quantityLimit})"
-                                  class="text-[10px] text-primary hover:underline ml-1 font-bold" title="Đặt lại số lượng">
+                          <button type="button"
+                                  class="btn-reset-quota text-[10px] text-primary hover:underline ml-1 font-bold cursor-pointer"
+                                  title="Đặt lại số lượng"
+                                  data-id="${p.id}"
+                                  data-name="<c:out value='${p.name}'/>"
+                                  data-quota="${p.quantityLimit}">
                             [Nạp lại]
                           </button>
                         </div>
@@ -257,8 +261,21 @@
                   </td>
                   <td class="py-3 px-4 text-right">
                     <div class="inline-flex items-center gap-1.5">
-                      <button type="button" onclick='editPrize(${p.id}, "${p.name}", "${p.prizeType}", ${p.discountValue}, ${p.minOrderValue}, ${p.probability}, ${p.quantityLimit}, "${p.colorBg}", "${p.colorText}", "${p.iconType}", ${p.displayOrder}, ${p.status})'
-                              class="p-1.5 rounded-lg text-slate-500 hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" title="Chỉnh sửa">
+                      <button type="button"
+                              class="btn-edit-prize p-1.5 rounded-lg text-slate-500 hover:text-primary hover:bg-surface-container transition-colors cursor-pointer"
+                              title="Chỉnh sửa"
+                              data-id="${p.id}"
+                              data-name="<c:out value='${p.name}'/>"
+                              data-type="${p.prizeType}"
+                              data-discount="${p.discountValue}"
+                              data-min-order="${p.minOrderValue}"
+                              data-prob="${p.probability}"
+                              data-limit="${p.quantityLimit}"
+                              data-bg="${p.colorBg}"
+                              data-text="${p.colorText}"
+                              data-icon="${p.iconType}"
+                              data-order="${p.displayOrder}"
+                              data-status="${p.status}">
                         <span class="material-symbols-outlined text-sm">edit</span>
                       </button>
                       <form action="${pageContext.request.contextPath}/admin/lucky-spin" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa giải thưởng này?');" class="inline-block">
@@ -572,6 +589,44 @@
       document.getElementById('grant-modal').classList.remove('hidden');
       document.getElementById('grant-modal').classList.add('flex');
     }
+
+    // Render dynamic colors and progress bars without inline CSS errors
+    document.querySelectorAll('.prize-badge-color').forEach(function(el) {
+      if (el.dataset.bg) el.style.backgroundColor = el.dataset.bg;
+      if (el.dataset.color) el.style.color = el.dataset.color;
+    });
+    document.querySelectorAll('.prob-progress-bar').forEach(function(el) {
+      if (el.dataset.width) el.style.width = el.dataset.width;
+    });
+
+    // Handle Edit Prize clicks safely via dataset
+    document.querySelectorAll('.btn-edit-prize').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var d = this.dataset;
+        editPrize(
+          parseInt(d.id, 10),
+          d.name,
+          d.type,
+          parseFloat(d.discount),
+          parseFloat(d.minOrder),
+          parseFloat(d.prob),
+          parseInt(d.limit, 10),
+          d.bg,
+          d.text,
+          d.icon,
+          parseInt(d.order, 10),
+          d.status === 'true'
+        );
+      });
+    });
+
+    // Handle Reset Quota clicks safely via dataset
+    document.querySelectorAll('.btn-reset-quota').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var d = this.dataset;
+        openResetQuotaModal(parseInt(d.id, 10), d.name, parseInt(d.quota, 10));
+      });
+    });
   </script>
 </body>
 </html>

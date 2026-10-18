@@ -427,9 +427,28 @@
                                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                                 <span class="font-bold text-on-surface truncate max-w-[170px]"><c:out value="${sessionScope.USERMODEL.fullName}"/></span>
                             </div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-900 uppercase tracking-wider" style="background-color: ${sessionScope.USERMODEL.vipTierColor != null ? sessionScope.USERMODEL.vipTierColor : '#fbbf24'}">
-                                ⭐ Hạng ${sessionScope.USERMODEL.vipTier}
-                            </span>
+                            <c:choose>
+                                <c:when test="${sessionScope.USERMODEL.vipTier == 'KIM CƯƠNG'}">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-900 uppercase tracking-wider bg-cyan-400">
+                                        ⭐ Hạng KIM CƯƠNG
+                                    </span>
+                                </c:when>
+                                <c:when test="${sessionScope.USERMODEL.vipTier == 'VÀNG'}">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-900 uppercase tracking-wider bg-amber-400">
+                                        ⭐ Hạng VÀNG
+                                    </span>
+                                </c:when>
+                                <c:when test="${sessionScope.USERMODEL.vipTier == 'BẠC'}">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-slate-900 uppercase tracking-wider bg-slate-300">
+                                        ⭐ Hạng BẠC
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full text-white uppercase tracking-wider bg-amber-700">
+                                        ⭐ Hạng ĐỒNG
+                                    </span>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                         <div class="grid grid-cols-2 gap-1.5 pt-1">
                             <a href="${pageContext.request.contextPath}/profile" class="flex items-center justify-center gap-1.5 py-2 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl font-medium">

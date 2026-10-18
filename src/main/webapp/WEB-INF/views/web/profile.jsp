@@ -71,9 +71,28 @@
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-900" style="background-color: ${sessionScope.USERMODEL.vipTierColor}">
-                ⭐ Hạng ${sessionScope.USERMODEL.vipTier}
-              </span>
+              <c:choose>
+                <c:when test="${sessionScope.USERMODEL.vipTier == 'KIM CƯƠNG'}">
+                  <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-900 bg-cyan-400 shadow-sm">
+                    ⭐ Hạng KIM CƯƠNG
+                  </span>
+                </c:when>
+                <c:when test="${sessionScope.USERMODEL.vipTier == 'VÀNG'}">
+                  <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-900 bg-amber-400 shadow-sm">
+                    ⭐ Hạng VÀNG
+                  </span>
+                </c:when>
+                <c:when test="${sessionScope.USERMODEL.vipTier == 'BẠC'}">
+                  <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-900 bg-slate-300 shadow-sm">
+                    ⭐ Hạng BẠC
+                  </span>
+                </c:when>
+                <c:otherwise>
+                  <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-white bg-amber-700 shadow-sm">
+                    ⭐ Hạng ĐỒNG
+                  </span>
+                </c:otherwise>
+              </c:choose>
               <span class="text-xs text-slate-300 font-medium">Fruitables Loyalty Member</span>
             </div>
             <h2 class="text-2xl font-black text-white">${sessionScope.USERMODEL.fullName}</h2>
