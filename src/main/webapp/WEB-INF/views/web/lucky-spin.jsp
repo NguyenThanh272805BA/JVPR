@@ -108,33 +108,45 @@
           <!-- KHUNG CHỨA VÒNG QUAY HTML5 CANVAS -->
           <div class="relative flex items-center justify-center w-full max-w-[390px] sm:max-w-[430px] aspect-square select-none">
             <!-- Vòng hào quang bên ngoài -->
-            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400/20 via-emerald-400/20 to-teal-400/20 blur-xl pointer-events-none"></div>
+            <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-400/30 via-rose-500/20 to-teal-400/30 blur-2xl pointer-events-none animate-pulse"></div>
 
-            <!-- Viền LED trang trí ngoài cùng -->
-            <div class="absolute inset-0 rounded-full border-[10px] border-amber-500 shadow-2xl pointer-events-none flex items-center justify-center">
-              <!-- Các bóng đèn LED vẽ bằng CSS -->
-              <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-amber-300 led-light shadow-md"></div>
-              <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-amber-300 led-light shadow-md" style="animation-delay: 0.3s;"></div>
-              <div class="absolute top-1/2 -left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-amber-300 led-light shadow-md" style="animation-delay: 0.6s;"></div>
-              <div class="absolute top-1/2 -right-2 -translate-y-1/2 w-4 h-4 rounded-full bg-amber-300 led-light shadow-md" style="animation-delay: 0.9s;"></div>
+            <!-- Viền LED trang trí kiểu lễ hội / Carnival (16 bóng LED đuổi nhau) -->
+            <div id="wheel-rim-frame" class="absolute inset-0 rounded-full border-[12px] border-gradient-to-b from-amber-400 via-amber-500 to-amber-600 shadow-[0_12px_35px_rgba(245,158,11,0.45)] pointer-events-none flex items-center justify-center">
+              <!-- Container cho 16 bóng LED đèn chạy do JavaScript tạo tự động -->
+              <div id="led-lights-container" class="absolute inset-0 pointer-events-none"></div>
             </div>
 
             <!-- Canvas vẽ bánh xe -->
             <canvas id="wheel-canvas" width="420" height="420" class="w-full h-full rounded-full cursor-pointer transition-transform ease-out"></canvas>
 
-            <!-- Kim chỉ (Pointer) ở đỉnh -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20 pointer-events-none drop-shadow-xl">
-              <svg width="40" height="50" viewBox="0 0 40 50">
-                <polygon points="20,48 5,6 35,6" fill="#DC2626" stroke="#FEF08A" stroke-width="3"/>
-                <circle cx="20" cy="14" r="6" fill="#FBBF24"/>
+            <!-- Kim chỉ (Pointer) ở đỉnh với hiệu ứng 3D & dao động cơ học khi quay -->
+            <div id="wheel-pointer" class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20 pointer-events-none drop-shadow-2xl transition-transform duration-75 origin-[20px_6px]">
+              <svg width="42" height="52" viewBox="0 0 42 52">
+                <defs>
+                  <linearGradient id="pointer-body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#EF4444"/>
+                    <stop offset="50%" stop-color="#DC2626"/>
+                    <stop offset="100%" stop-color="#991B1B"/>
+                  </linearGradient>
+                  <linearGradient id="pointer-pin-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FEF08A"/>
+                    <stop offset="100%" stop-color="#F59E0B"/>
+                  </linearGradient>
+                </defs>
+                <!-- Thân mũi tên đỏ ánh kim -->
+                <polygon points="21,50 6,8 36,8" fill="url(#pointer-body-grad)" stroke="#FEF08A" stroke-width="2.5" stroke-linejoin="round"/>
+                <!-- Chốt định vị kim loại tròn -->
+                <circle cx="21" cy="14" r="7.5" fill="url(#pointer-pin-grad)" stroke="#FFFFFF" stroke-width="2"/>
+                <circle cx="21" cy="14" r="3" fill="#B45309"/>
               </svg>
             </div>
 
-            <!-- Nút bấm quay ở trung tâm -->
+            <!-- Nút bấm quay ở trung tâm với vòng hào quang xoay liên tục -->
             <button type="button" id="spin-center-btn" onclick="triggerSpin()"
-                    class="absolute z-30 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-b from-amber-400 via-orange-500 to-amber-600 text-slate-900 font-black shadow-2xl border-4 border-white flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer select-none">
-              <svg class="w-5 h-5 text-slate-900 mb-0.5"><use href="#icon-lucky-spin"/></svg>
-              <span class="text-xs sm:text-sm font-black tracking-wider uppercase">QUAY</span>
+                    class="group/btn absolute z-30 w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-gradient-to-b from-amber-300 via-amber-500 to-amber-600 text-slate-950 font-black shadow-[0_10px_25px_rgba(245,158,11,0.6)] border-4 border-white flex flex-col items-center justify-center hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer select-none">
+              <div class="absolute -inset-2 rounded-full border-2 border-dashed border-amber-300/80 animate-[spin_10s_linear_infinite] pointer-events-none"></div>
+              <svg class="w-6 h-6 text-slate-950 mb-0.5 group-hover/btn:rotate-180 transition-transform duration-500"><use href="#icon-lucky-spin"/></svg>
+              <span class="text-xs sm:text-sm font-black tracking-widest uppercase">QUAY</span>
             </button>
           </div>
 
@@ -254,6 +266,9 @@
         <span class="material-symbols-outlined text-lg">close</span>
       </button>
 
+      <!-- Vòng hào quang tỏa sáng (Shining Sunburst Rays) -->
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-[radial-gradient(circle,_rgba(251,191,36,0.3)_0%,_transparent_70%)] animate-pulse pointer-events-none"></div>
+
       <!-- Canvas Confetti nổ pháo hoa -->
       <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none w-full h-full z-0"></canvas>
 
@@ -334,10 +349,66 @@
       const sliceAngle = (2 * Math.PI) / numSlices;
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      const radius = centerX - 12;
+      const radius = centerX - 14;
 
       // ----------------------------------------------------
-      // VẼ BÁNH XE BẰNG HTML5 CANVAS (100% CODE VECTOR MATH)
+      // 1. TẠO 16 BÓNG ĐÈN LED CHẠY KIỂU LỄ HỘI / CARNIVAL
+      // ----------------------------------------------------
+      const ledContainer = document.getElementById('led-lights-container');
+      const numLeds = 16;
+      const leds = [];
+      if (ledContainer) {
+        for (let i = 0; i < numLeds; i++) {
+          const angle = (i * 2 * Math.PI) / numLeds - Math.PI / 2;
+          const x = 50 + 48.6 * Math.cos(angle);
+          const y = 50 + 48.6 * Math.sin(angle);
+          const bulb = document.createElement('div');
+          bulb.className = 'absolute w-3.5 h-3.5 rounded-full transition-all duration-100 transform -translate-x-1/2 -translate-y-1/2';
+          bulb.style.left = x + '%';
+          bulb.style.top = y + '%';
+          bulb.style.backgroundColor = (i % 2 === 0) ? '#FEF08A' : '#F59E0B';
+          bulb.style.boxShadow = '0 0 6px rgba(245, 158, 11, 0.7)';
+          ledContainer.appendChild(bulb);
+          leds.push(bulb);
+        }
+      }
+
+      let ledInterval = null;
+      let ledChaseIndex = 0;
+      function startLedChase() {
+        if (ledInterval) clearInterval(ledInterval);
+        ledInterval = setInterval(() => {
+          ledChaseIndex = (ledChaseIndex + 1) % numLeds;
+          leds.forEach((bulb, idx) => {
+            const dist = (idx - ledChaseIndex + numLeds) % numLeds;
+            if (dist === 0) {
+              bulb.style.backgroundColor = '#FFFFFF';
+              bulb.style.boxShadow = '0 0 16px #FFFFFF, 0 0 8px #F59E0B';
+              bulb.style.transform = 'translate(-50%, -50%) scale(1.35)';
+            } else if (dist === 1 || dist === 2) {
+              bulb.style.backgroundColor = '#FEF08A';
+              bulb.style.boxShadow = '0 0 8px #FEF08A';
+              bulb.style.transform = 'translate(-50%, -50%) scale(1.15)';
+            } else {
+              bulb.style.backgroundColor = (idx % 2 === 0) ? '#F59E0B' : '#D97706';
+              bulb.style.boxShadow = '0 0 3px rgba(245, 158, 11, 0.35)';
+              bulb.style.transform = 'translate(-50%, -50%) scale(1)';
+            }
+          });
+        }, 50);
+      }
+
+      function stopLedChase() {
+        if (ledInterval) clearInterval(ledInterval);
+        leds.forEach((bulb, idx) => {
+          bulb.style.backgroundColor = (idx % 2 === 0) ? '#FEF08A' : '#F59E0B';
+          bulb.style.boxShadow = '0 0 8px rgba(245, 158, 11, 0.7)';
+          bulb.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+      }
+
+      // ----------------------------------------------------
+      // 2. VẼ BÁNH XE BẰNG HTML5 CANVAS (100% CODE VECTOR MATH)
       // ----------------------------------------------------
       function drawWheel(rotationAngle = 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -351,88 +422,198 @@
           const endAngle = startAngle + sliceAngle;
           const p = prizes[i];
 
-          // 1. Vẽ góc hình quạt (Slice)
+          // 1. Góc hình quạt với gradient hướng tâm tạo độ sâu 3D
           ctx.beginPath();
           ctx.moveTo(0, 0);
           ctx.arc(0, 0, radius, startAngle, endAngle);
           ctx.closePath();
-          ctx.fillStyle = p.colorBg || '#10B981';
+
+          const baseColor = p.colorBg || '#10B981';
+          const sliceGrad = ctx.createRadialGradient(0, 0, 35, 0, 0, radius);
+          sliceGrad.addColorStop(0, '#FFFFFF');
+          sliceGrad.addColorStop(0.2, baseColor);
+          sliceGrad.addColorStop(1, adjustColorBrightness(baseColor, -25));
+          ctx.fillStyle = sliceGrad;
           ctx.fill();
 
-          // Đường viền ngăn cách
-          ctx.strokeStyle = '#FFFFFF';
-          ctx.lineWidth = 2.5;
+          // Viền nan quạt mạ vàng
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+          ctx.lineWidth = 2;
           ctx.stroke();
 
-          // 2. Vẽ chữ tên phần thưởng quay theo bán kính
+          // Đinh tán vàng kim loại ở vành ngoài
+          const rivetX = Math.cos(startAngle) * (radius - 5);
+          const rivetY = Math.sin(startAngle) * (radius - 5);
+          ctx.beginPath();
+          ctx.arc(rivetX, rivetY, 2.5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#FEF08A';
+          ctx.fill();
+          ctx.strokeStyle = '#B45309';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+
+          // 2. Tên phần thưởng uốn lượn theo nan quạt
           ctx.save();
           const textAngle = startAngle + sliceAngle / 2;
           ctx.rotate(textAngle);
           ctx.textAlign = 'right';
           ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetX = 1;
+          ctx.shadowOffsetY = 1;
           ctx.fillStyle = p.colorText || '#FFFFFF';
-          ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+          ctx.font = 'bold 12.5px system-ui, -apple-system, sans-serif';
 
-          // Cắt ngắn nếu tên quá dài
           let displayName = p.name;
-          if (displayName.length > 16) displayName = displayName.substring(0, 14) + '...';
-          ctx.fillText(displayName, radius - 26, 0);
+          if (displayName.length > 15) displayName = displayName.substring(0, 13) + '..';
+          ctx.fillText(displayName, radius - 28, 0);
 
-          // 3. Vẽ Icon Vector bằng Canvas Code
-          drawSliceIcon(ctx, p.iconType, radius - 12, 0);
+          // 3. Vẽ Icon Vector cao cấp bằng Canvas 2D
+          ctx.shadowColor = 'transparent';
+          drawSliceIcon(ctx, p.iconType, radius - 14, 0);
 
           ctx.restore();
         }
 
-        // Vòng tròn kim loại trang trí ở tâm
+        // Vành đai tròn vàng bọc ngoài nan quạt
         ctx.beginPath();
-        ctx.arc(0, 0, 42, 0, 2 * Math.PI);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fill();
+        ctx.arc(0, 0, radius, 0, 2 * Math.PI);
         ctx.strokeStyle = '#F59E0B';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 2.5, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#FEF08A';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Ổ trục trung tâm 3D mạ vàng
+        ctx.beginPath();
+        ctx.arc(0, 0, 46, 0, 2 * Math.PI);
+        const hubGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 46);
+        hubGrad.addColorStop(0, '#FFFBEB');
+        hubGrad.addColorStop(0.5, '#F59E0B');
+        hubGrad.addColorStop(1, '#B45309');
+        ctx.fillStyle = hubGrad;
+        ctx.fill();
+        ctx.strokeStyle = '#FEF08A';
+        ctx.lineWidth = 3.5;
         ctx.stroke();
 
         ctx.restore();
       }
 
-      // Hàm vẽ Icon bằng Canvas Path
+      function adjustColorBrightness(hex, percent) {
+        let num = parseInt(hex.replace('#', ''), 16);
+        let amt = Math.round(2.55 * percent);
+        let R = (num >> 16) + amt;
+        let G = (num >> 8 & 0x00FF) + amt;
+        let B = (num & 0x0000FF) + amt;
+        return '#' + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
+      }
+
+      // ----------------------------------------------------
+      // 3. VẼ ICON VECTOR TRÊN TỪNG Ô (VOUCHER, XE, QUÀ, SAO...)
+      // ----------------------------------------------------
       function drawSliceIcon(c, iconType, x, y) {
         c.save();
         c.translate(x, y);
-        c.fillStyle = '#FEF08A';
-        c.strokeStyle = '#FEF08A';
-        c.lineWidth = 1.5;
 
         if (iconType === 'star') {
-          // Ngôi sao
+          // Ngôi sao 5 cánh vàng óng
+          c.fillStyle = '#FEF08A';
+          c.strokeStyle = '#B45309';
+          c.lineWidth = 1;
           c.beginPath();
           for (let i = 0; i < 5; i++) {
-            c.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * 6, -Math.sin((18 + i * 72) * Math.PI / 180) * 6);
-            c.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * 3, -Math.sin((54 + i * 72) * Math.PI / 180) * 3);
+            c.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * 7.5, -Math.sin((18 + i * 72) * Math.PI / 180) * 7.5);
+            c.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * 3.5, -Math.sin((54 + i * 72) * Math.PI / 180) * 3.5);
           }
           c.closePath();
           c.fill();
-        } else if (iconType === 'gift') {
-          // Hộp quà
-          c.strokeRect(-5, -4, 10, 8);
-          c.beginPath();
-          c.moveTo(0, -4); c.lineTo(0, 4);
-          c.moveTo(-5, 0); c.lineTo(5, 0);
           c.stroke();
-        } else {
-          // Chấm tròn điểm sáng
+        } else if (iconType === 'gift') {
+          // Hộp quà 3D
+          c.fillStyle = '#FBBF24';
+          c.fillRect(-6, -4, 12, 9);
+          c.fillStyle = '#EF4444';
+          c.fillRect(-2, -4, 4, 9);
+          c.fillRect(-6, -1, 12, 3);
+          c.strokeStyle = '#FFFFFF';
+          c.lineWidth = 1;
+          c.strokeRect(-6, -4, 12, 9);
+        } else if (iconType === 'shipping') {
+          // Xe tải giao hàng freeship
+          c.fillStyle = '#38BDF8';
+          c.fillRect(-7, -4, 8, 7);
+          c.fillRect(1, -2, 5, 5);
+          c.fillStyle = '#FFFFFF';
+          c.fillRect(2, -1.5, 3, 2.5);
+          c.fillStyle = '#1E293B';
           c.beginPath();
-          c.arc(0, 0, 3, 0, 2 * Math.PI);
+          c.arc(-4, 3.5, 2, 0, 2 * Math.PI);
+          c.arc(3.5, 3.5, 2, 0, 2 * Math.PI);
           c.fill();
+        } else if (iconType === 'spin') {
+          // Vòng lặp thêm lượt quay
+          c.strokeStyle = '#FEF08A';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.arc(0, 0, 5.5, 0.3 * Math.PI, 1.7 * Math.PI);
+          c.stroke();
+          c.fillStyle = '#FEF08A';
+          c.beginPath();
+          c.moveTo(5, -3); c.lineTo(7, -7); c.lineTo(2, -6);
+          c.closePath();
+          c.fill();
+        } else if (iconType === 'luck') {
+          // Cỏ 4 lá may mắn
+          c.fillStyle = '#4ADE80';
+          for (let k = 0; k < 4; k++) {
+            c.save();
+            c.rotate((k * Math.PI) / 2);
+            c.beginPath();
+            c.arc(0, -3.5, 2.5, 0, 2 * Math.PI);
+            c.fill();
+            c.restore();
+          }
+        } else {
+          // Vé Voucher giảm giá có răng cưa
+          c.fillStyle = '#FEF08A';
+          c.fillRect(-6.5, -4, 13, 8);
+          c.fillStyle = '#10B981';
+          c.beginPath();
+          c.arc(-6.5, 0, 2, -Math.PI / 2, Math.PI / 2);
+          c.arc(6.5, 0, 2, Math.PI / 2, -Math.PI / 2);
+          c.fill();
+          c.fillStyle = '#065F46';
+          c.font = 'bold 7px sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText('%', 0, 0);
         }
+
         c.restore();
       }
 
       drawWheel(0);
 
-      // Web Audio API để phát âm thanh tíc-tắc khi quay bánh xe
+      // ----------------------------------------------------
+      // 4. ÂM THANH WEB AUDIO SYNTHESIZER (TÍC TẮC & CHIẾN THẮNG)
+      // ----------------------------------------------------
+      const pointerEl = document.getElementById('wheel-pointer');
+      function wobblePointer() {
+        if (!pointerEl) return;
+        pointerEl.style.transform = 'translate(-50%, -8px) rotate(-18deg)';
+        setTimeout(() => {
+          pointerEl.style.transform = 'translate(-50%, -8px) rotate(0deg)';
+        }, 55);
+      }
+
       function playTickSound() {
+        wobblePointer();
         try {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           if (!AudioContext) return;
@@ -440,14 +621,35 @@
           const osc = actx.createOscillator();
           const gain = actx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(450, actx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(120, actx.currentTime + 0.04);
-          gain.gain.setValueAtTime(0.12, actx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.04);
+          osc.frequency.setValueAtTime(540, actx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(130, actx.currentTime + 0.035);
+          gain.gain.setValueAtTime(0.18, actx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.035);
           osc.connect(gain);
           gain.connect(actx.destination);
           osc.start();
-          osc.stop(actx.currentTime + 0.05);
+          osc.stop(actx.currentTime + 0.04);
+        } catch (e) {}
+      }
+
+      function playVictorySound() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const actx = new AudioContext();
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // Hợp âm C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const osc = actx.createOscillator();
+            const gain = actx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, actx.currentTime + idx * 0.12);
+            gain.gain.setValueAtTime(0.2, actx.currentTime + idx * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + idx * 0.12 + 0.4);
+            osc.connect(gain);
+            gain.connect(actx.destination);
+            osc.start(actx.currentTime + idx * 0.12);
+            osc.stop(actx.currentTime + idx * 0.12 + 0.45);
+          });
         } catch (e) {}
       }
 
@@ -507,6 +709,7 @@
       };
 
       function animateSpin(targetDegree, onComplete) {
+        startLedChase();
         const startRotation = currentRotation;
         const totalDegree = targetDegree;
         const duration = 4800; // 4.8 giây xoay mượt mà
@@ -525,7 +728,7 @@
           const rad = (currentDeg * Math.PI) / 180;
           drawWheel(rad);
 
-          // Phát âm thanh khi qua mỗi ô
+          // Phát âm thanh & rung kim chỉ khi qua mỗi ô
           if (Math.abs(currentDeg - lastTickAngle) >= (360 / numSlices)) {
             playTickSound();
             lastTickAngle = currentDeg;
@@ -534,6 +737,7 @@
           if (progress < 1) {
             requestAnimationFrame(step);
           } else {
+            stopLedChase();
             if (onComplete) onComplete();
           }
         }
@@ -610,11 +814,13 @@
           if (subTitle) subTitle.innerText = 'TUYỆT VỜI!';
           if (descEl) descEl.innerText = 'Bạn được cộng thêm 1 lượt quay ngay lập tức!';
           if (codeBox) codeBox.classList.add('hidden');
+          playVictorySound();
         } else {
           if (subTitle) subTitle.innerText = 'XIN CHÚC MỪNG!';
           if (descEl) descEl.innerText = 'Mã ưu đãi đã được lưu vào Ví quà tặng của bạn.';
           if (codeBox) codeBox.classList.remove('hidden');
           if (codeEl) codeEl.innerText = currentPrizeCode;
+          playVictorySound();
         }
 
         modal.classList.remove('hidden');
@@ -622,7 +828,9 @@
         setTimeout(() => {
           modalContent.classList.remove('scale-95', 'opacity-0');
           modalContent.classList.add('scale-100', 'opacity-100');
-          launchConfetti();
+          if (data.prizeType !== 'NO_PRIZE') {
+            launchConfetti();
+          }
         }, 50);
       }
 
@@ -642,7 +850,7 @@
         alert('Đã sao chép mã ưu đãi: ' + currentPrizeCode);
       };
 
-      // Hiệu ứng pháo hoa Confetti nhẹ bằng Canvas
+      // Hiệu ứng pháo hoa Confetti cao cấp (sao vàng, ruy băng đa sắc)
       function launchConfetti() {
         const c = document.getElementById('confetti-canvas');
         if (!c) return;
@@ -651,17 +859,19 @@
         c.height = c.offsetHeight;
 
         const particles = [];
-        const colors = ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6'];
+        const colors = ['#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6', '#EC4899', '#FEF08A'];
 
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 65; i++) {
           particles.push({
             x: c.width / 2,
             y: c.height / 2,
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8 - 2,
-            size: Math.random() * 5 + 3,
+            vx: (Math.random() - 0.5) * 12,
+            vy: (Math.random() - 0.5) * 12 - 3,
+            size: Math.random() * 6 + 3,
             color: colors[Math.floor(Math.random() * colors.length)],
-            alpha: 1
+            alpha: 1,
+            isStar: i % 4 === 0,
+            rotation: Math.random() * 360
           });
         }
 
@@ -672,14 +882,28 @@
           particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.15; // trọng lực
-            p.alpha -= 0.015;
+            p.vy += 0.16; // trọng lực
+            p.rotation += 4;
+            p.alpha -= 0.014;
             if (p.alpha > 0) {
               alive = true;
               cctx.save();
               cctx.globalAlpha = p.alpha;
+              cctx.translate(p.x, p.y);
+              cctx.rotate((p.rotation * Math.PI) / 180);
               cctx.fillStyle = p.color;
-              cctx.fillRect(p.x, p.y, p.size, p.size);
+              if (p.isStar) {
+                // Vẽ ngôi sao
+                cctx.beginPath();
+                for (let k = 0; k < 5; k++) {
+                  cctx.lineTo(Math.cos((18 + k * 72) * Math.PI / 180) * p.size, -Math.sin((18 + k * 72) * Math.PI / 180) * p.size);
+                  cctx.lineTo(Math.cos((54 + k * 72) * Math.PI / 180) * (p.size / 2), -Math.sin((54 + k * 72) * Math.PI / 180) * (p.size / 2));
+                }
+                cctx.closePath();
+                cctx.fill();
+              } else {
+                cctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+              }
               cctx.restore();
             }
           });

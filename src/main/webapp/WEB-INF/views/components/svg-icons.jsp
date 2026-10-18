@@ -369,15 +369,61 @@
     <!-- BỘ BIỂU TƯỢNG VÒNG QUAY MAY MẮN (CODE-DRAWN ICONS) -->
     <!-- ============================================== -->
 
-    <!-- Vòng quay may mắn (Lucky Spin Wheel) -->
-    <symbol id="icon-lucky-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Vòng quay may mắn đơn sắc (Monochrome Lucky Spin Wheel) -->
+    <symbol id="icon-lucky-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"></circle>
+      <circle cx="12" cy="12" r="7.5" stroke-dasharray="2 2"></circle>
       <path d="M12 2v20"></path>
       <path d="M2 12h20"></path>
       <path d="m4.93 4.93 14.14 14.14"></path>
       <path d="m19.07 4.93-14.14 14.14"></path>
       <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
-      <path d="m12 2 2 4h-4z" fill="currentColor"></path>
+      <circle cx="12" cy="12" r="1.2" fill="#FFFFFF"></circle>
+      <path d="m12 1.5 2.5 3.5h-5z" fill="currentColor" stroke="none"></path>
+    </symbol>
+
+    <!-- Vòng quay may mắn ĐA SẮC MÀU CAO CẤP (Vibrant Multi-Color Lucky Spin Wheel) -->
+    <symbol id="icon-lucky-spin-color" viewBox="0 0 32 32">
+      <!-- 8 nan quạt đa sắc màu rực rỡ -->
+      <g>
+        <!-- Nan 1: Xanh lá (Emerald) -->
+        <path d="M 16 16 L 16 3 A 13 13 0 0 1 25.19 6.81 Z" fill="#10B981"/>
+        <!-- Nan 2: Vàng hổ phách (Amber) -->
+        <path d="M 16 16 L 25.19 6.81 A 13 13 0 0 1 29 16 Z" fill="#F59E0B"/>
+        <!-- Nan 3: Đỏ san hô (Coral Red) -->
+        <path d="M 16 16 L 29 16 A 13 13 0 0 1 25.19 25.19 Z" fill="#EF4444"/>
+        <!-- Nan 4: Tím thạch anh (Purple) -->
+        <path d="M 16 16 L 25.19 25.19 A 13 13 0 0 1 16 29 Z" fill="#8B5CF6"/>
+        <!-- Nan 5: Xanh lơ (Cyan) -->
+        <path d="M 16 16 L 16 29 A 13 13 0 0 1 6.81 25.19 Z" fill="#06B6D4"/>
+        <!-- Nan 6: Hồng sen (Pink) -->
+        <path d="M 16 16 L 6.81 25.19 A 13 13 0 0 1 3 16 Z" fill="#EC4899"/>
+        <!-- Nan 7: Xanh dương (Royal Blue) -->
+        <path d="M 16 16 L 3 16 A 13 13 0 0 1 6.81 6.81 Z" fill="#3B82F6"/>
+        <!-- Nan 8: Cam tươi (Vibrant Orange) -->
+        <path d="M 16 16 L 6.81 6.81 A 13 13 0 0 1 16 3 Z" fill="#F97316"/>
+      </g>
+      <!-- Viền chia rãnh nan quạt màu trắng ánh vàng -->
+      <circle cx="16" cy="16" r="13" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.6"/>
+      <!-- Vành tròn vàng kim loại bên ngoài với các bóng LED kim loại -->
+      <circle cx="16" cy="16" r="14.2" fill="none" stroke="#F59E0B" stroke-width="2.4"/>
+      <circle cx="16" cy="16" r="15.2" fill="none" stroke="#FEF08A" stroke-width="0.6"/>
+      <!-- Các bóng đèn vàng trên vành bánh xe -->
+      <circle cx="16" cy="1.8" r="0.9" fill="#FFFBEB"/>
+      <circle cx="26" cy="6" r="0.9" fill="#FFFBEB"/>
+      <circle cx="30.2" cy="16" r="0.9" fill="#FFFBEB"/>
+      <circle cx="26" cy="26" r="0.9" fill="#FFFBEB"/>
+      <circle cx="16" cy="30.2" r="0.9" fill="#FFFBEB"/>
+      <circle cx="6" cy="26" r="0.9" fill="#FFFBEB"/>
+      <circle cx="1.8" cy="16" r="0.9" fill="#FFFBEB"/>
+      <circle cx="6" cy="6" r="0.9" fill="#FFFBEB"/>
+      <!-- Trục bánh xe trung tâm vàng 3D -->
+      <circle cx="16" cy="16" r="4.6" fill="#D97706" stroke="#FEF08A" stroke-width="1.2"/>
+      <circle cx="16" cy="16" r="3.2" fill="#F59E0B"/>
+      <!-- Ngôi sao may mắn lấp lánh ở tâm -->
+      <path d="M 16 13.5 L 16.7 15.3 L 18.5 16 L 16.7 16.7 L 16 18.5 L 15.3 16.7 L 13.5 16 L 15.3 15.3 Z" fill="#FFFFFF"/>
+      <!-- Kim chỉ mũi tên đỏ viền vàng ở đỉnh (Pointer) -->
+      <polygon points="16,6.2 13.2,0.8 18.8,0.8" fill="#DC2626" stroke="#FEF08A" stroke-width="0.8"/>
     </symbol>
 
     <!-- Phiếu giảm giá / Voucher (Voucher Coupon) -->

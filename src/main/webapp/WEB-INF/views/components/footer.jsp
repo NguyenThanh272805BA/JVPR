@@ -1107,3 +1107,31 @@
         </button>
     </div>
 </div>
+
+<!-- ============================================== -->
+<!-- FLOATING LUCKY SPIN WIDGET (GÓC TRÁI DƯỚI)     -->
+<!-- ============================================== -->
+<c:if test="${!pageContext.request.requestURI.endsWith('lucky-spin.jsp')}">
+<div id="floating-lucky-spin-widget" class="fixed bottom-6 left-6 z-[900] select-none group">
+    <a href="${pageContext.request.contextPath}/lucky-spin"
+       class="relative flex items-center gap-2.5 p-2 pr-3.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-2xl border-2 border-amber-300/80 hover:scale-110 active:scale-95 transition-all duration-300 hover:shadow-[0_10px_25px_rgba(245,158,11,0.5)]">
+        <!-- Vòng hào quang lấp lánh đằng sau -->
+        <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-400 via-rose-500 to-amber-400 blur-sm opacity-70 group-hover:opacity-100 animate-pulse pointer-events-none"></div>
+
+        <!-- Bánh xe xoay code-drawn SVG -->
+        <div class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900/20 backdrop-blur-xs flex items-center justify-center flex-shrink-0 shadow-inner">
+            <svg class="w-7 h-7 sm:w-8 sm:h-8 animate-[spin_8s_linear_infinite] group-hover:animate-[spin_2s_linear_infinite] transition-all" viewBox="0 0 32 32">
+                <use href="#icon-lucky-spin-color"/>
+            </svg>
+        </div>
+
+        <div class="flex flex-col text-left leading-none relative z-10">
+            <div class="flex items-center gap-1">
+                <span class="text-xs font-black uppercase tracking-wider text-white drop-shadow-xs">Vòng Quay</span>
+                <span class="px-1 py-0.2 rounded-full bg-yellow-300 text-slate-950 text-[8px] font-black uppercase animate-bounce">100% Quà</span>
+            </div>
+            <span class="text-[9px] font-bold text-amber-100/90 mt-0.5">Nhận voucher 50K</span>
+        </div>
+    </a>
+</div>
+</c:if>

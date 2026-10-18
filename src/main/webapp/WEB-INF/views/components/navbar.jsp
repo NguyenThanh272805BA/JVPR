@@ -67,7 +67,7 @@
                         <a href="${pageContext.request.contextPath}/lucky-spin"
                            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-surface-container transition-all group/item">
                             <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 group-hover/item:scale-110 transition-transform">
-                                <svg class="w-5 h-5 text-amber-600"><use href="#icon-lucky-spin"/></svg>
+                                <svg class="w-6 h-6 animate-[spin_10s_linear_infinite] group-hover/item:rotate-180 transition-transform duration-500" viewBox="0 0 32 32"><use href="#icon-lucky-spin-color"/></svg>
                             </div>
                             <div class="flex flex-col min-w-0">
                                 <span class="text-xs font-bold text-on-surface group-hover/item:text-amber-600 transition-colors">Vòng Quay May Mắn</span>
@@ -105,6 +105,27 @@
 
         <!-- Tiện ích người dùng & Giỏ hàng -->
         <div class="flex items-center space-x-2 md:space-x-3.5 flex-shrink-0">
+            <!-- Nút Vòng Quay May Mắn Đặc Trưng Trên Thanh Điều Hướng (Code-Drawn Animated Icon) -->
+            <a id="navbar-lucky-spin-btn" href="${pageContext.request.contextPath}/lucky-spin"
+               class="group/spin relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/20 hover:from-amber-500/25 hover:via-rose-500/20 hover:to-amber-500/35 border border-amber-400/60 hover:border-amber-500 shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all text-amber-950"
+               title="Vòng Quay May Mắn - Điểm danh nhận voucher & quà tặng mỗi ngày">
+                <!-- Icon bánh xe xoay đa sắc màu với ánh sáng hào quang nhấp nháy -->
+                <div class="relative w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full bg-amber-400/35 blur-xs group-hover/spin:blur-sm animate-pulse"></div>
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 relative z-10 transition-transform duration-700 ease-out group-hover/spin:rotate-180 animate-[spin_10s_linear_infinite]" viewBox="0 0 32 32">
+                        <use href="#icon-lucky-spin-color"/>
+                    </svg>
+                </div>
+                <div class="hidden xl:flex flex-col text-left leading-none">
+                    <span class="text-[11px] font-black text-amber-950 group-hover/spin:text-rose-600 transition-colors uppercase tracking-wider">Vòng Quay</span>
+                    <span class="text-[8px] font-bold text-amber-700/90">Quà mỗi ngày</span>
+                </div>
+                <!-- Badge HOT nhấp nháy lôi cuốn -->
+                <span class="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-xs animate-bounce">
+                    HOT
+                </span>
+            </a>
+
             <a id="navbar-cart-btn" href="${pageContext.request.contextPath}/cart" class="text-primary hover:bg-surface-container-highest p-2 rounded-full transition-colors relative inline-block" title="Giỏ hàng">
                 <span id="navbar-cart-icon" class="material-symbols-outlined inline-block transition-transform select-none">shopping_cart</span>
                 <c:if test="${not empty sessionScope.CART_TOTAL_ITEMS && sessionScope.CART_TOTAL_ITEMS > 0}">
@@ -337,8 +358,9 @@
                                 <a href="${pageContext.request.contextPath}/profile" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
                                     <span class="material-symbols-outlined text-sm">person</span> Trang cá nhân
                                 </a>
-                                <a href="${pageContext.request.contextPath}/lucky-spin" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
-                                    <svg class="w-4 h-4 text-amber-500"><use href="#icon-lucky-spin"/></svg> Vòng quay & Quà tặng
+                                <a href="${pageContext.request.contextPath}/lucky-spin" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors group/item">
+                                    <svg class="w-4 h-4 animate-[spin_10s_linear_infinite] group-hover/item:rotate-180 transition-transform duration-500" viewBox="0 0 32 32"><use href="#icon-lucky-spin-color"/></svg>
+                                    <span>Vòng quay & Quà tặng</span>
                                 </a>
                                 <a href="${pageContext.request.contextPath}/order-history" class="flex items-center gap-2 px-4 py-2.5 text-on-surface hover:bg-surface-container transition-colors">
                                     <span class="material-symbols-outlined text-sm">receipt_long</span> Lịch sử đơn hàng
@@ -400,6 +422,20 @@
                         <span>Tự mix giỏ quà</span>
                     </div>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 uppercase">Hot</span>
+                </a>
+                <a class="flex items-center justify-between p-2.5 rounded-2xl text-amber-950 bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-400/40 hover:border-amber-500 transition-all font-bold group" href="${pageContext.request.contextPath}/lucky-spin">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center flex-shrink-0 shadow-xs group-hover:scale-110 transition-transform">
+                            <svg class="w-5 h-5 animate-[spin_8s_linear_infinite]" viewBox="0 0 32 32">
+                                <use href="#icon-lucky-spin-color"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-black uppercase tracking-wider text-amber-950">Vòng quay may mắn</span>
+                            <span class="text-[9px] font-medium text-amber-800/80">Quay mỗi ngày & ví quà</span>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-600 text-white uppercase shadow-xs animate-pulse">Quay</span>
                 </a>
                 <a class="flex items-center justify-between p-2.5 rounded-2xl text-on-surface hover:bg-primary/10 hover:text-primary transition-all font-medium" href="${pageContext.request.contextPath}/promotions">
                     <div class="flex items-center gap-3">
