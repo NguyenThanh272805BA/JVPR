@@ -524,7 +524,22 @@ public class AIChatAPIServlet extends HttpServlet {
         response.addProperty("stepProgress", stepProgress);
         response.addProperty("totalAmount", matchedOrder.getTotalAmount() != null ? matchedOrder.getTotalAmount() : 0);
         response.addProperty("itemsSummary", itemsSummary.toString());
-        response.addProperty("deliverySlot", matchedOrder.getDeliverySlot() != null ? matchedOrder.getDeliverySlot() : "Giao tiêu chuẩn");
+        String rawSlot = matchedOrder.getDeliverySlot();
+        String slotLabel;
+        if (rawSlot == null || rawSlot.isEmpty()) {
+            slotLabel = "Giao tiêu chuẩn";
+        } else if ("FAST_1_2H".equalsIgnoreCase(rawSlot)) {
+            slotLabel = "Giao nhanh 1 - 2h";
+        } else if ("SLOT_MORNING".equalsIgnoreCase(rawSlot) || "MORNING_8_12H".equalsIgnoreCase(rawSlot)) {
+            slotLabel = "Khung sáng (08:00 - 11:30)";
+        } else if ("SLOT_AFTERNOON".equalsIgnoreCase(rawSlot) || "AFTERNOON_14_18H".equalsIgnoreCase(rawSlot)) {
+            slotLabel = "Khung chiều (14:00 - 17:30)";
+        } else if ("SLOT_EVENING".equalsIgnoreCase(rawSlot) || "EVENING_18_21H".equalsIgnoreCase(rawSlot)) {
+            slotLabel = "Khung tối (18:00 - 20:30)";
+        } else {
+            slotLabel = rawSlot;
+        }
+        response.addProperty("deliverySlot", slotLabel);
         response.addProperty("trackingUrl", "/guest-tracking");
     }
 

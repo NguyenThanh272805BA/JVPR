@@ -78,7 +78,7 @@
                                 <select name="targetAudience" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all font-semibold text-gray-800">
                                     <option value="ALL" ${coupon.targetAudience == 'ALL' ? 'selected' : ''}>Tất cả người dùng (Công khai)</option>
                                     <option value="REGULAR" ${coupon.targetAudience == 'REGULAR' ? 'selected' : ''}>Tài khoản người dùng thông thường</option>
-                                    <option value="GMAIL" ${coupon.targetAudience == 'GMAIL' ? 'selected' : ''}>Chỉ dành riêng cho tài khoản Gmail</option>
+                                    <option value="GOOGLE_ONLY" ${(coupon.targetAudience == 'GMAIL' || coupon.targetAudience == 'GOOGLE_ONLY') ? 'selected' : ''}>Chỉ dành riêng cho tài khoản Gmail</option>
                                 </select>
                             </div>
                         </div>
@@ -111,6 +111,7 @@
                             <select name="discountType" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all font-semibold text-gray-800">
                                 <option value="FIXED" ${coupon.discountType == 'FIXED' ? 'selected' : ''}>Giảm tiền trực tiếp (VNĐ)</option>
                                 <option value="PERCENT" ${coupon.discountType == 'PERCENT' ? 'selected' : ''}>Giảm theo %</option>
+                                <option value="FREESHIP" ${coupon.discountType == 'FREESHIP' ? 'selected' : ''}>Miễn phí vận chuyển (Freeship)</option>
                             </select>
                         </div>
 

@@ -440,7 +440,7 @@
               </div>
               <div>
                 <p class="font-bold text-amber-900">Cách nhận thêm lượt quay mỗi ngày:</p>
-                <p class="text-amber-800/80 mt-0.5">Điểm danh đăng nhập mỗi ngày (+1 lượt) • Mỗi đơn hàng hoàn tất (+1 lượt) • Mời bạn bè (+2 lượt)</p>
+                <p class="text-amber-800/80 mt-0.5">Điểm danh đăng nhập mỗi ngày (+1 lượt) • Mỗi đơn hàng hoàn tất (+1 lượt) • Quay trúng ô thêm lượt</p>
               </div>
             </div>
             <a href="${pageContext.request.contextPath}/lucky-spin" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl whitespace-nowrap shadow-xs hover:shadow transition-all flex items-center gap-1.5 flex-shrink-0">

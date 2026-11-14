@@ -59,8 +59,9 @@ public class AdminClaimManageServlet extends HttpServlet {
                         ICouponDAO couponDAO = new CouponDAOImpl();
                         CouponModel compCoupon = new CouponModel();
                         compCoupon.setCode(voucherCode);
-                        compCoupon.setDiscountType("PERCENTAGE");
+                        compCoupon.setDiscountType("PERCENT");
                         compCoupon.setDiscountValue(100.0);
+                        compCoupon.setTargetAudience("ALL");
                         compCoupon.setMinOrderValue(0.0);
                         compCoupon.setProductId(null);
                         compCoupon.setStartDate(new Timestamp(System.currentTimeMillis()));

@@ -92,12 +92,41 @@ public class CouponAPIServlet extends HttpServlet {
         String userLoginType = user.getLoginType() != null ? user.getLoginType() : "LOCAL";
         String userEmail = user.getEmail() != null ? user.getEmail().toLowerCase() : "";
 
+        // Tải danh sách mã cá nhân (Vòng quay may mắn & Đền bù khiếu nại) để không lộ mã của user khác
+        Map<String, Long> personalVoucherOwners = new java.util.HashMap<>();
+        try (java.sql.Connection conn = vn.edu.eaut.fruitables.util.DBConnectionUtil.getConnection();
+             java.sql.Statement st = conn.createStatement()) {
+            try (java.sql.ResultSet rs = st.executeQuery("SELECT reward_code, user_id FROM lucky_spin_history WHERE reward_code IS NOT NULL")) {
+                while (rs.next()) {
+                    String rc = rs.getString("reward_code");
+                    if (rc != null) personalVoucherOwners.put(rc.trim().toUpperCase(), rs.getLong("user_id"));
+                }
+            } catch (Exception ignored) {}
+            try (java.sql.ResultSet rs = st.executeQuery("SELECT compensation_voucher, user_id FROM order_claims WHERE compensation_voucher IS NOT NULL")) {
+                while (rs.next()) {
+                    String cv = rs.getString("compensation_voucher");
+                    if (cv != null && rs.getObject("user_id") != null) {
+                        personalVoucherOwners.put(cv.trim().toUpperCase(), rs.getLong("user_id"));
+                    }
+                }
+            } catch (Exception ignored) {}
+        } catch (Exception ignored) {}
+
         // 4. Evaluate từng voucher
         List<CouponEvaluationDTO> evaluated = new ArrayList<>();
         for (CouponModel coupon : allCoupons) {
 
             // Bỏ qua voucher không active
             if (coupon.getStatus() == null || !coupon.getStatus()) continue;
+
+            // Bỏ qua voucher cá nhân của người dùng khác
+            String cCodeUpper = coupon.getCode() != null ? coupon.getCode().trim().toUpperCase() : "";
+            if (personalVoucherOwners.containsKey(cCodeUpper)) {
+                Long ownerId = personalVoucherOwners.get(cCodeUpper);
+                if (ownerId == null || !ownerId.equals(user.getId())) {
+                    continue;
+                }
+            }
 
             CouponEvaluationDTO dto = new CouponEvaluationDTO(coupon);
 

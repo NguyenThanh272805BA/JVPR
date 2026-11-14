@@ -50,6 +50,7 @@ public class CouponManageServlet extends HttpServlet {
             String endDateStr = request.getParameter("endDate");
             Integer usageLimit = Integer.parseInt(request.getParameter("usageLimit"));
             String productIdStr = request.getParameter("productId");
+            String targetAudience = request.getParameter("targetAudience");
 
             // Parse datetime-local string (YYYY-MM-DDTHH:MM) sang SQL Timestamp an toàn
             String sDate = startDateStr.replace("T", " ").trim();
@@ -68,6 +69,7 @@ public class CouponManageServlet extends HttpServlet {
             coupon.setStartDate(startDate);
             coupon.setEndDate(endDate);
             coupon.setUsageLimit(usageLimit);
+            coupon.setTargetAudience(targetAudience != null && !targetAudience.trim().isEmpty() ? targetAudience.trim() : "ALL");
 
             if (productIdStr != null && !productIdStr.trim().isEmpty() && !productIdStr.equals("all")) {
                 try {

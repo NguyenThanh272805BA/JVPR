@@ -125,20 +125,37 @@
 
                             <!-- XỬ LÝ HIỂN THỊ TIỀN GIẢM TỪ VOUCHER -->
                             <c:set var="discount" value="${sessionScope.DISCOUNT_AMOUNT != null ? sessionScope.DISCOUNT_AMOUNT : 0}"/>
-                            <c:set var="finalTotal" value="${cartTotal - discount > 0 ? cartTotal - discount : 0}"/>
+                            <c:set var="isFreeshipCoupon" value="${sessionScope.APPLIED_COUPON_TYPE == 'FREESHIP'}"/>
+                            <c:set var="goodsDiscount" value="${isFreeshipCoupon ? 0 : discount}"/>
+                            <c:set var="finalTotal" value="${cartTotal - goodsDiscount > 0 ? cartTotal - goodsDiscount : 0}"/>
 
                             <c:if test="${discount > 0}">
                                 <div class="flex justify-between items-center mb-3 text-emerald-600 text-sm font-semibold">
                                     <span class="flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-sm">sell</span> Giảm giá (${sessionScope.APPLIED_COUPON_CODE})
+                                        <span class="material-symbols-outlined text-sm">${isFreeshipCoupon ? 'local_shipping' : 'sell'}</span>
+                                        ${isFreeshipCoupon ? 'Ưu đãi phí ship' : 'Giảm giá'} (${sessionScope.APPLIED_COUPON_CODE})
                                     </span>
-                                    <span>- <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫</span>
+                                    <span>
+                                        <c:choose>
+                                            <c:when test="${isFreeshipCoupon}">
+                                                Hỗ trợ tối đa <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫
+                                            </c:when>
+                                            <c:otherwise>
+                                                - <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </span>
                                 </div>
                             </c:if>
 
                             <div class="flex justify-between items-center mb-4 text-on-surface-variant text-sm border-b border-surface-variant pb-3">
                                 <span>Phí vận chuyển</span>
-                                <span class="font-semibold text-primary">Miễn phí</span>
+                                <span class="font-semibold text-primary">
+                                    <c:choose>
+                                        <c:when test="${isFreeshipCoupon}">Miễn phí (Giảm tới <fmt:formatNumber value="${discount}" type="number" groupingUsed="true"/> ₫)</c:when>
+                                        <c:otherwise>Tính tại bước thanh toán</c:otherwise>
+                                    </c:choose>
+                                </span>
                             </div>
 
                             <!-- TỔNG THANH TOÁN SAU GIẢM GIÁ -->

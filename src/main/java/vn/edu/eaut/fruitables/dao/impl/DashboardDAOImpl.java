@@ -1088,6 +1088,9 @@ public class DashboardDAOImpl implements IDashboardDAO {
         List<Integer> counts = new ArrayList<>();
         List<Double> amounts = new ArrayList<>();
 
+        Map<String, Integer> slotCounts = new LinkedHashMap<>();
+        Map<String, Double> slotAmounts = new LinkedHashMap<>();
+
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
@@ -1096,17 +1099,30 @@ public class DashboardDAOImpl implements IDashboardDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String slot = rs.getString("delivery_slot");
-                    String displayName = "FAST_1_2H".equalsIgnoreCase(slot) ? "Hỏa tốc 1 - 2 Giờ" :
-                                         ("MORNING_8_12H".equalsIgnoreCase(slot) ? "Buổi Sáng (8h - 12h)" :
-                                         ("AFTERNOON_14_18H".equalsIgnoreCase(slot) ? "Buổi Chiều (14h - 18h)" :
-                                         ("EVENING_18_21H".equalsIgnoreCase(slot) ? "Buổi Tối (18h - 21h)" : (slot != null ? slot : "Tiêu chuẩn"))));
-                    labels.add(displayName);
-                    counts.add(rs.getInt("cnt"));
-                    amounts.add(rs.getDouble("total"));
+                    String displayName;
+                    if ("FAST_1_2H".equalsIgnoreCase(slot)) {
+                        displayName = "Hỏa tốc 1 - 2 Giờ";
+                    } else if ("MORNING_8_12H".equalsIgnoreCase(slot) || "SLOT_MORNING".equalsIgnoreCase(slot)) {
+                        displayName = "Buổi Sáng (8h - 12h)";
+                    } else if ("AFTERNOON_14_18H".equalsIgnoreCase(slot) || "SLOT_AFTERNOON".equalsIgnoreCase(slot)) {
+                        displayName = "Buổi Chiều (14h - 18h)";
+                    } else if ("EVENING_18_21H".equalsIgnoreCase(slot) || "SLOT_EVENING".equalsIgnoreCase(slot)) {
+                        displayName = "Buổi Tối (18h - 21h)";
+                    } else {
+                        displayName = (slot != null && !slot.trim().isEmpty()) ? slot : "Tiêu chuẩn";
+                    }
+                    slotCounts.put(displayName, slotCounts.getOrDefault(displayName, 0) + rs.getInt("cnt"));
+                    slotAmounts.put(displayName, slotAmounts.getOrDefault(displayName, 0.0) + rs.getDouble("total"));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        for (Map.Entry<String, Integer> entry : slotCounts.entrySet()) {
+            labels.add(entry.getKey());
+            counts.add(entry.getValue());
+            amounts.add(slotAmounts.getOrDefault(entry.getKey(), 0.0));
         }
 
         if (labels.isEmpty()) {

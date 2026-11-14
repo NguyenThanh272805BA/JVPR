@@ -231,6 +231,34 @@ public class CheckoutServlet extends HttpServlet {
                                 isValid = false;
                             }
 
+                            // Kiểm tra quyền sở hữu nếu là Voucher cá nhân (Lucky Spin / Claim)
+                            if (isValid) {
+                                try (java.sql.PreparedStatement psSpin = conn.prepareStatement("SELECT user_id FROM lucky_spin_history WHERE reward_code = ?")) {
+                                    psSpin.setString(1, appliedCoupon.trim());
+                                    try (java.sql.ResultSet rsSpin = psSpin.executeQuery()) {
+                                        if (rsSpin.next()) {
+                                            long ownerId = rsSpin.getLong("user_id");
+                                            if (userId == null || userId != ownerId) {
+                                                isValid = false;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                            if (isValid) {
+                                try (java.sql.PreparedStatement psClaim = conn.prepareStatement("SELECT user_id FROM order_claims WHERE compensation_voucher = ?")) {
+                                    psClaim.setString(1, appliedCoupon.trim());
+                                    try (java.sql.ResultSet rsClaim = psClaim.executeQuery()) {
+                                        if (rsClaim.next() && rsClaim.getObject("user_id") != null) {
+                                            long ownerId = rsClaim.getLong("user_id");
+                                            if (userId == null || userId != ownerId) {
+                                                isValid = false;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+
                             if (isValid) {
                                 couponValid = true;
                                 if ("FREESHIP".equalsIgnoreCase(discountType)) {

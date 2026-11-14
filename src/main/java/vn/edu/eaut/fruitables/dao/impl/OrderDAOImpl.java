@@ -194,7 +194,7 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                         psU.executeUpdate();
                     } catch (Exception ignored) {}
 
-                    String insertRefundLog = "INSERT INTO point_transactions (user_id, order_id, points_amount, transaction_type, description) VALUES (?, ?, ?, 'REFUND', ?)";
+                    String insertRefundLog = "INSERT INTO point_transactions (user_id, order_id, points_amount, transaction_type, description) VALUES (?, ?, ?, 'EARN', ?)";
                     try (PreparedStatement psLog = conn.prepareStatement(insertRefundLog)) {
                         psLog.setLong(1, userId);
                         psLog.setLong(2, orderId);
@@ -217,6 +217,11 @@ public class OrderDAOImpl extends AbstractDAO<OrderModel> implements IOrderDAO {
                                     psV.setString(1, voucherCode);
                                     psV.executeUpdate();
                                 }
+                                String restoreSpinVoucherSql = "UPDATE lucky_spin_history SET is_used = FALSE, used_at = NULL WHERE reward_code = ?";
+                                try (PreparedStatement psSpin = conn.prepareStatement(restoreSpinVoucherSql)) {
+                                    psSpin.setString(1, voucherCode);
+                                    psSpin.executeUpdate();
+                                } catch (Exception ignored) {}
                             }
                         }
                     } catch (Exception ignored) {}

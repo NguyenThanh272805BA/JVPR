@@ -234,7 +234,15 @@
                                             <span>${order.estimatedDeliveryTime != null ? order.estimatedDeliveryTime : 'Khung giờ tiêu chuẩn'}</span>
                                         </span>
                                         <span>•</span>
-                                        <span class="text-primary font-semibold">${order.deliverySlot != null ? order.deliverySlot : 'FAST_1_2H'}</span>
+                                        <span class="text-primary font-semibold">
+                                            <c:choose>
+                                                <c:when test="${order.deliverySlot == 'FAST_1_2H' || empty order.deliverySlot}">Giao nhanh 1 - 2h</c:when>
+                                                <c:when test="${order.deliverySlot == 'SLOT_MORNING' || order.deliverySlot == 'MORNING_8_12H'}">Sáng (08:00 - 11:30)</c:when>
+                                                <c:when test="${order.deliverySlot == 'SLOT_AFTERNOON' || order.deliverySlot == 'AFTERNOON_14_18H'}">Chiều (14:00 - 17:30)</c:when>
+                                                <c:when test="${order.deliverySlot == 'SLOT_EVENING' || order.deliverySlot == 'EVENING_18_21H'}">Tối (18:00 - 20:30)</c:when>
+                                                <c:otherwise>${order.deliverySlot}</c:otherwise>
+                                            </c:choose>
+                                        </span>
                                     </div>
                                 </div>
 

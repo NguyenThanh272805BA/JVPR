@@ -40,6 +40,7 @@
           <select name="discountType" class="w-full border rounded px-3 py-2 outline-none focus:border-primary">
             <option value="FIXED">Giảm tiền trực tiếp (VNĐ)</option>
             <option value="PERCENT">Giảm theo %</option>
+            <option value="FREESHIP">Miễn phí vận chuyển (Freeship)</option>
           </select>
         </div>
         <div>
@@ -104,6 +105,9 @@
               <c:choose>
                 <c:when test="${coupon.discountType == 'FIXED'}">
                   - <fmt:formatNumber value="${coupon.discountValue}" type="number" groupingUsed="true"/> ₫
+                </c:when>
+                <c:when test="${coupon.discountType == 'FREESHIP'}">
+                  Freeship (<fmt:formatNumber value="${coupon.discountValue}" type="number" groupingUsed="true"/> ₫)
                 </c:when>
                 <c:otherwise>
                   - <c:out value="${coupon.discountValue}"/> %

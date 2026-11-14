@@ -13,10 +13,23 @@ public class CouponDAOImpl extends AbstractDAO<CouponModel> implements ICouponDA
         return query(sql, new CouponMapper());
     }
 
+    private String normalizeTargetAudience(String targetAudience) {
+        if (targetAudience == null || targetAudience.trim().isEmpty()) {
+            return "ALL";
+        }
+        String ta = targetAudience.trim().toUpperCase();
+        if ("GMAIL".equals(ta) || "GOOGLE_ONLY".equals(ta)) {
+            return "GOOGLE_ONLY";
+        }
+        return "ALL";
+    }
+
     @Override
     public Long save(CouponModel coupon) {
-        String sql = "INSERT INTO coupons (code, discount_type, discount_value, min_order_value, product_id, start_date, end_date, usage_limit, used_count, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 1)";
-        return insert(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(), coupon.getMinOrderValue(), coupon.getProductId(), coupon.getStartDate(), coupon.getEndDate(), coupon.getUsageLimit());
+        String sql = "INSERT INTO coupons (code, discount_type, discount_value, target_audience, min_order_value, product_id, start_date, end_date, usage_limit, used_count, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)";
+        return insert(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(),
+                normalizeTargetAudience(coupon.getTargetAudience()), coupon.getMinOrderValue(),
+                coupon.getProductId(), coupon.getStartDate(), coupon.getEndDate(), coupon.getUsageLimit());
     }
 
     @Override
@@ -35,8 +48,9 @@ public class CouponDAOImpl extends AbstractDAO<CouponModel> implements ICouponDA
 
     @Override
     public void update(CouponModel coupon) {
-        String sql = "UPDATE coupons SET code = ?, discount_type = ?, discount_value = ?, min_order_value = ?, product_id = ?, start_date = ?, end_date = ?, usage_limit = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE coupons SET code = ?, discount_type = ?, discount_value = ?, target_audience = ?, min_order_value = ?, product_id = ?, start_date = ?, end_date = ?, usage_limit = ?, status = ? WHERE id = ?";
         update(sql, coupon.getCode(), coupon.getDiscountType(), coupon.getDiscountValue(),
+                normalizeTargetAudience(coupon.getTargetAudience()),
                 coupon.getMinOrderValue(), coupon.getProductId(), coupon.getStartDate(), coupon.getEndDate(),
                 coupon.getUsageLimit(), coupon.getStatus(), coupon.getId());
     }

@@ -76,7 +76,8 @@ public class AdminAIChatAPIServlet extends HttpServlet {
             action = "analyze_dashboard";
         }
 
-        boolean forceRefresh = "true".equalsIgnoreCase(request.getParameter("forceRefresh"));
+        boolean forceRefresh = "true".equalsIgnoreCase(request.getParameter("forceRefresh"))
+                || "true".equalsIgnoreCase(request.getParameter("refresh"));
         String userQuery = request.getParameter("query");
 
         JsonObject jsonResponse = new JsonObject();

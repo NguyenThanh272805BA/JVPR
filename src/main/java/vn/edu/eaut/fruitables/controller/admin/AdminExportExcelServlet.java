@@ -92,20 +92,8 @@ public class AdminExportExcelServlet extends HttpServlet {
             }
 
             double totalRev = dashboardDAO.getTotalRevenue();
-            double totalCost = 0.0;
-            // Tính tổng giá vốn từ các đơn thành công
+            double totalCost = dashboardDAO.getTotalCost();
             List<OrderModel> orders = orderDAO.findAll();
-            for (OrderModel o : orders) {
-                if ("PAID".equalsIgnoreCase(o.getPaymentStatus()) || "COMPLETED".equalsIgnoreCase(o.getStatus())) {
-                    List<OrderDetailModel> details = orderDAO.findOrderDetailsByOrderId(o.getId());
-                    if (details != null) {
-                        for (OrderDetailModel d : details) {
-                            double cp = d.getCostPrice() != null ? d.getCostPrice() : 0.0;
-                            totalCost += (cp * d.getQuantity());
-                        }
-                    }
-                }
-            }
             double grossProfit = totalRev - totalCost;
             double profitMargin = totalRev > 0 ? (grossProfit / totalRev) : 0.0;
 

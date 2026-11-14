@@ -291,7 +291,14 @@ public class ShipperDeliveryDAOImpl implements IShipperDeliveryDAO {
             conn.setAutoCommit(false);
 
             // 1. Kiểm tra trạng thái hiện tại
-            String checkSql = "SELECT status FROM orders WHERE id = ? FOR UPDATE";
+            String curStatus = null;
+            long userId = 0;
+            boolean hasUserId = false;
+            int usedPoints = 0;
+            String orderCode = null;
+            String orderNotes = null;
+
+            String checkSql = "SELECT status, user_id, used_points, order_code, order_notes FROM orders WHERE id = ? FOR UPDATE";
             try (PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
                 psCheck.setLong(1, orderId);
                 try (ResultSet rs = psCheck.executeQuery()) {
@@ -299,11 +306,16 @@ public class ShipperDeliveryDAOImpl implements IShipperDeliveryDAO {
                         conn.rollback();
                         return false;
                     }
-                    String curStatus = rs.getString("status");
-                    if ("RETURNED".equalsIgnoreCase(curStatus)) {
+                    curStatus = rs.getString("status");
+                    if ("RETURNED".equalsIgnoreCase(curStatus) || "CANCELLED".equalsIgnoreCase(curStatus)) {
                         conn.rollback();
                         return true; // Đã hoàn rồi
                     }
+                    userId = rs.getLong("user_id");
+                    hasUserId = !rs.wasNull() && userId > 0;
+                    try { usedPoints = rs.getInt("used_points"); } catch (Exception ignored) {}
+                    try { orderCode = rs.getString("order_code"); } catch (Exception ignored) {}
+                    try { orderNotes = rs.getString("order_notes"); } catch (Exception ignored) {}
                 }
             }
 
@@ -319,6 +331,43 @@ public class ShipperDeliveryDAOImpl implements IShipperDeliveryDAO {
                     }
                     psStock.executeBatch();
                 }
+            }
+
+            // 2b. Hoàn lại điểm tích lũy và voucher (kể cả Lucky Spin)
+            if (hasUserId && usedPoints > 0) {
+                try (PreparedStatement psU = conn.prepareStatement("UPDATE users SET points = points + ? WHERE id = ?")) {
+                    psU.setInt(1, usedPoints);
+                    psU.setLong(2, userId);
+                    psU.executeUpdate();
+                } catch (Exception ignored) {}
+                try (PreparedStatement psLog = conn.prepareStatement(
+                        "INSERT INTO point_transactions (user_id, order_id, points_amount, transaction_type, description) VALUES (?, ?, ?, 'EARN', ?)")) {
+                    psLog.setLong(1, userId);
+                    psLog.setLong(2, orderId);
+                    psLog.setInt(3, usedPoints);
+                    psLog.setString(4, "Hoàn trả " + usedPoints + " điểm do hoàn kho đơn #" + (orderCode != null ? orderCode : orderId));
+                    psLog.executeUpdate();
+                } catch (Exception ignored) {}
+            }
+
+            if (orderNotes != null && orderNotes.contains("[VOUCHER:")) {
+                try {
+                    int vStart = orderNotes.indexOf("[VOUCHER:") + 9;
+                    int vEnd = orderNotes.indexOf("]", vStart);
+                    if (vEnd > vStart) {
+                        String voucherCode = orderNotes.substring(vStart, vEnd).trim();
+                        if (!voucherCode.isEmpty()) {
+                            try (PreparedStatement psV = conn.prepareStatement("UPDATE coupons SET used_count = GREATEST(0, used_count - 1) WHERE code = ?")) {
+                                psV.setString(1, voucherCode);
+                                psV.executeUpdate();
+                            }
+                            try (PreparedStatement psSpin = conn.prepareStatement("UPDATE lucky_spin_history SET is_used = FALSE, used_at = NULL WHERE reward_code = ?")) {
+                                psSpin.setString(1, voucherCode);
+                                psSpin.executeUpdate();
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                } catch (Exception ignored) {}
             }
 
             // 3. Cập nhật trạng thái RETURNED

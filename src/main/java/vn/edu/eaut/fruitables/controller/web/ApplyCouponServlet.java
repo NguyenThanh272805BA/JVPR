@@ -82,36 +82,62 @@ public class ApplyCouponServlet extends HttpServlet {
 
                     // 2. Kiểm tra trạng thái kích hoạt của Voucher
                     if (!status) {
+                        removeCouponFromSession(session);
                         session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " hiện đang tạm ngưng áp dụng!");
-                        session.removeAttribute("DISCOUNT_AMOUNT");
-                        session.removeAttribute("APPLIED_COUPON_CODE");
                         response.sendRedirect(request.getContextPath() + "/cart");
                         return;
                     }
 
+                    // 2b. Kiểm tra quyền sở hữu nếu là Voucher cá nhân (Lucky Spin hoặc Đền bù khiếu nại)
+                    try (PreparedStatement psSpin = conn.prepareStatement("SELECT user_id FROM lucky_spin_history WHERE reward_code = ?")) {
+                        psSpin.setString(1, codeUpper);
+                        try (ResultSet rsSpin = psSpin.executeQuery()) {
+                            if (rsSpin.next()) {
+                                long ownerId = rsSpin.getLong("user_id");
+                                if (user.getId() == null || user.getId() != ownerId) {
+                                    removeCouponFromSession(session);
+                                    session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " thuộc Ví thưởng cá nhân của tài khoản khác!");
+                                    response.sendRedirect(request.getContextPath() + "/cart");
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    try (PreparedStatement psClaim = conn.prepareStatement("SELECT user_id FROM order_claims WHERE compensation_voucher = ?")) {
+                        psClaim.setString(1, codeUpper);
+                        try (ResultSet rsClaim = psClaim.executeQuery()) {
+                            if (rsClaim.next() && rsClaim.getObject("user_id") != null) {
+                                long ownerId = rsClaim.getLong("user_id");
+                                if (user.getId() == null || user.getId() != ownerId) {
+                                    removeCouponFromSession(session);
+                                    session.setAttribute("COUPON_ERROR", "Mã đền bù " + codeUpper + " chỉ dành riêng cho tài khoản gửi khiếu nại!");
+                                    response.sendRedirect(request.getContextPath() + "/cart");
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+
                     // 3. Kiểm tra ngày bắt đầu hiệu lực
                     if (startDate != null && now.before(startDate)) {
+                        removeCouponFromSession(session);
                         session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " chưa đến thời gian áp dụng (Bắt đầu từ " + sdf.format(startDate) + ")!");
-                        session.removeAttribute("DISCOUNT_AMOUNT");
-                        session.removeAttribute("APPLIED_COUPON_CODE");
                         response.sendRedirect(request.getContextPath() + "/cart");
                         return;
                     }
 
                     // 4. KIỂM TRA HẾT HẠN SỬ DỤNG (HSD)
                     if (endDate != null && now.after(endDate)) {
+                        removeCouponFromSession(session);
                         session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " không còn hiệu lực do đã hết hạn sử dụng vào ngày " + sdf.format(endDate) + "!");
-                        session.removeAttribute("DISCOUNT_AMOUNT");
-                        session.removeAttribute("APPLIED_COUPON_CODE");
                         response.sendRedirect(request.getContextPath() + "/cart");
                         return;
                     }
 
                     // 5. Kiểm tra giới hạn số lượt sử dụng
                     if (usageLimit > 0 && usedCount >= usageLimit) {
+                        removeCouponFromSession(session);
                         session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " đã hết số lượt sử dụng (" + usedCount + "/" + usageLimit + " lượt)!");
-                        session.removeAttribute("DISCOUNT_AMOUNT");
-                        session.removeAttribute("APPLIED_COUPON_CODE");
                         response.sendRedirect(request.getContextPath() + "/cart");
                         return;
                     }
@@ -124,9 +150,8 @@ public class ApplyCouponServlet extends HttpServlet {
                     if ("GMAIL".equalsIgnoreCase(targetAudience) || "GOOGLE_ONLY".equalsIgnoreCase(targetAudience)) {
                         boolean isGoogleUser = "GOOGLE".equalsIgnoreCase(userLoginType) || userEmail.endsWith("@gmail.com");
                         if (!isGoogleUser) {
+                            removeCouponFromSession(session);
                             session.setAttribute("COUPON_ERROR", "Mã này chỉ dành riêng cho tài khoản Google / Gmail!");
-                            session.removeAttribute("DISCOUNT_AMOUNT");
-                            session.removeAttribute("APPLIED_COUPON_CODE");
                             response.sendRedirect(request.getContextPath() + "/cart");
                             return;
                         }
@@ -145,9 +170,8 @@ public class ApplyCouponServlet extends HttpServlet {
                     if (specificProductId != null) {
                         if (!cart.containsKey(specificProductId)) {
                             String targetName = specificProductName != null ? specificProductName : "sản phẩm chỉ định";
+                            removeCouponFromSession(session);
                             session.setAttribute("COUPON_ERROR", "Mã giảm giá " + codeUpper + " chỉ áp dụng riêng cho sản phẩm '" + targetName + "'. Giỏ hàng của bạn chưa có sản phẩm này!");
-                            session.removeAttribute("DISCOUNT_AMOUNT");
-                            session.removeAttribute("APPLIED_COUPON_CODE");
                             response.sendRedirect(request.getContextPath() + "/cart");
                             return;
                         }
