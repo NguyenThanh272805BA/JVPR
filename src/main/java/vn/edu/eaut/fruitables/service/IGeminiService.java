@@ -67,6 +67,12 @@ public interface IGeminiService {
     String diagnoseFruitImage(byte[] imageBytes, String mimeType, String userNote);
 
     /**
+     * Phân tích danh sách mặt hàng hoa quả có nguy cơ tồn kho/cận hạn (từ số liệu MySQL thật)
+     * và trả về JSON Map {productId -> {riskDescription, agentReasoning}} do AI biên soạn.
+     */
+    Map<Long, Map<String, String>> analyzeInventoryBatch(String inventoryMetricsJson);
+
+    /**
      * Làm mới hoặc xóa bộ nhớ đệm câu trả lời
      */
     void clearCache();

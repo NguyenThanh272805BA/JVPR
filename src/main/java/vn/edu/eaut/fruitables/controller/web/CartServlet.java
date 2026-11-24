@@ -68,12 +68,25 @@ public class CartServlet extends HttpServlet {
 
                     Double actualPrice = (product.getDiscountPrice() != null && product.getDiscountPrice() > 0)
                             ? product.getDiscountPrice() : product.getPrice();
+                    Integer availableStock = product.getStock();
 
                     if (cart.containsKey(productId)) {
-                        // Đã có trong giỏ -> Tăng số lượng
+                        // Đã có trong giỏ -> Kiểm tra tổng số lượng không vượt quá tồn kho thực tế
                         CartItemDTO existingItem = cart.get(productId);
-                        existingItem.setQuantity(existingItem.getQuantity() + qtyToAdd);
+                        int requestedTotal = existingItem.getQuantity() + qtyToAdd;
+                        if (availableStock != null && requestedTotal > availableStock) {
+                            existingItem.setQuantity(availableStock);
+                            session.setAttribute("ORDER_MESSAGE_ERROR",
+                                    "Sản phẩm \"" + product.getName() + "\" chỉ còn " + availableStock + " trong kho. Số lượng trong giỏ đã được giữ ở mức tối đa!");
+                        } else {
+                            existingItem.setQuantity(requestedTotal);
+                        }
                     } else {
+                        if (availableStock != null && qtyToAdd > availableStock) {
+                            qtyToAdd = availableStock;
+                            session.setAttribute("ORDER_MESSAGE_ERROR",
+                                    "Sản phẩm \"" + product.getName() + "\" chỉ còn " + availableStock + " trong kho. Đã thêm tối đa số lượng hiện có!");
+                        }
                         CartItemDTO newItem = new CartItemDTO(
                                 product.getId(),
                                 product.getName(),
@@ -95,7 +108,19 @@ public class CartServlet extends HttpServlet {
                     if (quantity <= 0) {
                         cart.remove(productId);
                     } else {
-                        cart.get(productId).setQuantity(quantity);
+                        ProductModel product = productService.findById(productId);
+                        if (product != null && product.getStock() != null && quantity > product.getStock()) {
+                            int capped = Math.max(0, product.getStock());
+                            if (capped == 0) {
+                                cart.remove(productId);
+                            } else {
+                                cart.get(productId).setQuantity(capped);
+                            }
+                            session.setAttribute("ORDER_MESSAGE_ERROR",
+                                    "Sản phẩm \"" + product.getName() + "\" chỉ còn " + capped + " trong kho!");
+                        } else {
+                            cart.get(productId).setQuantity(quantity);
+                        }
                     }
                 }
                 // CHỐNG GIAN LẬN VOUCHER (Session Bleed): Hủy voucher cũ nếu thay đổi giỏ hàng

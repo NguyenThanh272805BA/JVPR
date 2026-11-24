@@ -30,13 +30,14 @@ public class AdminInventoryAgentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getServletPath();
+        boolean forceRefresh = "true".equalsIgnoreCase(request.getParameter("refresh"));
+
+        List<ClearanceRecommendationDTO> recommendations = inventoryAgentService.analyzeInventoryRisks(forceRefresh);
+        Map<String, Object> metrics = inventoryAgentService.buildMacroMetrics(recommendations);
 
         if ("/api/inventory-agent".equals(path)) {
             response.setContentType("application/json;charset=UTF-8");
             PrintWriter out = response.getWriter();
-
-            List<ClearanceRecommendationDTO> recommendations = inventoryAgentService.analyzeInventoryRisks();
-            Map<String, Object> metrics = inventoryAgentService.getAgentMacroMetrics();
 
             JsonObject json = new JsonObject();
             json.add("metrics", gson.toJsonTree(metrics));
@@ -46,12 +47,12 @@ public class AdminInventoryAgentServlet extends HttpServlet {
             return;
         }
 
-        // View JSP trang Quản trị Agent Điều phối Xả kho
-        List<ClearanceRecommendationDTO> recommendations = inventoryAgentService.analyzeInventoryRisks();
-        Map<String, Object> metrics = inventoryAgentService.getAgentMacroMetrics();
+        List<Map<String, String>> auditLogs = inventoryAgentService.getRecentAuditLogs(8);
 
+        // View JSP trang Quản trị Agent Điều phối Xả kho
         request.setAttribute("recommendations", recommendations);
         request.setAttribute("metrics", metrics);
+        request.setAttribute("auditLogs", auditLogs);
         request.getRequestDispatcher("/WEB-INF/views/admin/inventory-agent.jsp").forward(request, response);
     }
 

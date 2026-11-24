@@ -59,6 +59,22 @@ public class ProfileServlet extends HttpServlet {
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
+
+        if (fullName == null || fullName.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Họ và tên không được để trống!");
+            populateWalletAndForward(request, response, user);
+            return;
+        }
+        fullName = fullName.trim();
+
+        String cleanPhone = (phone != null) ? phone.trim() : "";
+        if (!cleanPhone.isEmpty() && !cleanPhone.matches("^(03|05|07|08|09)[0-9]{8}$")) {
+            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (đầu 03, 05, 07, 08, 09).");
+            populateWalletAndForward(request, response, user);
+            return;
+        }
+        phone = cleanPhone.isEmpty() ? null : cleanPhone;
+
         // Xử lý Upload Avatar
         Part filePart = request.getPart("avatarFile");
         String fileName = extractFileName(filePart);
@@ -97,19 +113,22 @@ public class ProfileServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật hồ sơ. Vui lòng thử lại!");
         }
 
-        // Nạp lại Ví quà tặng & Lượt quay may mắn để hiển thị đầy đủ trên profile.jsp
+        populateWalletAndForward(request, response, user);
+    }
+
+    private void populateWalletAndForward(HttpServletRequest request, HttpServletResponse response, UserModel user) throws ServletException, IOException {
         vn.edu.eaut.fruitables.dao.IUserDAO userDAO = new vn.edu.eaut.fruitables.dao.impl.UserDAOImpl();
         UserModel freshUser = userDAO.findById(user.getId());
         if (freshUser != null) {
-            session.setAttribute("USERMODEL", freshUser);
+            request.getSession().setAttribute("USERMODEL", freshUser);
         }
         vn.edu.eaut.fruitables.service.ILuckySpinService luckySpinService = new vn.edu.eaut.fruitables.service.impl.LuckySpinServiceImpl();
         java.util.List<vn.edu.eaut.fruitables.model.entity.LuckySpinHistoryModel> userRewards = luckySpinService.getUserRewardWallet(user.getId());
         request.setAttribute("userRewards", userRewards);
         request.setAttribute("spinCount", freshUser != null ? freshUser.getSpinCount() : user.getSpinCount());
-
         request.getRequestDispatcher("/WEB-INF/views/web/profile.jsp").forward(request, response);
     }
 

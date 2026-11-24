@@ -38,8 +38,30 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirm_password");
 
+        if (username == null || username.trim().isEmpty()
+                || fullName == null || fullName.trim().isEmpty()
+                || password == null || password.isEmpty()
+                || confirmPassword == null) {
+            request.setAttribute("message", "Vui lòng điền đầy đủ các thông tin bắt buộc!");
+            request.getRequestDispatcher("/WEB-INF/views/web/register.jsp").forward(request, response);
+            return;
+        }
+
+        if (password.length() < 6) {
+            request.setAttribute("message", "Mật khẩu phải có ít nhất 6 ký tự!");
+            request.getRequestDispatcher("/WEB-INF/views/web/register.jsp").forward(request, response);
+            return;
+        }
+
         if (!password.equals(confirmPassword)) {
             request.setAttribute("message", "Mật khẩu xác nhận không khớp!");
+            request.getRequestDispatcher("/WEB-INF/views/web/register.jsp").forward(request, response);
+            return;
+        }
+
+        if (phone != null && !phone.trim().isEmpty()
+                && !phone.trim().matches("^(03|05|07|08|09)[0-9]{8}$")) {
+            request.setAttribute("message", "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (đầu 03, 05, 07, 08, 09).");
             request.getRequestDispatcher("/WEB-INF/views/web/register.jsp").forward(request, response);
             return;
         }

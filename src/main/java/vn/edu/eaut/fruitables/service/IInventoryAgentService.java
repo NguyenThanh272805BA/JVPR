@@ -13,9 +13,24 @@ public interface IInventoryAgentService {
     List<ClearanceRecommendationDTO> analyzeInventoryRisks();
 
     /**
+     * Quét lại toàn bộ kho hàng, cho phép bỏ qua cache để làm mới phân tích AI ngay lập tức.
+     */
+    List<ClearanceRecommendationDTO> analyzeInventoryRisks(boolean forceRefresh);
+
+    /**
      * Tổng hợp các chỉ số vĩ mô phục vụ bảng điều khiển Agent (Tổng giá trị nguy cơ, Vốn cứu được, Số mã đã kích hoạt)
      */
     Map<String, Object> getAgentMacroMetrics();
+
+    /**
+     * Tính nhanh các chỉ số vĩ mô từ danh sách khuyến nghị đã quét sẵn (tránh truy vấn lặp).
+     */
+    Map<String, Object> buildMacroMetrics(List<ClearanceRecommendationDTO> list);
+
+    /**
+     * Lấy nhật ký hoạt động thực tế của AI Agent từ bảng notifications.
+     */
+    List<Map<String, String>> getRecentAuditLogs(int limit);
 
     /**
      * Thực thi hành động tự động (Autonomous Action Execution):

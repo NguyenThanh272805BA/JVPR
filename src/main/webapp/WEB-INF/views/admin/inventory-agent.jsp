@@ -33,9 +33,9 @@
       </div>
     </div>
     <div class="flex items-center gap-4">
-      <button onclick="location.reload()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container text-xs font-semibold transition-all shadow-xs cursor-pointer">
-        <span class="material-symbols-outlined text-base">refresh</span> Quét Lại Kho
-      </button>
+      <a href="${pageContext.request.contextPath}/admin/inventory-agent?refresh=true" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-outline-variant bg-surface hover:bg-surface-container text-xs font-semibold transition-all shadow-xs cursor-pointer">
+        <span class="material-symbols-outlined text-base">refresh</span> Quét Lại Kho (AI)
+      </a>
       <div class="h-8 w-px bg-slate-200"></div>
       <span class="font-label-bold text-sm text-on-surface">${sessionScope.USERMODEL.fullName != null ? sessionScope.USERMODEL.fullName : 'Quản trị viên'}</span>
     </div>
@@ -138,6 +138,13 @@
       </div>
 
       <div class="divide-y divide-surface-variant">
+        <c:if test="${empty recommendations}">
+          <div class="p-10 text-center text-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-4xl text-emerald-500 mb-2">verified</span>
+            <p class="font-semibold text-on-surface">Kho hàng đang vận hành tối ưu!</p>
+            <p class="text-xs mt-1">Không phát hiện mặt hàng nào vượt ngưỡng rủi ro tồn kho hoặc cận hạn bảo quản.</p>
+          </div>
+        </c:if>
         <c:forEach var="item" items="${recommendations}">
           <div class="p-6 transition-colors hover:bg-surface-container-lowest/50" id="row-prod-${item.productId}">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -238,29 +245,33 @@
           <span class="material-symbols-outlined text-primary text-lg">history</span>
           Nhật Ký Tự Động Xử Lý Kho Hàng
         </h3>
-        <span class="text-xs text-on-surface-variant">Lưu lại toàn bộ lịch sử kiểm tra kho và áp dụng giảm giá</span>
+        <span class="text-xs text-on-surface-variant">
+          Nguồn phân tích: <strong>${metrics.aiPowered ? 'MySQL + Gemini LLM' : 'MySQL Rule-Engine'}</strong>
+        </span>
       </div>
       <div class="space-y-3 text-xs" id="audit-log-container">
         <div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/60 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <div>
-              <span class="font-bold text-on-surface">[KIỂM TRA KHO]</span>
-              <span class="text-on-surface-variant ml-1">Đã hoàn thành lượt kiểm tra 25 mặt hàng trái cây tươi. Phát hiện 4 sản phẩm cận hạn cần can thiệp xả hàng.</span>
+              <span class="font-bold text-on-surface">[KIỂM TRA KHO THỰC TẾ]</span>
+              <span class="text-on-surface-variant ml-1">Đã quét ${metrics.totalActiveCatalog} mặt hàng đang bán từ MySQL. Phát hiện ${recommendations.size()} sản phẩm có tốc độ bán chậm hoặc gần ngưỡng bảo quản cần xử lý.</span>
             </div>
           </div>
-          <span class="text-on-surface-variant text-[11px]">Hôm nay, 14:30:15</span>
+          <span class="text-on-surface-variant text-[11px]">${metrics.lastScanTime}</span>
         </div>
-        <div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/60 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="w-2 h-2 rounded-full bg-primary"></span>
-            <div>
-              <span class="font-bold text-on-surface">[TÍNH GIẢM GIÁ]</span>
-              <span class="text-on-surface-variant ml-1">Đã tính mức chiết khấu hợp lý: Giảm từ 15% đến 30% đối với các lô Nho Mỹ, Cherry và Kiwi để thu hồi vốn nhanh nhất.</span>
+        <c:forEach var="log" items="${auditLogs}">
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-outline-variant/60 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-primary"></span>
+              <div>
+                <span class="font-bold text-on-surface">[${log.title}]</span>
+                <span class="text-on-surface-variant ml-1">${log.message}</span>
+              </div>
             </div>
+            <span class="text-on-surface-variant text-[11px]">${log.time}</span>
           </div>
-          <span class="text-on-surface-variant text-[11px]">Hôm nay, 14:30:18</span>
-        </div>
+        </c:forEach>
       </div>
     </div>
 

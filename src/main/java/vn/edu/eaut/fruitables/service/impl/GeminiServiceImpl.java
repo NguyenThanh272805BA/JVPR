@@ -793,6 +793,59 @@ public class GeminiServiceImpl implements IGeminiService {
     }
 
     @Override
+    public Map<Long, Map<String, String>> analyzeInventoryBatch(String inventoryMetricsJson) {
+        Map<Long, Map<String, String>> resultMap = new HashMap<>();
+        if (inventoryMetricsJson == null || inventoryMetricsJson.trim().isEmpty()) {
+            return resultMap;
+        }
+
+        String systemInstructionText = """
+                Bạn là Chuyên gia AI Quản trị Chuỗi cung ứng Nông sản & Chống thất thoát kho (Inventory AI Agent) tại Fruitables.
+                Nhiệm vụ: Dựa vào ĐÚNG số liệu thực tế của từng sản phẩm (tồn kho, tốc độ bán/ngày, số ngày lưu kho, quy cách bảo quản COLD_CHAIN/FRAGILE_GIFT/NORMAL, giá gốc, giá đề xuất, % giảm), hãy viết nhận định chuyên môn ngắn gọn bằng tiếng Việt.
+
+                QUY TẮC BẮT BUỘC:
+                1. Chỉ sử dụng đúng các con số được cung cấp trong JSON đầu vào, tuyệt đối KHÔNG tự bịa số liệu tồn kho hay tốc độ bán khác.
+                2. Với mỗi sản phẩm, trả về 2 trường ngắn gọn (mỗi trường 1-2 câu):
+                   - "riskDescription": Chẩn đoán ngắn gọn nguy cơ hư hao / ứ đọng theo đặc tính nông sản và quy cách bảo quản.
+                   - "agentReasoning": Lý do đề xuất mức giảm giá và phương án xả kho thu hồi vốn.
+                3. Trả về DUY NHẤT một mảng JSON hợp lệ (không bọc ```json), định dạng:
+                [{"productId": 1, "riskDescription": "...", "agentReasoning": "..."}]
+                """;
+
+        String userPrompt = "DỮ LIỆU TỒN KHO THỰC TẾ CẦN PHÂN TÍCH:\n" + inventoryMetricsJson;
+
+        try {
+            String raw = executeGeminiRequest(systemInstructionText, userPrompt, 1500, 0.3, 15);
+            if (raw != null && !raw.trim().isEmpty()) {
+                String jsonClean = cleanHtmlOutput(raw).replaceAll("^```json|```$", "").trim();
+                JsonArray arr = gson.fromJson(jsonClean, JsonArray.class);
+                if (arr != null) {
+                    for (JsonElement el : arr) {
+                        if (!el.isJsonObject()) continue;
+                        JsonObject obj = el.getAsJsonObject();
+                        if (obj.has("productId")) {
+                            long pid = obj.get("productId").getAsLong();
+                            Map<String, String> item = new HashMap<>();
+                            if (obj.has("riskDescription")) {
+                                item.put("riskDescription", obj.get("riskDescription").getAsString());
+                            }
+                            if (obj.has("agentReasoning")) {
+                                item.put("agentReasoning", obj.get("agentReasoning").getAsString());
+                            }
+                            if (!item.isEmpty()) {
+                                resultMap.put(pid, item);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[GeminiService-Inventory] Parse/Call error: " + e.getMessage());
+        }
+        return resultMap;
+    }
+
+    @Override
     public void clearCache() {
         RESPONSE_CACHE.clear();
         cachedCompactCatalog = "";
